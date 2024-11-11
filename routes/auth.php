@@ -14,7 +14,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 
 Route::prefix("/v1")->group(function () {
 
-
     Route::post('/register', [RegisterUserController::class, 'create']);
 
     Route::post('/login', [AuthenticateUserController::class, 'create']);
