@@ -6,12 +6,13 @@
     },
     "routes": [
         { "src": "^/build/(.*)", "dest": "/public/build/$1" },
-        { "src": "/(.*)", "dest": "/api/index.php" }
+        { "src": "^/api/(.*)", "dest": "/api/index.php" },
+        { "src": "/(.*)", "dest": "/public/$1" }
     ],
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "true",
-        "APP_URL": "https://care-plus-vincentndegwa-vincentndegwas-projects.vercel.app",
+        "APP_URL": "https://care-plus-topaz.vercel.app",
 
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
