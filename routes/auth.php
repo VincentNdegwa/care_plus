@@ -20,14 +20,14 @@ Route::prefix("/v1")->group(function () {
 
     Route::post('/reset-password', [NewPasswordController::class, 'store']);
 
-    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class);
 
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/logout', [AuthenticateUserController::class, 'destroy']);
         Route::get("/user", function (Request $request) {
             return $request->user();
         });
+        Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
+        Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
     });
 });
