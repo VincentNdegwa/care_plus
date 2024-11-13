@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\UserProfileController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -29,5 +30,6 @@ Route::prefix("/v1")->group(function () {
         });
         Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
+        Route::post('/profile', [UserProfileController::class, 'update']);
     });
 });
