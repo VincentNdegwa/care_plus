@@ -31,5 +31,6 @@ Route::prefix("/v1")->group(function () {
         Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
         Route::post('/profile', [UserProfileController::class, 'update']);
+        Route::get("/profile", [UserProfileController::class, "open"]);
     });
 });

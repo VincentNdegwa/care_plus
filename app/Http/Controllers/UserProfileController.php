@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -46,6 +47,27 @@ class UserProfileController extends Controller
                 'error' => true,
                 'message' => 'An error occurred while updating the profile',
                 'details' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function open(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $userWithProfile = User::where("id", $user->id)
+                ->with("profile")
+                ->first();
+
+            return response()->json([
+                "error" => false,
+                "data" => $userWithProfile
+            ]);
+        } catch (\Throwable $th) {
+
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage(),
             ]);
         }
     }
