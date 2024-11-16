@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('patients', function (Blueprint $table) {
+        Schema::create('doctors_relations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId("patient_id")->nullable()->constrained("patients")->onDelete("set null");
+            $table->foreignId("doctor_id")->nullable()->constrained("doctors")->onDelete("set null");
+            $table->boolean('isMain')->default(false);
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('patients');
+        Schema::dropIfExists('doctors_relations');
     }
 };
