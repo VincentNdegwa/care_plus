@@ -18,13 +18,13 @@ class Patient extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function mainDoctor()
-    {
-        return $this->belongsTo(User::class, "main_doctor_id");
-    }
+    // public function mainDoctor()
+    // {
+    //     return $this->belongsTo(User::class, "main_doctor_id");
+    // }
 
-    public function caregiver()
-    {
-        return $this->belongsTo(User::class, "caregiver_id");
-    }
+    // public function caregiver()
+    // {
+    //     return $this->belongsTo(User::class, "caregiver_id");
+    // }
 }

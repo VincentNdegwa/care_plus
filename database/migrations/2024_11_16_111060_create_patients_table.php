@@ -13,14 +13,10 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("main_doctor_id")->nullable();
-            $table->unsignedBigInteger("caregiver_id")->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('main_doctor_id')->nullable()->constrained('doctors')->onDelete('set null');
+            $table->foreignId('caregiver_id')->nullable()->constrained('caregivers')->onDelete('set null');
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('main_doctor_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('caregiver_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
