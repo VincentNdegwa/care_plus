@@ -12,4 +12,14 @@ class CaregiverRelation extends Model
         "caregiver_id",
         "relation",
     ];
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'patient_id');
+    }
+
+    public function caregiver()
+    {
+        return $this->belongsTo(Caregiver::class, 'caregiver_id');
+    }
 }

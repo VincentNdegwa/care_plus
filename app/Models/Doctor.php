@@ -15,4 +15,9 @@ class Doctor extends Model
         "license_issuing_body",
         "clinic_address",
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, "user_id");
+    }
 }

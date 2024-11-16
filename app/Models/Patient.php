@@ -16,13 +16,12 @@ class Patient extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    // public function mainDoctor()
-    // {
-    //     return $this->belongsTo(User::class, "main_doctor_id");
-    // }
-
-    // public function caregiver()
-    // {
-    //     return $this->belongsTo(User::class, "caregiver_id");
-    // }
+    public function doctorRelations()
+    {
+        return $this->hasMany(DoctorRelation::class, 'patient_id');
+    }
+    public function caregiverRelations()
+    {
+        return $this->hasMany(CaregiverRelation::class, 'patient_id');
+    }
 }

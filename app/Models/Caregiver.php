@@ -12,4 +12,9 @@ class Caregiver extends Model
         "agency_name",
         "agency_contact",
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
