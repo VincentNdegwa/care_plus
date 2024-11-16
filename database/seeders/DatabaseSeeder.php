@@ -6,6 +6,7 @@ use App\Models\Caregiver;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
+use App\Models\UserProfile;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -43,5 +44,8 @@ class DatabaseSeeder extends Seeder
             default:
                 break;
         }
+        UserProfile::create([
+            'user_id' => $user->id,
+        ]);
     }
 }

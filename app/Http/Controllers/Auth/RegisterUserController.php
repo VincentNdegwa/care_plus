@@ -7,7 +7,9 @@ use App\Models\Caregiver;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -17,6 +19,7 @@ class RegisterUserController extends Controller
     {
 
         try {
+            DB::beginTransaction();
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
@@ -52,8 +55,12 @@ class RegisterUserController extends Controller
                     break;
             }
 
-            $token = $user->createToken('API Token')->plainTextToken;
+            UserProfile::create([
+                'user_id' => $user->id,
+            ]);
 
+            $token = $user->createToken('API Token')->plainTextToken;
+            DB::commit();
             return response()->json([
                 "error" => false,
                 'message' => 'Registration successful',
@@ -61,12 +68,14 @@ class RegisterUserController extends Controller
                 "user" => $user
             ], 200);
         } catch (ValidationException $th) {
+            DB::rollBack();
             return response()->json([
                 "error" => true,
                 "message" => $th->getMessage(),
                 'errors' => $th->errors()
             ]);
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 "error" => true,
                 'message' => 'An error occurred during registration',

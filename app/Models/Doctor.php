@@ -15,6 +15,10 @@ class Doctor extends Model
         "license_issuing_body",
         "clinic_address",
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
     public function user()
     {

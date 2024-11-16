@@ -16,6 +16,11 @@ class UserProfile extends Model
         "phone_number",
         "avatar",
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
 
     public function user()
     {

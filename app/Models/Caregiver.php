@@ -12,6 +12,10 @@ class Caregiver extends Model
         "agency_name",
         "agency_contact",
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
     public function user()
     {
