@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Caregiver;
+use App\Models\Doctor;
+use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +31,26 @@ class RegisterUserController extends Controller
                 'role' => $request->role,
                 'password' => Hash::make($request->password),
             ]);
+
+            switch ($user->role) {
+                case 'Doctor':
+                    Doctor::create([
+                        'user_id' => $user->id,
+                    ]);
+                    break;
+                case 'Caregiver':
+                    Caregiver::create([
+                        'user_id' => $user->id,
+                    ]);
+                    break;
+                case 'Patient':
+                    Patient::create([
+                        'user_id' => $user->id,
+                    ]);
+                    break;
+                default:
+                    break;
+            }
 
             $token = $user->createToken('API Token')->plainTextToken;
 

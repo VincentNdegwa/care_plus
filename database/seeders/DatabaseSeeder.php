@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Caregiver;
+use App\Models\Doctor;
+use App\Models\Patient;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,9 +18,30 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role' => "Patient"
         ]);
+
+        switch ($user->role) {
+            case 'Doctor':
+                Doctor::create([
+                    'user_id' => $user->id,
+                ]);
+                break;
+            case 'Caregiver':
+                Caregiver::create([
+                    'user_id' => $user->id,
+                ]);
+                break;
+            case 'Patient':
+                Patient::create([
+                    'user_id' => $user->id,
+                ]);
+                break;
+            default:
+                break;
+        }
     }
 }
