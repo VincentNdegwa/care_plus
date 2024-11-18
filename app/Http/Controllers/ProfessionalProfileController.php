@@ -12,15 +12,13 @@ class ProfessionalProfileController extends Controller
     public function fetchProfile($id, $model, $type)
     {
         $record = $model::with([
-            'user' => function ($query) {
-                $query->with(['profile']);
-            }
+            "user.profile"
         ])->find($id);
 
         if ($record) {
             return response()->json([
                 "error" => false,
-                $type => $record,
+                'data' => $record,
 
 
             ], 200);

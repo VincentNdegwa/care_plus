@@ -10,28 +10,36 @@ use Illuminate\Validation\Rule;
 
 class UpdateProfessionalProfileController extends Controller
 {
-    /**
-     * Generic update method for updating a profile.
-     */
+
     private function updateProfile(Request $request, string $role, string $model, array $validationRules)
     {
         $user = $request->user();
 
-        // Check if the user has the correct role
         if ($user->role !== $role) {
-            return response()->json(['error' => "You don't have permission to update this profile"], 403);
+            return response()->json(['error' => true, 'message' => "You don't have permission to update this profile"], 403);
         }
 
-        // Validate the request data
         $validatedData = $request->validate($validationRules);
 
-        // Update or create the profile
         $model::updateOrCreate(
             ['user_id' => $user->id],
             $validatedData
         );
 
-        return response()->noContent();
+        $prof = new ProfessionalProfileController();
+        $response = $prof->fetchProfile($user->id, $model, $role);
+        if ($response['error']) {
+            return response()->json([
+                "error" => true,
+                "message" => "Failed to update profile"
+            ]);
+        }
+
+        return response()->json([
+            "error" => false,
+            "message" => "Profile Updated successfully",
+            "data" => $response['data']
+        ]);
     }
 
     /**
@@ -46,7 +54,7 @@ class UpdateProfessionalProfileController extends Controller
             "license_number" => [
                 'required',
                 'string',
-                Rule::unique('doctors', 'license_number'),
+                Rule::unique('doctors', 'license_number')->ignore($request->user()->id, 'user_id'),
             ],
             "license_issuing_body" => 'required|string',
             "clinic_name" => 'required|string',
@@ -56,9 +64,7 @@ class UpdateProfessionalProfileController extends Controller
         return $this->updateProfile($request, 'Doctor', Doctor::class, $validationRules);
     }
 
-    /**
-     * Update patient's profile.
-     */
+
     public function patient(Request $request)
     {
         $validationRules = [
@@ -68,9 +74,7 @@ class UpdateProfessionalProfileController extends Controller
         return $this->updateProfile($request, 'Patient', Patient::class, $validationRules);
     }
 
-    /**
-     * Update caregiver's profile.
-     */
+
     public function caregiver(Request $request)
     {
         $validationRules = [
