@@ -13,33 +13,47 @@ class UpdateProfessionalProfileController extends Controller
 
     private function updateProfile(Request $request, string $role, string $model, array $validationRules)
     {
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        if ($user->role !== $role) {
-            return response()->json(['error' => true, 'message' => "You don't have permission to update this profile"], 403);
-        }
+            if ($user->role !== $role) {
+                return response()->json(['error' => true, 'message' => "You don't have permission to update this profile"], 403);
+            }
 
-        $validatedData = $request->validate($validationRules);
+            $validatedData = $request->validate($validationRules);
 
-        $model::updateOrCreate(
-            ['user_id' => $user->id],
-            $validatedData
-        );
+            $model::updateOrCreate(
+                ['user_id' => $user->id],
+                $validatedData
+            );
 
-        $prof = new ProfessionalProfileController();
-        $response = $prof->fetchProfile($user->id, $model, $role);
-        if ($response['error']) {
+            $prof = new ProfessionalProfileController();
+            $response = $prof->fetchProfile($user->id, $model, $role);
+            if ($response['error']) {
+                return response()->json([
+                    "error" => true,
+                    "message" => "Failed to update profile"
+                ]);
+            }
+
+            return response()->json([
+                "error" => false,
+                "message" => "Profile Updated successfully",
+                "data" => $response['data']
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $th) {
             return response()->json([
                 "error" => true,
-                "message" => "Failed to update profile"
+                "message" => $th->getMessage(),
+                'errors' => $th->errors()
+            ]);
+        } catch (\Exception $th) {
+            return response()->json([
+                "error" => true,
+                "message" => "An error occurred while updating the profile",
+                'errors' => $th->getMessage()
             ]);
         }
-
-        return response()->json([
-            "error" => false,
-            "message" => "Profile Updated successfully",
-            "data" => $response['data']
-        ]);
     }
 
     /**
