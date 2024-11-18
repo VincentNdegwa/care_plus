@@ -11,9 +11,13 @@ class Doctor extends Model
         "user_id",
         "specialization",
         "qualifications",
+        "last_activity",
+        "active",
         "license_number",
         "license_issuing_body",
+        "clinic_name",
         "clinic_address",
+
     ];
     protected $hidden = [
         'created_at',

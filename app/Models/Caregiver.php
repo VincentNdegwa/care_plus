@@ -9,6 +9,8 @@ class Caregiver extends Model
     protected $table = "caregivers";
     protected $fillable = [
         "user_id",
+        "specialization",
+        "last_activity",
         "agency_name",
         "agency_contact",
     ];
