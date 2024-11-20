@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('license_issuing_body')->nullable();
             $table->string('clinic_name')->nullable();
             $table->string('clinic_address')->nullable();
-            $table->boolean('active')->default(true);
+            $table->enum('active', [true, false])->default(true);
             $table->timestamps();
         });
     }

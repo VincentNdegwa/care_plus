@@ -21,6 +21,9 @@ class UpdateProfessionalProfileController extends Controller
             }
 
             $validatedData = $request->validate($validationRules);
+            if (!isset($validatedData["active"])) {
+                unset($validatedData["active"]);
+            }
 
             $newModel = $model::updateOrCreate(
                 ['user_id' => $user->id],
