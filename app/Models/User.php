@@ -56,15 +56,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserProfile::class);
     }
 
+    public function doctorProfile()
+    {
+        return $this->hasOne(Doctor::class, 'user_id');
+    }
+
+    public function caregiverProfile()
+    {
+        return $this->hasOne(Caregiver::class, 'user_id');
+    }
+
     public function professionalProfile()
     {
-        if ($this->role = "Doctor") {
-            return $this->hasOne(Doctor::class, 'user_id');
-        }
-        if ($this->role == "CareGiver") {
-            return $this->hasOne(Caregiver::class, 'user_id');
-        }
-
-        return $this->profile();
+        return $this->role === "Doctor"
+            ? $this->doctorProfile()
+            : ($this->role === "Caregiver" ? $this->caregiverProfile() : null);
     }
 }

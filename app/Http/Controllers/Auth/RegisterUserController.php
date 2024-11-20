@@ -22,7 +22,7 @@ class RegisterUserController extends Controller
             DB::beginTransaction();
             $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+                'email' => 'required|string|email|max:255|unique:' . User::class,
                 'role' => 'required|string|in:Doctor,Caregiver,Patient',
                 'password' => 'required|min:4',
                 'password_confirmation' => 'required|min:4|same:password',

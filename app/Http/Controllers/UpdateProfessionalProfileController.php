@@ -78,17 +78,6 @@ class UpdateProfessionalProfileController extends Controller
         return $this->updateProfile($request, 'Doctor', Doctor::class, $validationRules);
     }
 
-
-    public function patient(Request $request)
-    {
-        $validationRules = [
-            // Add any required patient validation rules here
-        ];
-
-        return $this->updateProfile($request, 'Patient', Patient::class, $validationRules);
-    }
-
-
     public function caregiver(Request $request)
     {
         $validationRules = [

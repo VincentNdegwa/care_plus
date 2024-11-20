@@ -11,11 +11,17 @@ class ProfessionalProfileController extends Controller
 {
     public function fetchProfile($id, $model, $type)
     {
-        $record = $model::with([
+        $relations = [
             "user.profile",
-            "user.professionalProfile"
-        ])->find($id);
+        ];
 
+        if ($type === "doctor") {
+            $relations[] = "user.doctorProfile";
+        } elseif ($type === "caregiver") {
+            $relations[] = "user.caregiverProfile";
+        }
+
+        $record = $model::with($relations)->find($id);
         if ($record) {
             return response()->json([
                 "error" => false,
