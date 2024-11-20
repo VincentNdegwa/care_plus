@@ -22,24 +22,26 @@ class UpdateProfessionalProfileController extends Controller
 
             $validatedData = $request->validate($validationRules);
 
-            $model::updateOrCreate(
+            $newModel = $model::updateOrCreate(
                 ['user_id' => $user->id],
                 $validatedData
             );
 
             $prof = new ProfessionalProfileController();
-            $response = $prof->fetchProfile($user->id, $model, $role);
-            if ($response['error']) {
+            $response = $prof->fetchProfile($newModel->id, $model, $role);
+            $responseData = json_decode($response->getContent(), true);
+
+            if ($responseData['error']) {
                 return response()->json([
                     "error" => true,
-                    "message" => "Failed to update profile"
+                    "message" => $responseData['message'] ?? $responseData["errors"]
                 ]);
             }
 
             return response()->json([
                 "error" => false,
                 "message" => "Profile Updated successfully",
-                "data" => $response['data']
+                "data" => $responseData['data']
             ]);
         } catch (\Illuminate\Validation\ValidationException $th) {
             return response()->json([
@@ -61,10 +63,12 @@ class UpdateProfessionalProfileController extends Controller
      */
     public function doctor(Request $request)
     {
+
+
         $validationRules = [
             "specialization" => 'required|string',
             "qualifications" => 'required|string',
-            "active" => 'required|boolean',
+            "active" => 'nullable|boolean',
             "license_number" => [
                 'required',
                 'string',

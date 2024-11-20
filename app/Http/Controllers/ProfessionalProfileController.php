@@ -14,13 +14,6 @@ class ProfessionalProfileController extends Controller
         $relations = [
             "user.profile",
         ];
-
-        if ($type === "doctor") {
-            $relations[] = "user.doctorProfile";
-        } elseif ($type === "caregiver") {
-            $relations[] = "user.caregiverProfile";
-        }
-
         $record = $model::with($relations)->find($id);
         if ($record) {
             return response()->json([

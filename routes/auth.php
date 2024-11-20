@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ProfessionalProfileController;
+use App\Http\Controllers\UpdateProfessionalProfileController;
 use App\Http\Controllers\UserProfileController;
 
 Route::prefix("/v1")->group(function () {
@@ -32,7 +33,10 @@ Route::prefix("/v1")->group(function () {
             });
             Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
             Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
+            Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
+            Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
         });
+
         Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
         Route::patch('/profile', [UserProfileController::class, 'update']);
