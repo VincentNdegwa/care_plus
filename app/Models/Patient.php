@@ -28,4 +28,14 @@ class Patient extends Model
     {
         return $this->hasMany(CaregiverRelation::class, 'patient_id');
     }
+
+    public function diagnoses()
+    {
+        return $this->hasMany(Diagnosis::class, 'patient_id');
+    }
+
+    public function medications()
+    {
+        return $this->hasMany(Medication::class, 'patient_id');
+    }
 }

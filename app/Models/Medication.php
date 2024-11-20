@@ -21,4 +21,19 @@ class Medication extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'patient_id');
+    }
+
+    public function diagnosis()
+    {
+        return $this->belongsTo(Diagnosis::class, 'diagnosis_id');
+    }
+
+    public function prescribedBy()
+    {
+        return $this->belongsTo(User::class, 'prescribed_by');
+    }
 }
