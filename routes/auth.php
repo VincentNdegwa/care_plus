@@ -30,13 +30,12 @@ Route::prefix("/v1")->group(function () {
             Route::get("/", function (Request $request) {
                 return $request->user();
             });
-            Route::get('/patient/{id}', [ProfessionalProfileController::class, "patient"]);
             Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
             Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
         });
         Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
-        Route::post('/profile', [UserProfileController::class, 'update']);
+        Route::patch('/profile', [UserProfileController::class, 'update']);
         Route::get("/profile", [UserProfileController::class, "open"]);
     });
 });

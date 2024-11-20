@@ -12,7 +12,8 @@ class ProfessionalProfileController extends Controller
     public function fetchProfile($id, $model, $type)
     {
         $record = $model::with([
-            "user.profile"
+            "user.profile",
+            "user.professionalProfile"
         ])->find($id);
 
         if ($record) {
@@ -30,10 +31,6 @@ class ProfessionalProfileController extends Controller
         ], 404);
     }
 
-    public function patient($id)
-    {
-        return $this->fetchProfile($id, Patient::class, 'patient');
-    }
 
     public function doctor($id)
     {
