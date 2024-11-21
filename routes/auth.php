@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
+use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
+use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -57,6 +59,11 @@ Route::prefix("/v1")->group(function () {
                 Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
                 Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
             });
+        });
+
+
+        Route::prefix("/diagnosis")->group(function () {
+            Route::get("/{diagnosis_id}", [FetchDiagnosisController::class, "find"]);
         });
     });
 });
