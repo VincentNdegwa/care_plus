@@ -79,7 +79,6 @@ class AuthenticateUserController extends Controller
                 $abilities = ['patient'];
                 break;
             default:
-                // No abilities for unknown roles
                 $abilities = [];
                 break;
         }

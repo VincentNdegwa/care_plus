@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -48,5 +49,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Resource not found',
                 'errors' => $e->getMessage()
             ], 404);
+        });
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            return response()->json([
+                "error" => true,
+                'message' => 'Access denied!, you are not allowed to access this page due to permission issues.',
+                'errors' => $e->getMessage()
+            ], 403);
         });
     })->create();

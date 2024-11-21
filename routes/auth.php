@@ -23,27 +23,35 @@ Route::prefix("/v1")->group(function () {
 
     Route::post('/reset-password', [NewPasswordController::class, 'store']);
 
-
-
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/logout', [AuthenticateUserController::class, 'destroy']);
         Route::prefix("/user")->group(function () {
             Route::get("/", function (Request $request) {
                 return $request->user();
             });
-            Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
-            Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
-            Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
         });
 
         Route::post('/email/request-verification', [EmailVerificationNotificationController::class, 'store']);
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
         Route::patch('/profile', [UserProfileController::class, 'update']);
         Route::get("/profile", [UserProfileController::class, "open"]);
+    });
+
+
+
+    Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::middleware(['ability:doctor'])->group(function () {
             Route::prefix("/user")->group(function () {
                 Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
+                Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
+            });
+        });
+
+        Route::middleware(['ability:caregiver'])->group(function () {
+            Route::prefix("/user")->group(function () {
+                Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
+                Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
             });
         });
     });
