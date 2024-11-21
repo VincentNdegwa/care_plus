@@ -9,9 +9,9 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\ProfessionalProfileController;
-use App\Http\Controllers\UpdateProfessionalProfileController;
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Profile\ProfessionalProfileController;
+use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
+use App\Http\Controllers\Profile\UserProfileController;
 
 Route::prefix("/v1")->group(function () {
 
