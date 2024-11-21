@@ -24,7 +24,7 @@ class AuthenticateUserController extends Controller
                     'email' => ['The provided credentials are incorrect.'],
                 ]);
             }
-            $token = $user->createToken('API Token')->plainTextToken;
+            $token = $this->createToken($user);
             return response()->json([
                 "error" => false,
                 'message' => 'Login successful',
@@ -64,5 +64,26 @@ class AuthenticateUserController extends Controller
                 'errors' => $th
             ], 500);
         }
+    }
+    private function createToken(User $user)
+    {
+        $abilities = [];
+        switch ($user->role) {
+            case 'Doctor':
+                $abilities = ['doctor'];
+                break;
+            case 'Caregiver':
+                $abilities = ['caregiver'];
+                break;
+            case 'Patient':
+                $abilities = ['patient'];
+                break;
+            default:
+                // No abilities for unknown roles
+                $abilities = [];
+                break;
+        }
+
+        return $user->createToken('API Token', $abilities)->plainTextToken;
     }
 }

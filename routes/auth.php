@@ -31,7 +31,6 @@ Route::prefix("/v1")->group(function () {
             Route::get("/", function (Request $request) {
                 return $request->user();
             });
-            Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
             Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
             Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
             Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
@@ -41,5 +40,11 @@ Route::prefix("/v1")->group(function () {
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
         Route::patch('/profile', [UserProfileController::class, 'update']);
         Route::get("/profile", [UserProfileController::class, "open"]);
+
+        Route::middleware(['ability:doctor'])->group(function () {
+            Route::prefix("/user")->group(function () {
+                Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
+            });
+        });
     });
 });

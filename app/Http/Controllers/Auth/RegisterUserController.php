@@ -59,7 +59,7 @@ class RegisterUserController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            $token = $user->createToken('API Token')->plainTextToken;
+            $token = $this->createToken($user);
             DB::commit();
             return response()->json([
                 "error" => false,
@@ -82,5 +82,27 @@ class RegisterUserController extends Controller
                 'errors' => $th->getMessage()
             ], 500);
         }
+    }
+
+    private function createToken(User $user)
+    {
+        $abilities = [];
+        switch ($user->role) {
+            case 'Doctor':
+                $abilities = ['doctor'];
+                break;
+            case 'Caregiver':
+                $abilities = ['caregiver'];
+                break;
+            case 'Patient':
+                $abilities = ['patient'];
+                break;
+            default:
+                // No abilities for unknown roles
+                $abilities = [];
+                break;
+        }
+
+        return $user->createToken('API Token', $abilities)->plainTextToken;
     }
 }
