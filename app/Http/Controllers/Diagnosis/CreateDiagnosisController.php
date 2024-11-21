@@ -19,9 +19,11 @@ class CreateDiagnosisController extends Controller
                 "date_diagnosed" => "required|date",
             ]);
 
+            $validateDate["doctor_id"] = $request->user()->id;
+
             $diagnosis = Diagnosis::create($validateDate);
             $diagnosisWithRelationship = Diagnosis::where("id", $diagnosis->id)
-                ->with('patient', 'doctor')
+                ->with('patient.user', 'doctor.user')
                 ->first();
             return response()->json([
                 "error" => false,

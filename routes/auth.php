@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -45,6 +46,9 @@ Route::prefix("/v1")->group(function () {
             Route::prefix("/user")->group(function () {
                 Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
                 Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
+            });
+            Route::prefix("/diagnosis")->group(function () {
+                Route::post("/create", [CreateDiagnosisController::class, "create"]);
             });
         });
 
