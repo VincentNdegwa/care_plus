@@ -53,7 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             return response()->json([
                 "error" => true,
-                'message' => 'Access denied!, you are not allowed to access this page due to permission issues.',
+                'message' => 'Access denied! You are not allowed to access this page due to permission issues.',
                 'errors' => $e->getMessage()
             ], 403);
         });

@@ -32,13 +32,15 @@ class ProfessionalProfileController extends Controller
     }
 
 
-    public function doctor($id)
+    public function doctor(Request $request)
     {
+        $id = $request->user()->id;
         return $this->fetchProfile($id, Doctor::class, 'doctor');
     }
 
-    public function caregiver($id)
+    public function caregiver(Request $request)
     {
+        $id = $request->user()->id;
         return $this->fetchProfile($id, Caregiver::class, 'caregiver');
     }
 }

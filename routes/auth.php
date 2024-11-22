@@ -46,7 +46,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::middleware(['ability:doctor'])->group(function () {
             Route::prefix("/user")->group(function () {
-                Route::get('/doctor/{id}', [ProfessionalProfileController::class, "doctor"]);
+                Route::get('/doctor', [ProfessionalProfileController::class, "doctor"]);
                 Route::patch("/doctor", [UpdateProfessionalProfileController::class, "doctor"]);
             });
             Route::prefix("/diagnosis")->group(function () {
@@ -56,7 +56,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::middleware(['ability:caregiver'])->group(function () {
             Route::prefix("/user")->group(function () {
-                Route::get('/caregiver/{id}', [ProfessionalProfileController::class, "caregiver"]);
+                Route::get('/caregiver', [ProfessionalProfileController::class, "caregiver"]);
                 Route::patch("/caregiver", [UpdateProfessionalProfileController::class, "caregiver"]);
             });
         });
@@ -66,7 +66,8 @@ Route::prefix("/v1")->group(function () {
             Route::get("/{diagnosis_id}", [FetchDiagnosisController::class, "find"]);
             Route::get("/patient/{patient_id}", [FetchDiagnosisController::class, "fetchByPatient"]);
             Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
-            Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnosis"]);
+            Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnoses"]);
+            Route::post("/filter", [FetchDiagnosisController::class, "filterDiagnoses"]);
         });
     });
 });
