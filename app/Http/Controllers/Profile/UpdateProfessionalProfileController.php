@@ -71,7 +71,6 @@ class UpdateProfessionalProfileController extends Controller
 
         $validationRules = [
             "specialization" => 'required|string',
-            "qualifications" => 'required|string',
             "active" => 'nullable|boolean',
             "license_number" => [
                 'required',
