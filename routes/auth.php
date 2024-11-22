@@ -64,6 +64,9 @@ Route::prefix("/v1")->group(function () {
 
         Route::prefix("/diagnosis")->group(function () {
             Route::get("/{diagnosis_id}", [FetchDiagnosisController::class, "find"]);
+            Route::get("/patient/{patient_id}", [FetchDiagnosisController::class, "fetchByPatient"]);
+            Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
+            Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnosis"]);
         });
     });
 });
