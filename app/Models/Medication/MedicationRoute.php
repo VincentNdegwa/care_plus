@@ -11,4 +11,8 @@ class MedicationRoute extends Model
         "name",
         "description",
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 }

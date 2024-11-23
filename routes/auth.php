@@ -13,6 +13,7 @@ use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Medication\CreateMedicationController;
+use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -72,7 +73,13 @@ Route::prefix("/v1")->group(function () {
         });
 
         Route::prefix("medications")->group(function () {
-            Route::post("create", [CreateMedicationController::class, 'create']);
+            Route::post("/create", [CreateMedicationController::class, 'create']);
+            Route::prefix('medication-resources')->group(function () {
+                Route::get('/forms', [MedicationResourcesController::class, 'getMedicationForms']);
+                Route::get('/routes', [MedicationResourcesController::class, 'getMedicationRoutes']);
+                Route::get('/units', [MedicationResourcesController::class, 'getMedicationUnits']);
+                Route::get('/frequencies', [MedicationResourcesController::class, 'getMedicationFrequencies']);
+            });
         });
     });
 });

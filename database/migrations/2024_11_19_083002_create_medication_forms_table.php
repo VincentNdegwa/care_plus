@@ -30,7 +30,7 @@ return new class extends Migration
             $table->text('description')->nullable(); // Description of the route
             $table->timestamps();
         });
-        Schema::create('frequencies', function (Blueprint $table) {
+        Schema::create('medication_frequencies', function (Blueprint $table) {
             $table->id();
             $table->string('frequency'); // column for storing frequency names
             $table->timestamps(); // for created_at and updated_at timestamps

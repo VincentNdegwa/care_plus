@@ -42,7 +42,7 @@ class MedicationFrequenciesSeeder extends Seeder
         ];
 
         foreach ($frequencies as $frequency) {
-            DB::table('frequencies')->insert([
+            DB::table('medication_frequencies')->insert([
                 'frequency' => $frequency
             ]);
         }
