@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Caregiver;
 use App\Models\Doctor;
+use App\Models\Medication\MedicationRoute;
 use App\Models\Patient;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -17,7 +18,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
         $user = User::factory()->create([
             'name' => 'Test User',
@@ -47,5 +47,10 @@ class DatabaseSeeder extends Seeder
         UserProfile::create([
             'user_id' => $user->id,
         ]);
+
+        $this->call(MedicationFormsSeeder::class);
+        $this->call(MedicationUnitsSeeder::class);
+        $this->call(MedicationRoutesSeeder::class);
+        $this->call(MedicationFrequenciesSeeder::class);
     }
 }

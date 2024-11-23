@@ -8,14 +8,21 @@ class Medication extends Model
 {
     protected $table = "medications";
     protected $fillable = [
-        "patient_id",
-        "diagnosis_id",
-        "medication_name",
-        "dosage",
-        "frequency",
-        "duration",
-        "prescribed_date",
-        "prescribed_by",
+        'patient_id',
+        'diagnosis_id',
+        'medication_name',
+        'dosage_quantity',
+        'dosage_strength',
+        'form_id',
+        'unit_id',
+        'route_id',
+        'frequency',
+        'duration',
+        'prescribed_date',
+        'doctor_id',
+        'caregiver_id',
+        'stock',
+        'active',
     ];
     protected $hidden = [
         'created_at',

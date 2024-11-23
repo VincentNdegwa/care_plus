@@ -15,12 +15,11 @@ class ProfessionalProfileController extends Controller
         $relations = [
             "user.profile",
         ];
-        $record = $model::with($relations)->find($id);
+        $record = $model::with($relations)->where('id', $id)->first();
         if ($record) {
             return response()->json([
                 "error" => false,
                 'data' => $record,
-
 
             ], 200);
         }
@@ -34,13 +33,13 @@ class ProfessionalProfileController extends Controller
 
     public function doctor(Request $request)
     {
-        $id = $request->user()->id;
+        $id = $request->user()->doctorProfile->id;
         return $this->fetchProfile($id, Doctor::class, 'doctor');
     }
 
     public function caregiver(Request $request)
     {
-        $id = $request->user()->id;
+        $id = $request->user()->caregiverProfile->id;
         return $this->fetchProfile($id, Caregiver::class, 'caregiver');
     }
 }

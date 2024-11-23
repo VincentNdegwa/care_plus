@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
+use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -68,6 +69,10 @@ Route::prefix("/v1")->group(function () {
             Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
             Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnoses"]);
             Route::post("/filter", [FetchDiagnosisController::class, "filterDiagnoses"]);
+        });
+
+        Route::prefix("medications")->group(function () {
+            Route::post("create", [CreateMedicationController::class, 'create']);
         });
     });
 });

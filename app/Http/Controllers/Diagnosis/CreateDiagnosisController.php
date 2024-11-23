@@ -19,7 +19,8 @@ class CreateDiagnosisController extends Controller
                 "date_diagnosed" => "required|date",
             ]);
 
-            $validateDate["doctor_id"] = $request->user()->id;
+            $id = $request->user()->doctorProfile->id;
+            $validateDate["doctor_id"] = $id;
 
             $diagnosis = Diagnosis::create($validateDate);
             $diagnosisWithRelationship = Diagnosis::where("id", $diagnosis->id)
