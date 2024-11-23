@@ -17,6 +17,7 @@ use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
+use App\Http\Controllers\ScheduleMedicationController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -74,6 +75,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::prefix("medications")->group(function () {
             Route::post("/create", [CreateMedicationController::class, 'create']);
+            Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
             Route::prefix('medication-resources')->group(function () {
                 Route::get('/forms', [MedicationResourcesController::class, 'getMedicationForms']);
                 Route::get('/routes', [MedicationResourcesController::class, 'getMedicationRoutes']);
