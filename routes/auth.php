@@ -76,6 +76,7 @@ Route::prefix("/v1")->group(function () {
         Route::prefix("medications")->group(function () {
             Route::post("/create", [CreateMedicationController::class, 'create']);
             Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
+            Route::post("/schedule/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
             Route::prefix('medication-resources')->group(function () {
                 Route::get('/forms', [MedicationResourcesController::class, 'getMedicationForms']);
                 Route::get('/routes', [MedicationResourcesController::class, 'getMedicationRoutes']);

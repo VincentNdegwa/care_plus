@@ -33,54 +33,73 @@ class ScheduleMedicationController extends Controller
         }
     }
 
-    function generateMedicationScheduleWithStock($frequency, $duration, $startDate, $stock)
+    public function scheduleCustom(Request $request)
     {
-        // Parse the start date
-        $startDate = Carbon::parse($startDate);
-        // Calculate the end date based on duration
-        $endDate = $startDate->copy()->addDays($duration); // Assuming duration is in days
+        try {
+            $validatedData = $request->validate([
+                "medication_id" => "required|exists:medications,id",
+                "schedules" => "required|array",
+                "schedules.*" => "required|date_format:H:i",
+                "start_datetime" => "nullable|date_format:Y-m-d H:i:s"
 
-        // Get the frequency interval in minutes
-        $frequencyIntervals = $this->getFrequencyInterval($frequency);
+            ]);
+            $medication = Medication::find($validatedData['medication_id']);
+            $startDate = Carbon::now();
+            if (isset($validatedData['start_datetime'])) {
+                $startDate = Carbon::parse($validatedData['start_datetime']);
+            }
+            return $this->generateMedicationScheduleCustom($validatedData['schedules'], $medication->duration, $startDate);
+        } catch (\Illuminate\Validation\ValidationException $th) {
+            return response()->json([
+                'error' => true,
+                "message" => $th->getMessage(),
+                'errors' => $th->errors()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'errors' => $e,
+            ], 500);
+        }
+    }
 
-        $medicationLogs = [];
-        $currentDoseTime = $startDate;
+    private function generateMedicationScheduleCustom($schedules, $duration, $startDate)
+    {
+        $endDate = $this->calculateEndDate($startDate->copy(), $duration);
+        $doseSchedules = [];
 
-        // Loop through and generate the medication logs
-        while ($currentDoseTime->lte($endDate) && $stock > 0) {
+        if ($startDate->lte($endDate)) {
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                foreach ($schedules as $time) {
+                    [$hour, $minute] = explode(':', $time);
+                    $doseTime = $date->copy()->setTime($hour, $minute);
 
-            // Decrease stock
-            $stock--;
-
-            $medicationLogs[] = [
-                'dose_time' => $currentDoseTime->format('Y-m-d H:i:s'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-            // Move to the next dose time based on frequency
-            if ($frequency != "Once a day" && $frequency != "Twice a day") {
-                $currentDoseTime->addMinutes($frequencyIntervals);
-            } else {
-                $currentDoseTime->addDays(1);
+                    if ($doseTime->lte($endDate)) {
+                        $doseSchedules[] = [
+                            'dose_time' => $doseTime->format('Y-m-d H:i:s'),
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                }
             }
         }
 
-        return response()->json($medicationLogs);
+        return $doseSchedules;
     }
+
+
     function generateMedicationScheduleWithoutStock($frequency, $duration, $startDate)
     {
-        // Parse the start date
         $startDate = Carbon::parse($startDate);
-        // Calculate the end date based on duration
         $endDate = $this->calculateEndDate($startDate->copy(), $duration);
 
-        // Get the frequency interval in minutes
         $frequencyIntervals = $this->getFrequencyInterval($frequency);
 
         $medicationLogs = [];
         $currentDoseTime = $startDate;
 
-        // Loop through and generate the medication logs without considering stock
         while ($currentDoseTime->lte($endDate)) {
 
             $medicationLogs[] = [
@@ -96,13 +115,6 @@ class ScheduleMedicationController extends Controller
             } else {
                 $currentDoseTime->addMinutes($frequencyIntervals);
             }
-
-            // Move to the next dose time based on frequency
-            // if ($frequency != "Once a day" && $frequency != "Twice a day") {
-            //     $currentDoseTime->addMinutes($frequencyIntervals);
-            // } else {
-            //     $currentDoseTime->addDays(1);
-            // }
         }
 
         return response()->json($medicationLogs);
