@@ -18,8 +18,8 @@ class CreateMedicationController extends Controller
         $user = $request->user();
         $role = $user->role;
 
-        $doctor_id = ($role === "Doctor" && $user->doctorProfile) ? $user->doctorProfile->id : null;
-        $caregiver_id = ($role === "Caregiver" && $user->caregiverProfile) ? $user->caregiverProfile->id : null;
+        $doctor_id = ($role === "Doctor" && $user->doctor) ? $user->doctor->id : null;
+        $caregiver_id = ($role === "Caregiver" && $user->caregiver) ? $user->caregiver->id : null;
 
         $rules = [
             'patient_id' => 'required|exists:patients,id',
@@ -65,6 +65,4 @@ class CreateMedicationController extends Controller
             ], 500);
         }
     }
-
-    
 }

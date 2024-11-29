@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Medication\MedicationForm;
+use App\Models\Medication\MedicationRoute;
+use App\Models\Medication\MedicationUnit;
 use Illuminate\Database\Eloquent\Model;
 
 class Medication extends Model
@@ -34,13 +37,31 @@ class Medication extends Model
         return $this->belongsTo(Patient::class, 'patient_id');
     }
 
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+    public function caregiver()
+    {
+        return $this->belongsTo(Caregiver::class, 'caregiver_id');
+    }
+
     public function diagnosis()
     {
         return $this->belongsTo(Diagnosis::class, 'diagnosis_id');
     }
 
-    public function prescribedBy()
+    public function form()
     {
-        return $this->belongsTo(User::class, 'prescribed_by');
+        return $this->belongsTo(MedicationForm::class, 'form_id');
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(MedicationUnit::class, 'unit_id');
+    }
+    public function route()
+    {
+        return $this->belongsTo(MedicationRoute::class, 'route_id');
     }
 }

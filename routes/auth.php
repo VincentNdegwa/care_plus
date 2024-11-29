@@ -13,6 +13,8 @@ use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Medication\CreateMedicationController;
+use App\Http\Controllers\Medication\FetchMedicationController;
+use App\Http\Controllers\Medication\MedicationFilterController;
 use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
@@ -82,6 +84,12 @@ Route::prefix("/v1")->group(function () {
                 Route::get('/routes', [MedicationResourcesController::class, 'getMedicationRoutes']);
                 Route::get('/units', [MedicationResourcesController::class, 'getMedicationUnits']);
                 Route::get('/frequencies', [MedicationResourcesController::class, 'getMedicationFrequencies']);
+            });
+
+            Route::prefix('fetch')->group(function () {
+                Route::post('/by-patient', [FetchMedicationController::class, 'findByPatient']);
+                Route::post('/by-doctor', [FetchMedicationController::class, 'findByDoctor']);
+                Route::post('/filter', [MedicationFilterController::class, 'filterMedications']);
             });
         });
     });

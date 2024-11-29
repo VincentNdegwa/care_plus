@@ -60,12 +60,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Patient::class, 'user_id');
     }
 
-    public function doctorProfile()
+    public function doctor()
     {
         return $this->hasOne(Doctor::class, 'user_id');
     }
 
-    public function caregiverProfile()
+    public function caregiver()
     {
         return $this->hasOne(Caregiver::class, 'user_id');
     }
@@ -73,7 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function professionalProfile()
     {
         return $this->role === "Doctor"
-            ? $this->doctorProfile()
-            : ($this->role === "Caregiver" ? $this->caregiverProfile() : null);
+            ? $this->doctor()
+            : ($this->role === "Caregiver" ? $this->caregiver() : null);
     }
 }

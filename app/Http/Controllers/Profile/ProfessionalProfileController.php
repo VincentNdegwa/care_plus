@@ -33,13 +33,13 @@ class ProfessionalProfileController extends Controller
 
     public function doctor(Request $request)
     {
-        $id = $request->user()->doctorProfile->id;
+        $id = $request->user()->doctor->id;
         return $this->fetchProfile($id, Doctor::class, 'doctor');
     }
 
     public function caregiver(Request $request)
     {
-        $id = $request->user()->caregiverProfile->id;
+        $id = $request->user()->caregiver->id;
         return $this->fetchProfile($id, Caregiver::class, 'caregiver');
     }
 }
