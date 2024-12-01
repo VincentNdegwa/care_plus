@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("side_effect");
             $table->enum("severity", ['low', 'high', 'moderate']);
             $table->string("duration")->nullable();
-            $table->string("notes");
+            $table->string("notes")->nullable();
             $table->timestamps();
         });
     }
