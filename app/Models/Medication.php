@@ -64,4 +64,9 @@ class Medication extends Model
     {
         return $this->belongsTo(MedicationRoute::class, 'route_id');
     }
+
+    public function sideEffects()
+    {
+        return $this->hasMany(SideEffect::class, 'medication_id');
+    }
 }
