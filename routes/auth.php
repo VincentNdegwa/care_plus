@@ -14,6 +14,7 @@ use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
+use App\Http\Controllers\Medication\FetchMedicationResourcesController;
 use App\Http\Controllers\Medication\MedicationFilterController;
 use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
@@ -76,6 +77,7 @@ Route::prefix("/v1")->group(function () {
         });
 
         Route::prefix("medications")->group(function () {
+            Route::get("/{medication_id}", [FetchMedicationController::class, "find"]);
             Route::post("/create", [CreateMedicationController::class, 'create']);
             Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
             Route::post("/schedule/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
