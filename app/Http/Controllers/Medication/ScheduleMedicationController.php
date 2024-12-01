@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Medication;
 
+use App\Http\Controllers\Controller;
 use App\Models\Medication;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -17,10 +17,10 @@ use App\Http\Controllers\Medication\FetchMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationResourcesController;
 use App\Http\Controllers\Medication\MedicationFilterController;
 use App\Http\Controllers\Medication\MedicationResourcesController;
+use App\Http\Controllers\Medication\ScheduleMedicationController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
-use App\Http\Controllers\ScheduleMedicationController;
 
 Route::prefix("/v1")->group(function () {
 
