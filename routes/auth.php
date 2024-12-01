@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
+use App\Http\Controllers\FetchSideEffectsController;
 use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationResourcesController;
@@ -93,6 +94,12 @@ Route::prefix("/v1")->group(function () {
                 Route::post('/by-doctor', [FetchMedicationController::class, 'findByDoctor']);
                 Route::post('/filter', [MedicationFilterController::class, 'filterMedications']);
             });
+        });
+
+        Route::prefix("/side-effects")->group(function () {
+            Route::post("/create", [CreateMedicationController::class, "create"]);
+            // Route::get("/{medication_id}", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
+            // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
         });
     });
 });
