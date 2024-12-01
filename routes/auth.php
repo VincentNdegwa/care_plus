@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
+use App\Http\Controllers\Diagnosis\UpdateDiagnosisController;
 use App\Http\Controllers\FetchSideEffectsController;
 use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
@@ -76,6 +77,7 @@ Route::prefix("/v1")->group(function () {
             Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
             Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnoses"]);
             Route::post("/filter", [FetchDiagnosisController::class, "filterDiagnoses"]);
+            Route::patch("/update/{diagnosis_id}", [UpdateDiagnosisController::class, 'update']);
         });
 
         Route::prefix("medications")->group(function () {
