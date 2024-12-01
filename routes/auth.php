@@ -22,6 +22,7 @@ use App\Http\Controllers\Medication\ScheduleMedicationController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
+use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -97,7 +98,7 @@ Route::prefix("/v1")->group(function () {
         });
 
         Route::prefix("/side-effects")->group(function () {
-            Route::post("/create", [CreateMedicationController::class, "create"]);
+            Route::post("/create", [CreateSideEffectsController::class, "create"]);
             // Route::get("/{medication_id}", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
             // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
         });
