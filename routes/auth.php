@@ -105,4 +105,5 @@ Route::prefix("/v1")->group(function () {
             // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
         });
     });
+    // update side effects create route, diagnosis update route in the postman collection
 });
