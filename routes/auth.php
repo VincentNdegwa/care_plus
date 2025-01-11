@@ -101,7 +101,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::prefix("/side-effects")->group(function () {
             Route::post("/create", [CreateSideEffectsController::class, "create"]);
-            Route::get("/{medication_id}", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
+            Route::post("/fetch", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
             // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
         });
     });
