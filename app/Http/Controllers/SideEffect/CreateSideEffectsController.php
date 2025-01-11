@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SideEffect;
 
 use App\Http\Controllers\Controller;
+use App\Models\Medication;
 use App\Models\SideEffect;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class CreateSideEffectsController extends Controller
                 'duration' => 'nullable|integer',
                 'notes' => 'nullable|string',
             ]);
+            $validatedData['patient_id'] = Medication::find($validatedData['medication_id'])->value('patient_id');
             $side_effect = SideEffect::create($validatedData);
             return response()->json([
                 'error' => false,

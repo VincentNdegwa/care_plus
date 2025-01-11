@@ -15,12 +15,14 @@ return new class extends Migration
         Schema::create('side_effects', function (Blueprint $table) {
             $table->id();
             $table->foreignId("medication_id")->constrained('medications')->onDelete('cascade');
+            $table->unsignedBigInteger('patient_id')->nullable();
             $table->dateTime("datetime")->default(Carbon::now());
             $table->string("side_effect");
             $table->enum("severity", ['low', 'high', 'moderate']);
             $table->string("duration")->nullable();
             $table->string("notes")->nullable();
             $table->timestamps();
+
         });
     }
 

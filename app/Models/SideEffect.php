@@ -9,6 +9,7 @@ class SideEffect extends Model
     protected $table = "side_effects";
     protected $fillable = [
         "medication_id",
+        'patient_id',
         "datetime",
         "side_effect",
         "severity",

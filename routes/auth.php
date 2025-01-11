@@ -13,7 +13,6 @@ use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Diagnosis\UpdateDiagnosisController;
-use App\Http\Controllers\FetchSideEffectsController;
 use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationResourcesController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
+use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -101,7 +101,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::prefix("/side-effects")->group(function () {
             Route::post("/create", [CreateSideEffectsController::class, "create"]);
-            // Route::get("/{medication_id}", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
+            Route::get("/{medication_id}", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
             // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
         });
     });
