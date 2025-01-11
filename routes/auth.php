@@ -9,6 +9,8 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CareProvider\FetchCareProvidersController;
+use App\Http\Controllers\CareProvider\SetCareGiversController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\DeleteDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
@@ -111,6 +113,13 @@ Route::prefix("/v1")->group(function () {
             Route::post("/create", [CreateSideEffectsController::class, "create"]);
             Route::post("/fetch", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
             // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
+        });
+
+        Route::prefix('care-providers')->group(function () {
+            Route::get('/fetch-patient-doctors/{patient_id}', [FetchCareProvidersController::class, 'fetchPatientDoctors']);
+            Route::get('/fetch-patient-caregivers/{patient_id}', [FetchCareProvidersController::class, 'fetchPatientCareGivers']);
+            Route::post('/set-doctor', [SetCareGiversController::class, 'setDoctor'])->name('set-doctor');
+            Route::post('/set-caregiver', [SetCareGiversController::class, 'setCareGiver'])->name('set-caregiver');
         });
     });
     // update side effects create route, diagnosis update route in the postman collection

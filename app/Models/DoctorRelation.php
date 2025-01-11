@@ -8,8 +8,8 @@ class DoctorRelation extends Model
 {
     protected $table = "doctors_relations";
     protected $fillable = [
-        "patient_id",
         "doctor_id",
+        "patient_id",
         "isMain",
     ];
 
