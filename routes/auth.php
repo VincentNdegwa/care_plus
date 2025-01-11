@@ -15,11 +15,13 @@ use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Diagnosis\UpdateDiagnosisController;
 use App\Http\Controllers\Medication\CreateMedicationController;
+use App\Http\Controllers\Medication\DeleteMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationResourcesController;
 use App\Http\Controllers\Medication\MedicationFilterController;
 use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Medication\ScheduleMedicationController;
+use App\Http\Controllers\Medication\UpdateMedicationController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -85,6 +87,10 @@ Route::prefix("/v1")->group(function () {
         Route::prefix("medications")->group(function () {
             Route::get("/{medication_id}", [FetchMedicationController::class, "find"]);
             Route::post("/create", [CreateMedicationController::class, 'create']);
+            Route::patch("/update/{medication_id}", [UpdateMedicationController::class, 'update']);
+            Route::delete("/delete/{medication_id}", [DeleteMedicationController::class, 'delete']);
+
+
             Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
             Route::post("/schedule/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
             Route::prefix('medication-resources')->group(function () {
