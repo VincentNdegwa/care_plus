@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
+use App\Http\Controllers\Diagnosis\DeleteDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Diagnosis\UpdateDiagnosisController;
@@ -78,6 +79,7 @@ Route::prefix("/v1")->group(function () {
             Route::get("/search/{professionalId}", [FetchDiagnosisController::class, "searchDiagnoses"]);
             Route::post("/filter", [FetchDiagnosisController::class, "filterDiagnoses"]);
             Route::patch("/update/{diagnosis_id}", [UpdateDiagnosisController::class, 'update']);
+            Route::delete("/delete/{diagnosis_id}", [DeleteDiagnosisController::class, 'delete']);
         });
 
         Route::prefix("medications")->group(function () {
