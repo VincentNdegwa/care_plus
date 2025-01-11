@@ -26,8 +26,8 @@ return new class extends Migration
         });
         Schema::create('medication_routes', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // Name of the medication route
-            $table->text('description')->nullable(); // Description of the route
+            $table->string('name')->unique();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
         Schema::create('medication_frequencies', function (Blueprint $table) {
@@ -45,6 +45,6 @@ return new class extends Migration
         Schema::dropIfExists('medication_forms');
         Schema::dropIfExists('medication_units');
         Schema::dropIfExists('medication_routes');
-        Schema::dropIfExists('frequencies');
+        Schema::dropIfExists('medication_frequencies');
     }
 };
