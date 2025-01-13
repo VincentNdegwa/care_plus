@@ -1,0 +1,4 @@
+node-modules
+vendor
+.env
+.env.example
