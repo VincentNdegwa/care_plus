@@ -23,5 +23,8 @@
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
+    },
+    "hooks": {
+        "build": "composer install && php artisan migrate --force"
     }
 }
