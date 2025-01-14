@@ -24,7 +24,5 @@
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
     },
-    "scripts": {
-        "build": "composer install --no-dev --optimize-autoloader && php artisan migrate --force"
-    }
+    "buildCommand": "composer install && php artisan migrate --force"
 }
