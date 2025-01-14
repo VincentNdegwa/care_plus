@@ -123,6 +123,8 @@ Route::prefix("/v1")->group(function () {
             Route::get('/fetch-patient-caregivers/{patient_id}', [FetchCareProvidersController::class, 'fetchPatientCareGivers']);
             Route::post('/set-doctor', [SetCareGiversController::class, 'setDoctor'])->name('set-doctor');
             Route::post('/set-caregiver', [SetCareGiversController::class, 'setCareGiver'])->name('set-caregiver');
+            Route::post('/remove-doctor', [SetCareGiversController::class, 'removeDoctor']);
+            Route::post('/remove-caregiver', [SetCareGiversController::class, 'removeCareGiver']);
         });
     });
     // update side effects create route, diagnosis update route in the postman collection
