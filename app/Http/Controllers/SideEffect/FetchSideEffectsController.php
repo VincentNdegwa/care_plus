@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class FetchSideEffectsController extends Controller
 {
+    public function getOne($id)
+    {
+        $sideEffect = SideEffect::findOrFail($id);
+        return response()->json($sideEffect);
+    }
     public function getMedicationSideEffects(Request $request)
     {
         try {

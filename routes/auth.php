@@ -27,6 +27,7 @@ use App\Http\Controllers\Medication\UpdateMedicationController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
+use App\Http\Controllers\SideEffect\AlterSideEffectController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 
@@ -112,7 +113,9 @@ Route::prefix("/v1")->group(function () {
         Route::prefix("/side-effects")->group(function () {
             Route::post("/create", [CreateSideEffectsController::class, "create"]);
             Route::post("/fetch", [FetchSideEffectsController::class, "getMedicationSideEffects"]);
-            // Route::post("/filter", [FetchSideEffectsController::class, "filterMedicationSideEffects"]);
+            Route::get("/{side_effect_id}", [FetchSideEffectsController::class, "getOne"]);
+            Route::patch("/update/{side_effect_id}", [AlterSideEffectController::class, "update"]);
+            Route::delete("/delete/{side_effect_id}", [AlterSideEffectController::class, "delete"]);
         });
 
         Route::prefix('care-providers')->group(function () {
