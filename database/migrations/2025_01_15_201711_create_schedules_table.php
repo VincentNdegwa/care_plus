@@ -21,6 +21,8 @@ return new class extends Migration
         Schema::create('medication_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('medication_schedule_id')->constrained('medication_schedules')->onDelete('cascade');
+            $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
+            $table->dateTime("time_scheduled");
             $table->enum('status', ['Taken', 'Missed', 'Pending'])->default('Pending');
             $table->timestamps();
         });
@@ -31,6 +33,9 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
             $table->dateTime('next_start_month')->nullable();
+            $table->dateTime('stop_date')->nullable();
+            $table->string('duration')->nullable();
+            $table->string('frequency')->nullable();
             $table->timestamps();
         });
 

@@ -15,6 +15,8 @@ class MedicationLog extends Model
     protected $fillable = [
         'medication_schedule_id',
         'status',
+        'time_scheduled',
+        'patient_id'
     ];
 
     /**

@@ -8,54 +8,81 @@ use InvalidArgumentException;
 
 class ScheduleGenerator
 {
+    private static $medication_id = null;
+    private static $patient_id = null;
+
     public static function generateSchedule($custom)
     {
         $medication_id = $custom['medication_id'];
-        $startDate = Carbon::parse($custom['start_datetime']);
         $medication = self::getMedication($medication_id);
+
+        self::$medication_id = $medication_id;
+        self::$patient_id = $medication->patient_id;
+
+        $startDate = Carbon::parse($custom['start_datetime']);
         $frequency = $medication->frequency;
         $duration = $medication->duration;
 
+        $endDate = self::calculateEndDate($startDate->copy(), $duration);
+
+        $next_start_month = null;
         $nextMonth = $startDate->copy()->addMonth();
+        $stopDay = $endDate;
+        if ($endDate->gt($nextMonth)) {
+            $next_start_month = $nextMonth;
+            $stopDay = $nextMonth;
+        }
+
         $medicationLogs = [];
+        $medication_tracker = [
+            'medication_id' => $medication_id,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'next_start_month' => $next_start_month,
+            'stop_date' => $stopDay,
+            "duration" => $duration,
+            "frequency" => $frequency
+        ];
 
         if (isset($custom['schedules'])) {
             $schedules = $custom['schedules'];
-
-            foreach ($schedules as $time) {
-                self::generateCustomSchedule($startDate, $nextMonth, $time, $medicationLogs);
-            }
+            self::generateCustomSchedule($startDate, $stopDay, $schedules, $medicationLogs);
         } else {
-            self::generateDefaultSchedule($startDate, $nextMonth, $frequency, $medicationLogs);
+            self::generateDefaultSchedule($startDate, $stopDay, $frequency, $medicationLogs);
         }
 
         return $medicationLogs;
     }
 
-    private static function generateCustomSchedule($startDate, $nextMonth, $time, &$medicationLogs)
+    private static function generateCustomSchedule($startDate, $stopDay, $schedule, &$medicationLogs)
     {
-        [$hour, $minute] = explode(':', $time);
-        $doseTime = $startDate->copy()->setTime($hour, $minute);
+        $doseTime = $startDate;
 
-        while ($doseTime->lte($nextMonth)) {
-            $medicationLogs[] = [
-                'dose_time' => $doseTime->format('Y-m-d H:i:s'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+        while ($doseTime->lte($stopDay)) {
+            foreach ($schedule as $time) {
+                [$hour, $minute] = explode(':', $time);
+                $doseTime = $doseTime->copy()->setTime($hour, $minute);
+
+                $medicationLogs[] = [
+                    'dose_time' => $doseTime->format('Y-m-d H:i:s'),
+                    "medication_id" => self::$medication_id,
+                    "patient_id" => self::$patient_id,
+                ];
+            }
+
             $doseTime->addDay();
         }
     }
 
-    private static function generateDefaultSchedule($startDate, $nextMonth, $frequency, &$medicationLogs)
+    private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationLogs)
     {
         $frequencyInterval = self::getFrequencyInterval($frequency);
 
-        while ($startDate->lte($nextMonth)) {
+        while ($startDate->lte($stopDay)) {
             $medicationLogs[] = [
                 'dose_time' => $startDate->format('Y-m-d H:i:s'),
-                'created_at' => now(),
-                'updated_at' => now(),
+                "medication_id" => self::$medication_id,
+                "patient_id" => self::$patient_id,
             ];
 
             self::updateStartDate($startDate, $frequency, $frequencyInterval);
@@ -81,7 +108,7 @@ class ScheduleGenerator
 
     private static function getMedication($medication_id)
     {
-        return Medication::findOrFail($medication_id);
+        return Medication::findOrFail(id: $medication_id);
     }
 
     private static function calculateEndDate(Carbon $startDate, string $duration): Carbon

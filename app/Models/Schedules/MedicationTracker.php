@@ -17,6 +17,9 @@ class MedicationTracker extends Model
         'start_date',
         'end_date',
         'next_start_month',
+        'stop_date',
+        'duration',
+        'frequency',
     ];
 
     /**
