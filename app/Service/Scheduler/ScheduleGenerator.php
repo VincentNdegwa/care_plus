@@ -11,19 +11,24 @@ class ScheduleGenerator
     private static $medication_id = null;
     private static $patient_id = null;
 
+    private static $app_timezone = null;
+
     public static function generateSchedule($custom, $timezone)
     {
+        self::$app_timezone = config('app.timezone') ?: 'UTC';
+
         $medication_id = $custom['medication_id'];
         $medication = self::getMedication($medication_id);
 
         self::$medication_id = $medication_id;
         self::$patient_id = $medication->patient_id;
 
-        $startDate = Carbon::parse($custom['start_datetime'], $timezone);
+        // Parse the user's start_datetime with the provided timezone, then convert to the app timezone (UTC)
+        $startDate = Carbon::parse($custom['start_datetime'], $timezone)->setTimezone(self::$app_timezone);
         $frequency = $medication->frequency;
         $duration = $medication->duration;
 
-        $endDate = self::calculateEndDate($startDate->copy(), $duration, $timezone);
+        $endDate = self::calculateEndDate($startDate->copy(), $duration, self::$app_timezone);
 
         $next_start_month = null;
         $nextMonth = $startDate->copy()->addMonth();
@@ -42,14 +47,26 @@ class ScheduleGenerator
             'stop_date' => $stopDay,
             'duration' => $duration,
             'frequency' => $frequency,
-            'timezone' => $timezone
+            'timezone' => $timezone,
         ];
 
         if (isset($custom['schedules'])) {
             $schedules = $custom['schedules'];
-            self::generateCustomSchedule($startDate, $stopDay, $schedules, $medicationSchedule, $timezone);
+            self::generateCustomSchedule(
+                $startDate,
+                $stopDay,
+                $schedules,
+                $medicationSchedule,
+                $timezone
+            );
         } else {
-            self::generateDefaultSchedule($startDate, $stopDay, $frequency, $medicationSchedule, $timezone);
+            self::generateDefaultSchedule(
+                $startDate,
+                $stopDay,
+                $frequency,
+                $medicationSchedule,
+                self::$app_timezone
+            );
         }
 
         return [
@@ -58,17 +75,21 @@ class ScheduleGenerator
         ];
     }
 
+
     private static function generateCustomSchedule($startDate, $stopDay, $schedule, &$medicationSchedule, $timezone)
     {
-        $doseTime = $startDate;
+        $doseTime = $startDate->copy()->setTimezone($timezone);
+        $stopDay = $stopDay->copy()->setTimezone($timezone);
 
         while ($doseTime->lte($stopDay)) {
             foreach ($schedule as $time) {
                 [$hour, $minute] = explode(':', $time);
-                $doseTime = $doseTime->copy()->setTime($hour, $minute);
+
+                $appDoseTime = $doseTime->copy()->setTime($hour, $minute)
+                    ->setTimezone(self::$app_timezone);
 
                 $medicationSchedule[] = [
-                    'dose_time' => $doseTime->setTimezone($timezone)->format('Y-m-d H:i:s'),
+                    'dose_time' => $appDoseTime->format('Y-m-d H:i:s'),
                     'medication_id' => self::$medication_id,
                     'patient_id' => self::$patient_id,
                 ];
@@ -77,6 +98,9 @@ class ScheduleGenerator
             $doseTime->addDay();
         }
     }
+
+
+
 
     private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationSchedule, $timezone)
     {
