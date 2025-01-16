@@ -20,6 +20,7 @@ class MedicationTracker extends Model
         'stop_date',
         'duration',
         'frequency',
+        'timezone'
     ];
 
     /**

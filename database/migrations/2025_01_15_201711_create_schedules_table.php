@@ -15,17 +15,10 @@ return new class extends Migration
             $table->foreignId('medication_id')->constrained('medications')->onDelete('cascade');
             $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
             $table->dateTime('dose_time');
-            $table->timestamps();
-        });
-
-        Schema::create('medication_logs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('medication_schedule_id')->constrained('medication_schedules')->onDelete('cascade');
-            $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
-            $table->dateTime("time_scheduled");
             $table->enum('status', ['Taken', 'Missed', 'Pending'])->default('Pending');
             $table->timestamps();
         });
+
 
         Schema::create('medication_tracker', function (Blueprint $table) {
             $table->id();
@@ -36,6 +29,7 @@ return new class extends Migration
             $table->dateTime('stop_date')->nullable();
             $table->string('duration')->nullable();
             $table->string('frequency')->nullable();
+            $table->string("timezone")->default('Africa/Nairobi');
             $table->timestamps();
         });
 
@@ -52,7 +46,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('medication_schedules_notifications');
         Schema::dropIfExists('medication_tracker');
-        Schema::dropIfExists('medication_logs');
         Schema::dropIfExists('medication_schedules');
     }
 };

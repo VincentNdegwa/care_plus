@@ -11,7 +11,7 @@ class ScheduleGenerator
     private static $medication_id = null;
     private static $patient_id = null;
 
-    public static function generateSchedule($custom)
+    public static function generateSchedule($custom, $timezone)
     {
         $medication_id = $custom['medication_id'];
         $medication = self::getMedication($medication_id);
@@ -19,11 +19,11 @@ class ScheduleGenerator
         self::$medication_id = $medication_id;
         self::$patient_id = $medication->patient_id;
 
-        $startDate = Carbon::parse($custom['start_datetime']);
+        $startDate = Carbon::parse($custom['start_datetime'], $timezone);
         $frequency = $medication->frequency;
         $duration = $medication->duration;
 
-        $endDate = self::calculateEndDate($startDate->copy(), $duration);
+        $endDate = self::calculateEndDate($startDate->copy(), $duration, $timezone);
 
         $next_start_month = null;
         $nextMonth = $startDate->copy()->addMonth();
@@ -33,28 +33,32 @@ class ScheduleGenerator
             $stopDay = $nextMonth;
         }
 
-        $medicationLogs = [];
+        $medicationSchedule = [];
         $medication_tracker = [
             'medication_id' => $medication_id,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'next_start_month' => $next_start_month,
             'stop_date' => $stopDay,
-            "duration" => $duration,
-            "frequency" => $frequency
+            'duration' => $duration,
+            'frequency' => $frequency,
+            'timezone' => $timezone
         ];
 
         if (isset($custom['schedules'])) {
             $schedules = $custom['schedules'];
-            self::generateCustomSchedule($startDate, $stopDay, $schedules, $medicationLogs);
+            self::generateCustomSchedule($startDate, $stopDay, $schedules, $medicationSchedule, $timezone);
         } else {
-            self::generateDefaultSchedule($startDate, $stopDay, $frequency, $medicationLogs);
+            self::generateDefaultSchedule($startDate, $stopDay, $frequency, $medicationSchedule, $timezone);
         }
 
-        return $medicationLogs;
+        return [
+            'medications_schedules' => $medicationSchedule,
+            'medication_tracker' => $medication_tracker,
+        ];
     }
 
-    private static function generateCustomSchedule($startDate, $stopDay, $schedule, &$medicationLogs)
+    private static function generateCustomSchedule($startDate, $stopDay, $schedule, &$medicationSchedule, $timezone)
     {
         $doseTime = $startDate;
 
@@ -63,10 +67,10 @@ class ScheduleGenerator
                 [$hour, $minute] = explode(':', $time);
                 $doseTime = $doseTime->copy()->setTime($hour, $minute);
 
-                $medicationLogs[] = [
-                    'dose_time' => $doseTime->format('Y-m-d H:i:s'),
-                    "medication_id" => self::$medication_id,
-                    "patient_id" => self::$patient_id,
+                $medicationSchedule[] = [
+                    'dose_time' => $doseTime->setTimezone($timezone)->format('Y-m-d H:i:s'),
+                    'medication_id' => self::$medication_id,
+                    'patient_id' => self::$patient_id,
                 ];
             }
 
@@ -74,15 +78,15 @@ class ScheduleGenerator
         }
     }
 
-    private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationLogs)
+    private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationSchedule, $timezone)
     {
         $frequencyInterval = self::getFrequencyInterval($frequency);
 
         while ($startDate->lte($stopDay)) {
-            $medicationLogs[] = [
-                'dose_time' => $startDate->format('Y-m-d H:i:s'),
-                "medication_id" => self::$medication_id,
-                "patient_id" => self::$patient_id,
+            $medicationSchedule[] = [
+                'dose_time' => $startDate->setTimezone($timezone)->format('Y-m-d H:i:s'),
+                'medication_id' => self::$medication_id,
+                'patient_id' => self::$patient_id,
             ];
 
             self::updateStartDate($startDate, $frequency, $frequencyInterval);
@@ -92,10 +96,10 @@ class ScheduleGenerator
     private static function updateStartDate(Carbon &$startDate, $frequency, $frequencyInterval)
     {
         switch ($frequency) {
-            case "Once a day":
+            case 'Once a day':
                 $startDate->addDay();
                 break;
-            case "Twice a day":
+            case 'Twice a day':
                 $startDate->addHours(12);
                 break;
             default:
@@ -108,10 +112,10 @@ class ScheduleGenerator
 
     private static function getMedication($medication_id)
     {
-        return Medication::findOrFail(id: $medication_id);
+        return Medication::findOrFail($medication_id);
     }
 
-    private static function calculateEndDate(Carbon $startDate, string $duration): Carbon
+    private static function calculateEndDate(Carbon $startDate, string $duration, $timezone): Carbon
     {
         preg_match('/(\d+)\s*(day|week|month|year|hour|minute|second)s?/i', $duration, $matches);
 
@@ -122,26 +126,26 @@ class ScheduleGenerator
         $value = (int) $matches[1];
         $unit = strtolower($matches[2]);
 
-        return self::addDurationToDate($startDate, $value, $unit);
+        return self::addDurationToDate($startDate, $value, $unit, $timezone);
     }
 
-    private static function addDurationToDate(Carbon $startDate, $value, $unit)
+    private static function addDurationToDate(Carbon $startDate, $value, $unit, $timezone)
     {
         switch ($unit) {
             case 'day':
-                return $startDate->addDays($value);
+                return $startDate->addDays($value)->setTimezone($timezone);
             case 'week':
-                return $startDate->addWeeks($value);
+                return $startDate->addWeeks($value)->setTimezone($timezone);
             case 'month':
-                return $startDate->addMonths($value);
+                return $startDate->addMonths($value)->setTimezone($timezone);
             case 'year':
-                return $startDate->addYears($value);
+                return $startDate->addYears($value)->setTimezone($timezone);
             case 'hour':
-                return $startDate->addHours($value);
+                return $startDate->addHours($value)->setTimezone($timezone);
             case 'minute':
-                return $startDate->addMinutes($value);
+                return $startDate->addMinutes($value)->setTimezone($timezone);
             case 'second':
-                return $startDate->addSeconds($value);
+                return $startDate->addSeconds($value)->setTimezone($timezone);
             default:
                 throw new InvalidArgumentException("Unsupported duration unit: $unit");
         }
@@ -150,32 +154,31 @@ class ScheduleGenerator
     private static function getFrequencyInterval($frequency)
     {
         $intervals = [
-            "Once a day" => 1440,           // 24 hours = 1440 minutes
-            "Twice a day" => 720,           // 12 hours = 720 minutes
-            "Three times a day" => 480,     // 8 hours = 480 minutes
-            "Four times a day" => 360,      // 6 hours = 360 minutes
-            "Once every other day" => 2880, // 48 hours = 2880 minutes
-            "Every third day" => 4320,      // 72 hours = 4320 minutes
-            "Once a week" => 10080,         // 7 days = 10080 minutes
-            "Twice a week" => 4320,         // 3 days = 4320 minutes
-            "Three times a week" => 2880,   // 2 days = 2880 minutes
-            "Once a month" => 43200,        // 30 days = 43200 minutes
-            "Every 6 hours" => 360,         // 6 hours = 360 minutes
-            "Every 8 hours" => 480,         // 8 hours = 480 minutes
-            "Every 12 hours" => 720,        // 12 hours = 720 minutes
-            "Every 24 hours" => 1440,       // 24 hours = 1440 minutes
-            "Every hour" => 60,             // 1 hour = 60 minutes
-            "Every 2 hours" => 120,         // 2 hours = 120 minutes
-            "Every 4 hours" => 240,         // 4 hours = 240 minutes
-            "Every 30 minutes" => 30,       // 30 minutes
-            "Every 45 minutes" => 45,       // 45 minutes
-            "On demand" => 0,               // No fixed schedule
-            "As needed" => 0,               // No fixed schedule
-            "Until finished" => 0,          // No fixed schedule
-            "Until bottle is empty" => 0,   // No fixed schedule
+            'Once a day' => 1440,           // 24 hours = 1440 minutes
+            'Twice a day' => 720,           // 12 hours = 720 minutes
+            'Three times a day' => 480,     // 8 hours = 480 minutes
+            'Four times a day' => 360,      // 6 hours = 360 minutes
+            'Once every other day' => 2880, // 48 hours = 2880 minutes
+            'Every third day' => 4320,      // 72 hours = 4320 minutes
+            'Once a week' => 10080,         // 7 days = 10080 minutes
+            'Twice a week' => 4320,         // 3 days = 4320 minutes
+            'Three times a week' => 2880,   // 2 days = 2880 minutes
+            'Once a month' => 43200,        // 30 days = 43200 minutes
+            'Every 6 hours' => 360,         // 6 hours = 360 minutes
+            'Every 8 hours' => 480,         // 8 hours = 480 minutes
+            'Every 12 hours' => 720,        // 12 hours = 720 minutes
+            'Every 24 hours' => 1440,       // 24 hours = 1440 minutes
+            'Every hour' => 60,             // 1 hour = 60 minutes
+            'Every 2 hours' => 120,         // 2 hours = 120 minutes
+            'Every 4 hours' => 240,         // 4 hours = 240 minutes
+            'Every 30 minutes' => 30,       // 30 minutes
+            'Every 45 minutes' => 45,       // 45 minutes
+            'On demand' => 0,               // No fixed schedule
+            'As needed' => 0,               // No fixed schedule
+            'Until finished' => 0,          // No fixed schedule
+            'Until bottle is empty' => 0,   // No fixed schedule
         ];
 
-        // Return the interval for the provided frequency, defaulting to 1440 (Once a day) if not found
         return $intervals[$frequency] ?? 1440;
     }
 }

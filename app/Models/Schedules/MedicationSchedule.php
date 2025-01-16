@@ -17,6 +17,7 @@ class MedicationSchedule extends Model
         'medication_id',
         'patient_id',
         'dose_time',
+        'status'
     ];
 
     /**
@@ -35,13 +36,6 @@ class MedicationSchedule extends Model
         return $this->belongsTo(Patient::class, 'patient_id');
     }
 
-    /**
-     * Get the logs for the medication schedule.
-     */
-    public function logs()
-    {
-        return $this->hasMany(MedicationLog::class, 'medication_schedule_id');
-    }
 
     /**
      * Get the notifications for the medication schedule.
