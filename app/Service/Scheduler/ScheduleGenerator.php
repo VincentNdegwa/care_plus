@@ -53,16 +53,16 @@ class ScheduleGenerator
         if (isset($custom['schedules'])) {
             $schedules = $custom['schedules'];
             self::generateCustomSchedule(
-                $startDate,
-                $stopDay,
+                $startDate->copy(),
+                $stopDay->copy(),
                 $schedules,
                 $medicationSchedule,
                 $timezone
             );
         } else {
             self::generateDefaultSchedule(
-                $startDate,
-                $stopDay,
+                $startDate->copy(),
+                $stopDay->copy(),
                 $frequency,
                 $medicationSchedule,
                 self::$app_timezone
@@ -105,6 +105,7 @@ class ScheduleGenerator
     private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationSchedule, $timezone)
     {
         $frequencyInterval = self::getFrequencyInterval($frequency);
+
 
         while ($startDate->lte($stopDay)) {
             $medicationSchedule[] = [
