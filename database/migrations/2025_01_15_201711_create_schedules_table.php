@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('medication_id')->constrained('medications')->onDelete('cascade');
             $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
             $table->dateTime('dose_time');
+            $table->dateTime('processed_at')->nullable();
             $table->enum('status', ['Taken', 'Missed', 'Pending'])->default('Pending');
             $table->timestamps();
         });

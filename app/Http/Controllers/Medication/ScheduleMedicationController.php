@@ -20,10 +20,10 @@ class ScheduleMedicationController extends Controller
 
             $scheduleData = ScheduleGenerator::generateSchedule($validatedData, $timezone);
 
-            // ScheduleSaver::saveSchedule(
-            //     $scheduleData['medications_schedules'],
-            //     $scheduleData['medication_tracker']
-            // );
+            ScheduleSaver::saveSchedule(
+                $scheduleData['medications_schedules'],
+                $scheduleData['medication_tracker']
+            );
 
             DB::commit();
 

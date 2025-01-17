@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Medication\MedicationForm;
 use App\Models\Medication\MedicationRoute;
 use App\Models\Medication\MedicationUnit;
+use App\Models\Schedules\MedicationTracker;
 use Illuminate\Database\Eloquent\Model;
 
 class Medication extends Model
@@ -68,5 +69,10 @@ class Medication extends Model
     public function sideEffects()
     {
         return $this->hasMany(SideEffect::class, 'medication_id');
+    }
+
+    public function tracker()
+    {
+        return $this->hasOne(MedicationTracker::class);
     }
 }
