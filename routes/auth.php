@@ -30,6 +30,8 @@ use App\Http\Controllers\Profile\UserProfileController;
 use App\Http\Controllers\SideEffect\AlterSideEffectController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
+use App\Http\Controllers\AtSMSController;
+
 
 Route::prefix("/v1")->group(function () {
 
@@ -127,5 +129,7 @@ Route::prefix("/v1")->group(function () {
             Route::post('/remove-caregiver', [SetCareGiversController::class, 'removeCareGiver']);
         });
     });
+
+    Route::get("/send-sms", [AtSMSController::class, "send"]);
     // update side effects create route, diagnosis update route in the postman collection
 });
