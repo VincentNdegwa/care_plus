@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\MedicationTake;
 use App\Models\Schedules\MedicationSchedule;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,10 +38,13 @@ class MedicationCheckJob implements ShouldQueue
 
 
             foreach ($schedules as $schedule) {
-                Log::info("Processing schedule ID: " . $schedule->id);
 
                 $schedule->processed_at = $nowTime;
                 $schedule->save();
+
+                MedicationTake::dispatch($schedule);
+
+                Log::info("Dispatched MedicationTake event for schedule ID: {$schedule->id}");
             }
         } catch (\Throwable $th) {
             Log::error("Error: " . $th->getMessage());

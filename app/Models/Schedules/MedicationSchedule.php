@@ -44,5 +44,4 @@ class MedicationSchedule extends Model
     {
         return $this->hasMany(MedicationScheduleNotification::class, 'medication_schedule_id');
     }
-
 }
