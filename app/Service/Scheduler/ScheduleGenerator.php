@@ -44,7 +44,7 @@ class ScheduleGenerator extends BaseScheduler
             'duration' => $duration,
             'frequency' => $frequency,
             'timezone' => $timezone,
-            'schedules' => json_encode($custom['schedules']),
+            'schedules' => isset($custom['schedules']) ? json_encode($custom['schedules']) : null,
         ];
 
         if (isset($custom['schedules'])) {

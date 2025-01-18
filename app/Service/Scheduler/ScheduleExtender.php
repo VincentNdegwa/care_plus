@@ -39,7 +39,7 @@ class ScheduleExtender extends BaseScheduler
             $scheduleData['frequency']
         );
 
-        return [
+        $medication_tracker = [
             'medication_id' => $medicationTracker->medication_id,
             'start_date' => $medicationTracker->startDate,
             'end_date' => $medicationTracker->endDate,
@@ -49,6 +49,11 @@ class ScheduleExtender extends BaseScheduler
             'frequency' => $medicationTracker->frequency,
             'timezone' => $medicationTracker->timezone,
             'schedules' => $medicationTracker->schedules,
+        ];
+
+        return [
+            'medications_schedules' => $medicationSchedule,
+            'medication_tracker' => $medication_tracker,
         ];
     }
 
