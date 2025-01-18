@@ -4,6 +4,7 @@ namespace App\Service\Scheduler;
 
 use App\Models\Schedules\MedicationSchedule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ScheduleExtender extends BaseScheduler
 {
@@ -12,7 +13,7 @@ class ScheduleExtender extends BaseScheduler
 
         parent::$app_timezone = config('app.timezone') ?: 'UTC';
         parent::$medication_id = $medicationTracker->medication_id;
-        parent::$patient_id = $medicationTracker->patient_id;
+        parent::$patient_id = parent::getMedication(parent::$medication_id)->patient_id;
 
         $startDate = Carbon::parse($medicationTracker->next_start_month);
         $endDate = Carbon::parse($medicationTracker->end_date);
@@ -41,8 +42,8 @@ class ScheduleExtender extends BaseScheduler
 
         $medication_tracker = [
             'medication_id' => $medicationTracker->medication_id,
-            'start_date' => $medicationTracker->startDate,
-            'end_date' => $medicationTracker->endDate,
+            'start_date' => $medicationTracker->start_date,
+            'end_date' => $medicationTracker->end_date,
             'next_start_month' => $more_than_month ? $new_next_start_month : null,
             'stop_date' => $more_than_month ? $new_stop_date : $endDate,
             'duration' => $medicationTracker->duration,
@@ -60,6 +61,7 @@ class ScheduleExtender extends BaseScheduler
     private static function generateSchedules($startDate, $endDate, $schedules, $timezone, &$medicationSchedule, $frequency)
     {
         if (!empty($schedules)) {
+
             self::generateCustomSchedule(
                 $startDate,
                 $endDate,
@@ -68,6 +70,7 @@ class ScheduleExtender extends BaseScheduler
                 $timezone
             );
         } else {
+            Log::info(json_encode($schedules));
             self::generateDefaultSchedule(
                 $startDate,
                 $endDate,

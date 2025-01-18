@@ -131,5 +131,6 @@ Route::prefix("/v1")->group(function () {
     });
 
     Route::get("/send-sms", [AtSMSController::class, "send"]);
+    Route::get("/medication-extend/{medication_tracker_id}", [ScheduleMedicationController::class, 'extend']);
     // update side effects create route, diagnosis update route in the postman collection
 });

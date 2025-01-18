@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Models\Schedules\MedicationTracker;
+use App\Service\Scheduler\ScheduleExtender;
 use App\Service\Scheduler\ScheduleGenerator;
 use App\Service\Scheduler\ScheduleSaver;
 use Illuminate\Http\Request;
@@ -49,6 +51,11 @@ class ScheduleMedicationController extends Controller
                 'errors' => $e,
             ], 500);
         }
+    }
+    public function extend($medication_tracker_id)
+    {
+        $medication_track = MedicationTracker::find($medication_tracker_id);
+        return ScheduleExtender::generateSchedule($medication_track);
     }
 
     public function scheduleDefault(Request $request)

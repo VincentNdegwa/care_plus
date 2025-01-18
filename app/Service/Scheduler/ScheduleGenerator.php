@@ -8,6 +8,7 @@ use InvalidArgumentException;
 
 class ScheduleGenerator extends BaseScheduler
 {
+    public static $scheduledHours = null;
 
     public static function generateSchedule($custom, $timezone)
     {
@@ -33,19 +34,10 @@ class ScheduleGenerator extends BaseScheduler
             $next_start_month = $nextMonth;
             $stopDay = $nextMonth;
         }
+        self::$scheduledHours = isset($custom['schedules']) ? json_encode($custom['schedules']) : null;
 
         $medicationSchedule = [];
-        $medication_tracker = [
-            'medication_id' => $medication_id,
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'next_start_month' => $next_start_month,
-            'stop_date' => $stopDay,
-            'duration' => $duration,
-            'frequency' => $frequency,
-            'timezone' => $timezone,
-            'schedules' => isset($custom['schedules']) ? json_encode($custom['schedules']) : null,
-        ];
+
 
         if (isset($custom['schedules'])) {
             $schedules = $custom['schedules'];
@@ -62,9 +54,21 @@ class ScheduleGenerator extends BaseScheduler
                 $stopDay->copy(),
                 $frequency,
                 $medicationSchedule,
-                parent::$app_timezone
+                $timezone
             );
         }
+
+        $medication_tracker = [
+            'medication_id' => $medication_id,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'next_start_month' => $next_start_month,
+            'stop_date' => $stopDay,
+            'duration' => $duration,
+            'frequency' => $frequency,
+            'timezone' => $timezone,
+            'schedules' => self::$scheduledHours,
+        ];
 
         return [
             'medications_schedules' => $medicationSchedule,
@@ -102,16 +106,22 @@ class ScheduleGenerator extends BaseScheduler
     private static function generateDefaultSchedule($startDate, $stopDay, $frequency, &$medicationSchedule, $timezone)
     {
         $frequencyInterval = parent::getFrequencyInterval($frequency);
-
+        $scheduleHours = [];
 
         while ($startDate->lte($stopDay)) {
             $medicationSchedule[] = [
-                'dose_time' => $startDate->setTimezone($timezone)->format('Y-m-d H:i:s'),
+                'dose_time' => $startDate->setTimezone(parent::$app_timezone)->format('Y-m-d H:i:s'),
                 'medication_id' => parent::$medication_id,
                 'patient_id' => parent::$patient_id,
             ];
+            $hourMinute = $startDate->copy()->setTimezone($timezone)->format('H:i');
+            if (!in_array($hourMinute, $scheduleHours)) {
+                $scheduleHours[] = $hourMinute;
+            }
 
             parent::updateStartDate($startDate, $frequency, $frequencyInterval);
         }
+
+        self::$scheduledHours = $scheduleHours;
     }
 }
