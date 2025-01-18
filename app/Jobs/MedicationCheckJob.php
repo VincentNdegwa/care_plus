@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\MedicationTake;
 use App\Models\Schedules\MedicationSchedule;
+use App\Models\Schedules\MedicationScheduleNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -43,6 +44,8 @@ class MedicationCheckJob implements ShouldQueue
                 $schedule->save();
 
                 MedicationTake::dispatch($schedule);
+
+                SendMedicationDefaultNotification::dispatch($schedule);
 
                 Log::info("Dispatched MedicationTake event for schedule ID: {$schedule->id}");
             }
