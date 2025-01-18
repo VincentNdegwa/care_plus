@@ -9,11 +9,9 @@ class ScheduleSaver
 {
     public static function saveSchedule($medications_schedules, $medication_tracker)
     {
-        $mdt = MedicationTracker::firstOrCreate(
+        $mdt = MedicationTracker::updateOrCreate(
             [
                 'medication_id' => $medication_tracker['medication_id'],
-                'start_date' => $medication_tracker['start_date'],
-                'end_date' => $medication_tracker['end_date'],
             ],
             $medication_tracker
         );

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Schedules\MedicationTracker;
 use App\Service\Scheduler\ScheduleExtender;
+use App\Service\Scheduler\ScheduleSaver;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -34,7 +35,12 @@ class CheckMedicationTracker implements ShouldQueue
         foreach ($medicationTrackers as $medicationTracker) {
             Log::info('Found active medication track ' . $medicationTracker->id);
 
-            ScheduleExtender::generateSchedule($medicationTracker);
+            $scheduleData = ScheduleExtender::generateSchedule($medicationTracker);
+
+            ScheduleSaver::saveSchedule(
+                $scheduleData['medications_schedules'],
+                $scheduleData['medication_tracker']
+            );
         }
     }
 }
