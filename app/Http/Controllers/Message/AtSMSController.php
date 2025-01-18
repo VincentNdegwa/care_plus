@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Message;
 
+use App\Http\Controllers\Controller;
 use App\Service\Sms\SendSms;
 use Illuminate\Http\Request;
 

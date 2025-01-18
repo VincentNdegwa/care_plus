@@ -24,13 +24,13 @@ use App\Http\Controllers\Medication\MedicationFilterController;
 use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Medication\ScheduleMedicationController;
 use App\Http\Controllers\Medication\UpdateMedicationController;
+use App\Http\Controllers\Message\AtSMSController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
 use App\Http\Controllers\SideEffect\AlterSideEffectController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
-use App\Http\Controllers\AtSMSController;
 
 
 Route::prefix("/v1")->group(function () {
