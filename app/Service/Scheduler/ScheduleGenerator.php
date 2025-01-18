@@ -48,6 +48,7 @@ class ScheduleGenerator
             'duration' => $duration,
             'frequency' => $frequency,
             'timezone' => $timezone,
+            'schedules' => $custom['schedules'],
         ];
 
         if (isset($custom['schedules'])) {

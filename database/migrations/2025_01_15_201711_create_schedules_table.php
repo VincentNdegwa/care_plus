@@ -30,6 +30,7 @@ return new class extends Migration
             $table->dateTime('stop_date')->nullable();
             $table->string('duration')->nullable();
             $table->string('frequency')->nullable();
+            $table->string('schedules')->nullable();
             $table->string("timezone")->default('Africa/Nairobi');
             $table->timestamps();
         });
