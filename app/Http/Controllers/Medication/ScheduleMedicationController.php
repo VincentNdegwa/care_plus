@@ -22,10 +22,10 @@ class ScheduleMedicationController extends Controller
 
             $scheduleData = ScheduleGenerator::generateSchedule($validatedData, $timezone);
 
-            // ScheduleSaver::saveSchedule(
-            //     $scheduleData['medications_schedules'],
-            //     $scheduleData['medication_tracker']
-            // );
+            ScheduleSaver::saveSchedule(
+                $scheduleData['medications_schedules'],
+                $scheduleData['medication_tracker']
+            );
 
             DB::commit();
 
@@ -55,7 +55,17 @@ class ScheduleMedicationController extends Controller
     public function extend($medication_tracker_id)
     {
         $medication_track = MedicationTracker::find($medication_tracker_id);
-        return ScheduleExtender::generateSchedule($medication_track);
+
+        $scheduleData = ScheduleExtender::generateSchedule($medication_track);
+        // ScheduleSaver::saveSchedule(
+        //     $scheduleData['medications_schedules'],
+        //     $scheduleData['medication_tracker']
+        // );
+
+        return response()->json([
+            'success' => true,
+            'data' => $scheduleData,
+        ]);
     }
 
     public function scheduleDefault(Request $request)
