@@ -37,10 +37,14 @@ class CheckMedicationTracker implements ShouldQueue
 
             $scheduleData = ScheduleExtender::generateSchedule($medicationTracker);
 
-            ScheduleSaver::saveSchedule(
-                $scheduleData['medications_schedules'],
-                $scheduleData['medication_tracker']
-            );
+            if (
+                isset($scheduleData['medications_schedules']) && isset($scheduleData['medication_tracker'])
+            ) {
+                ScheduleSaver::saveSchedule(
+                    $scheduleData['medications_schedules'],
+                    $scheduleData['medication_tracker']
+                );
+            }
         }
     }
 }

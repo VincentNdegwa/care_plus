@@ -16,7 +16,15 @@ class ScheduleMedicationController extends Controller
     {
         try {
             $validatedData = $request->validate($rules);
-
+            $existTrack = MedicationTracker::where('medication_id', $request->input('medication_id'))->exists();
+            if ($existTrack) {
+                return response()->json(
+                    [
+                        'error' => true,
+                        "message" => "The medication has already been scheduled"
+                    ]
+                );
+            }
             $timezone = "Africa/Nairobi";
             DB::beginTransaction();
 
@@ -30,7 +38,7 @@ class ScheduleMedicationController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
+                'error' => false,
                 'message' => $successMessage,
                 'data' => $scheduleData,
             ]);

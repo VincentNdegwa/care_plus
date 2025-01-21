@@ -3,6 +3,7 @@
 namespace App\Service\Scheduler;
 
 use App\Models\Medication;
+use App\Models\Schedules\MedicationTracker;
 use Carbon\Carbon;
 use InvalidArgumentException;
 
@@ -12,6 +13,9 @@ class ScheduleGenerator extends BaseScheduler
 
     public static function generateSchedule($custom, $timezone)
     {
+
+
+
         parent::$app_timezone = config('app.timezone') ?: 'UTC';
 
         $medication_id = $custom['medication_id'];

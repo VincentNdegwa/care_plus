@@ -15,14 +15,24 @@ class ScheduleExtender extends BaseScheduler
         parent::$medication_id = $medicationTracker->medication_id;
         parent::$patient_id = parent::getMedication(parent::$medication_id)->patient_id;
 
-        $startDate = Carbon::parse($medicationTracker->next_start_month);
+        $last_medication = MedicationSchedule::where('medication_id', parent::$medication_id)->max('dose_time');
         $endDate = Carbon::parse($medicationTracker->end_date);
+
+        $startDate = Carbon::parse($last_medication);
+
+        if ($startDate->gt($endDate)) {
+            return [
+                "message" => "The medication has already ended"
+            ];
+        }
+
+        $more_than_month = ($medicationTracker->next_start_month != null) && $startDate->diffInMonths($endDate, false) >= 1;
+
         $medicationSchedule = [];
 
         $new_next_start_month = $startDate->copy()->addMonth();
         $new_stop_date = $startDate->copy()->addMonth();
 
-        $more_than_month = $startDate->diffInMonths($endDate, false) >= 1;
         $scheduleData = [
             'start_date' => $startDate,
             'end_date' => $more_than_month ? $new_next_start_month : $endDate,
