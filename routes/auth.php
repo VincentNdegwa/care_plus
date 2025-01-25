@@ -128,6 +128,10 @@ Route::prefix("/v1")->group(function () {
             Route::post('/remove-doctor', [SetCareGiversController::class, 'removeDoctor']);
             Route::post('/remove-caregiver', [SetCareGiversController::class, 'removeCareGiver']);
         });
+
+        Route::prefix('medication-schedules')->group(function () {
+            Route::post("/fetch", [ScheduleMedicationController::class, 'getMedicationScheduleByDate']);
+        });
     });
 
     Route::get("/send-sms", [AtSMSController::class, "send"]);

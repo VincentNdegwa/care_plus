@@ -107,6 +107,7 @@ class ScheduleMedicationController extends Controller
     {
         try {
             $rules = [
+                "patient_id" => 'required|exists:patients,id',
                 "start_date" => 'required|date',
                 "end_date" => "required|date"
             ];
@@ -115,12 +116,17 @@ class ScheduleMedicationController extends Controller
 
             $query = MedicationSchedule::query();
 
-            $query->where('dose_time', '>=', $request->input('start_date'))
-                ->where('dose_time', '=<', $request->input('end_date'));
+            $data = $query->where('dose_time', '>=', $request->input('start_date'))
+                ->where('dose_time', '<=', $request->input('end_date'))
+                ->get();
+            $count = $data->count();
 
             return response()->json([
                 "error" => false,
-                "data" => $this->fetchSchedules($query),
+                "data" => [
+                    "count" => $count,
+                    "records" => $data,
+                ],
             ]);
         } catch (\Illuminate\Validation\ValidationException $th) {
             return response()->json([
@@ -137,8 +143,5 @@ class ScheduleMedicationController extends Controller
         }
     }
 
-    public function fetchSchedules($scheduleQuery)
-    {
-        return $scheduleQuery->get();
-    }
+    public function fetchSchedules($scheduleQuery) {}
 }
