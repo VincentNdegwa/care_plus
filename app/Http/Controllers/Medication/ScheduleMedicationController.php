@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationTracker;
 use App\Service\Scheduler\ScheduleExtender;
 use App\Service\Scheduler\ScheduleGenerator;
 use App\Service\Scheduler\ScheduleSaver;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -100,5 +102,43 @@ class ScheduleMedicationController extends Controller
             ],
             'Custom medication schedule created successfully.'
         );
+    }
+    public function getMedicationScheduleByDate(Request $request)
+    {
+        try {
+            $rules = [
+                "start_date" => 'required|date',
+                "end_date" => "required|date"
+            ];
+
+            $request->validate($rules);
+
+            $query = MedicationSchedule::query();
+
+            $query->where('dose_time', '>=', $request->input('start_date'))
+                ->where('dose_time', '=<', $request->input('end_date'));
+
+            return response()->json([
+                "error" => false,
+                "data" => $this->fetchSchedules($query),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $th) {
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage(),
+                "errors" => $th->errors(),
+            ]);
+        } catch (Exception $th) {
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage(),
+                "errors" => $th,
+            ]);
+        }
+    }
+
+    public function fetchSchedules($scheduleQuery)
+    {
+        return $scheduleQuery->get();
     }
 }
