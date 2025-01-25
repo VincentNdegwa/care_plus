@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Models\Patient;
 use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationTracker;
 use App\Service\Scheduler\ScheduleExtender;
@@ -118,6 +119,7 @@ class ScheduleMedicationController extends Controller
 
             $data = $query->where('dose_time', '>=', $request->input('start_date'))
                 ->where('dose_time', '<=', $request->input('end_date'))
+                ->with("medication")
                 ->get();
             $count = $data->count();
 
@@ -143,5 +145,14 @@ class ScheduleMedicationController extends Controller
         }
     }
 
-    public function fetchSchedules($scheduleQuery) {}
+    public function getTodaysPatientMedicationSchedule($patient_id)
+    {
+        if (isset($patient_id)) {
+            $patient = Patient::find($patient_id);
+            if ($patient) {
+                return $patient->todaySchedules();
+            }
+        }
+        return null;
+    }
 }
