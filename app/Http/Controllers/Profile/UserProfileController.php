@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Models\Doctor;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -56,16 +57,28 @@ class UserProfileController extends Controller
     {
         try {
             $user = $request->user();
-            $userWithProfile = User::where("id", $user->id)
-                ->with("profile")
-                ->first();
+
+            $userQuery = User::query()->where("id", $user->id);
+
+            switch ($user->role) {
+                case 'Doctor':
+                    $userQuery->with('doctor');
+                    break;
+                case 'Patient':
+                    $userQuery->with('patient');
+                    break;
+                case 'Caregiver':
+                    $userQuery->with('caregiver');
+                    break;
+            }
+
+            $userWithProfile = $userQuery->with("profile")->first();
 
             return response()->json([
                 "error" => false,
-                "data" => $userWithProfile
+                "data" => $userWithProfile,
             ]);
         } catch (\Throwable $th) {
-
             return response()->json([
                 "error" => true,
                 "message" => $th->getMessage(),

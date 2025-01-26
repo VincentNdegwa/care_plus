@@ -9,6 +9,10 @@ class ScheduleSaver
 {
     public static function saveSchedule($medications_schedules, $medication_tracker)
     {
+        if (isset($medication_tracker['schedules']) && is_array($medication_tracker['schedules'])) {
+            $medication_tracker['schedules'] = json_encode($medication_tracker['schedules']);
+        }
+
         $mdt = MedicationTracker::updateOrCreate(
             [
                 'medication_id' => $medication_tracker['medication_id'],
