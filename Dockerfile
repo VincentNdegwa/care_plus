@@ -43,17 +43,6 @@ COPY composer.json composer.lock /var/www/html/
 
 RUN composer install --optimize-autoloader
 
-<<<<<<< HEAD
-=======
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
-COPY package.json package-lock.json /var/www/html/
-
-WORKDIR /var/www/html
-
-RUN npm install && npm run build
->>>>>>> a8fd4d5459de179bc017fedafed92641ecbc12d6
-
 # RUN php artisan migrate --force \
 #     && php artisan optimize:clear \
 #     && php artisan config:cache \
