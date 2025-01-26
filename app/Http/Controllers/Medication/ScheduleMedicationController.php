@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Models\Patient;
+use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationTracker;
 use App\Service\Scheduler\ScheduleExtender;
 use App\Service\Scheduler\ScheduleGenerator;
 use App\Service\Scheduler\ScheduleSaver;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -100,5 +103,56 @@ class ScheduleMedicationController extends Controller
             ],
             'Custom medication schedule created successfully.'
         );
+    }
+    public function getMedicationScheduleByDate(Request $request)
+    {
+        try {
+            $rules = [
+                "patient_id" => 'required|exists:patients,id',
+                "start_date" => 'required|date',
+                "end_date" => "required|date"
+            ];
+
+            $request->validate($rules);
+
+            $query = MedicationSchedule::query();
+
+            $data = $query->where('dose_time', '>=', $request->input('start_date'))
+                ->where('dose_time', '<=', $request->input('end_date'))
+                ->with("medication")
+                ->get();
+            $count = $data->count();
+
+            return response()->json([
+                "error" => false,
+                "data" => [
+                    "count" => $count,
+                    "records" => $data,
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $th) {
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage(),
+                "errors" => $th->errors(),
+            ]);
+        } catch (Exception $th) {
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage(),
+                "errors" => $th,
+            ]);
+        }
+    }
+
+    public function getTodaysPatientMedicationSchedule($patient_id)
+    {
+        if (isset($patient_id)) {
+            $patient = Patient::find($patient_id);
+            if ($patient) {
+                return $patient->todaySchedules();
+            }
+        }
+        return null;
     }
 }
