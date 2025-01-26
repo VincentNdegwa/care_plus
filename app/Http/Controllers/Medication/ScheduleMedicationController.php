@@ -9,6 +9,7 @@ use App\Models\Schedules\MedicationTracker;
 use App\Service\Scheduler\ScheduleExtender;
 use App\Service\Scheduler\ScheduleGenerator;
 use App\Service\Scheduler\ScheduleSaver;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -145,14 +146,21 @@ class ScheduleMedicationController extends Controller
         }
     }
 
-    public function getTodaysPatientMedicationSchedule($patient_id)
+    public function getTodaysPatientMedicationSchedule($patient_id, Request $request)
     {
-        if (isset($patient_id)) {
-            $patient = Patient::find($patient_id);
-            if ($patient) {
-                return $patient->todaySchedules();
-            }
+        $patient = Patient::find($patient_id);
+        if (!$patient) {
+            return response()->json(['error' => true, 'message' => 'Patient not found'], 404);
         }
-        return null;
+
+        $date = $request->query('today_date');
+        $parsedDate = $date ? Carbon::parse($date) : Carbon::now();
+
+        $schedules = $patient->todaySchedules($parsedDate);
+
+        return response()->json([
+            "error" => false,
+            "schedules" => $schedules
+        ]);
     }
 }

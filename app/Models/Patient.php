@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Schedules\MedicationSchedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request;
 
 class Patient extends Model
 {
@@ -40,23 +41,24 @@ class Patient extends Model
     {
         return $this->hasMany(Medication::class, 'patient_id');
     }
-    public function todaySchedules()
+    public function todaySchedules($todayDate = null)
     {
-        $now = Carbon::now();
-        $start_day = $now->copy()->startOfDay();
-        $end_day = $now->copy()->endOfDay();
+        $date = $todayDate ?? Carbon::now();
 
-        $medications = MedicationSchedule::whereBetween('dose_time', [$start_day, $end_day])
-            ->where("patient_id", $this->id)
+        $startOfDay = $date->copy()->startOfDay();
+        $endOfDay = $date->copy()->endOfDay();
+
+        $medications = MedicationSchedule::whereBetween('dose_time', [$startOfDay, $endOfDay])
+            ->where('patient_id', $this->id)
             ->with('medication')
             ->get();
 
         return [
-            "now" => $now,
-            "start_day" => $start_day,
-            "end_day" => $end_day,
-            "count" => $medications->count(),
-            "medications" => $medications,
+            'now' => Carbon::now(),
+            'start_of_day' => $startOfDay,
+            'end_of_day' => $endOfDay,
+            'count' => $medications->count(),
+            'medications' => $medications,
         ];
     }
 }

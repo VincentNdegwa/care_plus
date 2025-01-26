@@ -131,7 +131,7 @@ Route::prefix("/v1")->group(function () {
 
         Route::prefix('medication-schedules')->group(function () {
             Route::post("/fetch", [ScheduleMedicationController::class, 'getMedicationScheduleByDate']);
-            Route::get("/today/{patient_id}", [ScheduleMedicationController::class, 'getTodaysPatientMedicationSchedule']);
+            Route::get("/{patient_id}", [ScheduleMedicationController::class, 'getTodaysPatientMedicationSchedule']);
         });
     });
 
