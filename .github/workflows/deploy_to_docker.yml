@@ -1,0 +1,31 @@
+name: care_plus Deployement
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  deploy_to_droplet:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Application
+        run: |
+          ssh -t -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd /var/www/html/care_plus || git clone https://github.com/VincentNdegwa/care_plus.git /var/www/html/care_plus && cd /var/www/html/care_plus
+          git pull origin main
+          docker compose down
+          docker compose up -d --build
+          docker image prune -f
+          EOF
