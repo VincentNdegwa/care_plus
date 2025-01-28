@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
 use App\Models\Medication;
+use App\Models\SideEffect;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
