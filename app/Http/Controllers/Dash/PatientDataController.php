@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dash;
 
 use App\Http\Controllers\Controller;
-use App\Models\Caregiver;
 use App\Models\CaregiverRelation;
 use App\Models\Diagnosis;
 use App\Models\DoctorRelation;
