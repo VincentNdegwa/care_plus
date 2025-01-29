@@ -17,6 +17,7 @@ use App\Http\Controllers\Diagnosis\DeleteDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchPatientDiagnoses;
 use App\Http\Controllers\Diagnosis\UpdateDiagnosisController;
+use App\Http\Controllers\HealthVitals\HealthVitalsController;
 use App\Http\Controllers\Medication\CreateMedicationController;
 use App\Http\Controllers\Medication\DeleteMedicationController;
 use App\Http\Controllers\Medication\FetchMedicationController;
@@ -133,6 +134,11 @@ Route::prefix("/v1")->group(function () {
         Route::prefix('medication-schedules')->group(function () {
             Route::post("/fetch", [ScheduleMedicationController::class, 'getMedicationScheduleByDate']);
             Route::get("/{patient_id}", [ScheduleMedicationController::class, 'getTodaysPatientMedicationSchedule']);
+        });
+        Route::prefix("health-vitals")->group(function () {
+            Route::post("/create", [HealthVitalsController::class, "create"]);
+            Route::patch("/update", [HealthVitalsController::class, "update"]);
+            Route::get("/{patient_id}", [HealthVitalsController::class, "index"]);
         });
         Route::prefix('dashboard')->group(function () {
             Route::get('/patient-data/{patient_id}', [PatientDataController::class, 'index']);
