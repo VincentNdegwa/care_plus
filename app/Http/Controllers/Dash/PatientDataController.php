@@ -7,6 +7,7 @@ use App\Models\Caregiver;
 use App\Models\CaregiverRelation;
 use App\Models\Diagnosis;
 use App\Models\DoctorRelation;
+use App\Models\HealthVital;
 use App\Models\Medication;
 use App\Models\SideEffect;
 use Carbon\Carbon;
@@ -72,32 +73,38 @@ class PatientDataController extends Controller
         $sideEffectChange = $this->calculatePercentageChange($sideEffectCountLastYear, $sideEffectCountCurrentYear);
         $diagnosisChange = $this->calculatePercentageChange($diagnosisCountLastYear, $diagnosisCountCurrentYear);
 
+        $heatlthVitals = HealthVital::getPatientVitalsAndCheckRange($patientId);
+
         // Return the counts and changes as a JSON response in the specified format
         return response()->json([
-            'medication' => [
-                'current' => $medicationCountCurrentYear,
-                'last' => $medicationCountLastYear,
-                'change' => $medicationChange,
-                "label" => "This year"
+            "patient_stats" => [
+
+                'medication' => [
+                    'current' => $medicationCountCurrentYear,
+                    'last' => $medicationCountLastYear,
+                    'change' => $medicationChange,
+                    "label" => "This year"
+                ],
+                'caregiver' => [
+                    'current' => $caregiverCountCurrentYear,
+                    'last' => $caregiverCountLastYear,
+                    'change' => $caregiverChange,
+                    "label" => "This year"
+                ],
+                'side_effect' => [
+                    'current' => $sideEffectCountCurrentYear,
+                    'last' => $sideEffectCountLastYear,
+                    'change' => $sideEffectChange,
+                    "label" => "This year"
+                ],
+                'diagnosis' => [
+                    'current' => $diagnosisCountCurrentYear,
+                    'last' => $diagnosisCountLastYear,
+                    'change' => $diagnosisChange,
+                    "label" => "This year"
+                ],
             ],
-            'caregiver' => [
-                'current' => $caregiverCountCurrentYear,
-                'last' => $caregiverCountLastYear,
-                'change' => $caregiverChange,
-                "label" => "This year"
-            ],
-            'side_effect' => [
-                'current' => $sideEffectCountCurrentYear,
-                'last' => $sideEffectCountLastYear,
-                'change' => $sideEffectChange,
-                "label" => "This year"
-            ],
-            'diagnosis' => [
-                'current' => $diagnosisCountCurrentYear,
-                'last' => $diagnosisCountLastYear,
-                'change' => $diagnosisChange,
-                "label" => "This year"
-            ],
+            "health_vitals" => $heatlthVitals['vitals']
         ]);
     }
 
