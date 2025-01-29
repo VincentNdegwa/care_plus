@@ -41,6 +41,10 @@ class Patient extends Model
     {
         return $this->hasMany(Medication::class, 'patient_id');
     }
+    public function healthVitals()
+    {
+        return $this->hasOne(HealthVital::class, 'patient_id');
+    }
     public function todaySchedules($todayDate = null)
     {
         $date = $todayDate ?? Carbon::now();
