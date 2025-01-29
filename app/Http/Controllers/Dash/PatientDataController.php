@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dash;
 
-use App\Models\Medication;
+use App\Http\Controllers\Controller;
 use App\Models\Caregiver;
-use App\Models\SideEffect; // Assuming you have a SideEffect model
+use App\Models\CaregiverRelation;
 use App\Models\Diagnosis;
-use Illuminate\Http\Request;
+use App\Models\DoctorRelation;
+use App\Models\Medication;
+use App\Models\SideEffect;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Request;
 
 class PatientDataController extends Controller
 {
@@ -17,9 +20,8 @@ class PatientDataController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request, $patientId)
     {
-        $patientId = $request->query('patient_id');
 
         // Validate the patient_id
         if (!$patientId) {
@@ -34,7 +36,10 @@ class PatientDataController extends Controller
         $medicationCountCurrentYear = Medication::where('patient_id', $patientId)
             ->whereYear('created_at', $currentYear)
             ->count();
-        $caregiverCountCurrentYear = Caregiver::where('patient_id', $patientId)
+        $caregiverCountCurrentYear = CaregiverRelation::where('patient_id', $patientId)
+            ->whereYear('created_at', $currentYear)
+            ->count();
+        $doctorCountCurrentYear = DoctorRelation::where("patient_id", $patientId)
             ->whereYear('created_at', $currentYear)
             ->count();
         $sideEffectCountCurrentYear = SideEffect::where('patient_id', $patientId)
@@ -48,7 +53,10 @@ class PatientDataController extends Controller
         $medicationCountLastYear = Medication::where('patient_id', $patientId)
             ->whereYear('created_at', $lastYear)
             ->count();
-        $caregiverCountLastYear = Caregiver::where('patient_id', $patientId)
+        $caregiverCountLastYear = CaregiverRelation::where('patient_id', $patientId)
+            ->whereYear('created_at', $lastYear)
+            ->count();
+        $doctorCountLastYear = DoctorRelation::where("patient_id", $patientId)
             ->whereYear('created_at', $lastYear)
             ->count();
         $sideEffectCountLastYear = SideEffect::where('patient_id', $patientId)
@@ -60,7 +68,7 @@ class PatientDataController extends Controller
 
         // Calculate percentage change
         $medicationChange = $this->calculatePercentageChange($medicationCountLastYear, $medicationCountCurrentYear);
-        $caregiverChange = $this->calculatePercentageChange($caregiverCountLastYear, $caregiverCountCurrentYear);
+        $caregiverChange = $this->calculatePercentageChange(($caregiverCountLastYear + $doctorCountLastYear), ($caregiverCountCurrentYear + $doctorCountCurrentYear));
         $sideEffectChange = $this->calculatePercentageChange($sideEffectCountLastYear, $sideEffectCountCurrentYear);
         $diagnosisChange = $this->calculatePercentageChange($diagnosisCountLastYear, $diagnosisCountCurrentYear);
 
@@ -70,21 +78,25 @@ class PatientDataController extends Controller
                 'current' => $medicationCountCurrentYear,
                 'last' => $medicationCountLastYear,
                 'change' => $medicationChange,
+                "label" => "This year"
             ],
             'caregiver' => [
                 'current' => $caregiverCountCurrentYear,
                 'last' => $caregiverCountLastYear,
                 'change' => $caregiverChange,
+                "label" => "This year"
             ],
             'side_effect' => [
                 'current' => $sideEffectCountCurrentYear,
                 'last' => $sideEffectCountLastYear,
                 'change' => $sideEffectChange,
+                "label" => "This year"
             ],
             'diagnosis' => [
                 'current' => $diagnosisCountCurrentYear,
                 'last' => $diagnosisCountLastYear,
                 'change' => $diagnosisChange,
+                "label" => "This year"
             ],
         ]);
     }
@@ -103,6 +115,6 @@ class PatientDataController extends Controller
         }
 
         $change = (($currentYearCount - $lastYearCount) / $lastYearCount) * 100;
-        return ($change > 0 ? '+' : '') . round($change, 2) . '%';
+        return ($change > 0 ? '+' : '-') . round($change, 2) . '%';
     }
 }

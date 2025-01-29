@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CareProvider\FetchCareProvidersController;
 use App\Http\Controllers\CareProvider\SetCareGiversController;
+use App\Http\Controllers\Dash\PatientDataController;
 use App\Http\Controllers\Diagnosis\CreateDiagnosisController;
 use App\Http\Controllers\Diagnosis\DeleteDiagnosisController;
 use App\Http\Controllers\Diagnosis\FetchDiagnosisController;
@@ -25,7 +26,6 @@ use App\Http\Controllers\Medication\MedicationResourcesController;
 use App\Http\Controllers\Medication\ScheduleMedicationController;
 use App\Http\Controllers\Medication\UpdateMedicationController;
 use App\Http\Controllers\Message\AtSMSController;
-use App\Http\Controllers\PatientDataController;
 use App\Http\Controllers\Profile\ProfessionalProfileController;
 use App\Http\Controllers\Profile\UpdateProfessionalProfileController;
 use App\Http\Controllers\Profile\UserProfileController;
@@ -134,7 +134,9 @@ Route::prefix("/v1")->group(function () {
             Route::post("/fetch", [ScheduleMedicationController::class, 'getMedicationScheduleByDate']);
             Route::get("/{patient_id}", [ScheduleMedicationController::class, 'getTodaysPatientMedicationSchedule']);
         });
-        Route::get('/patient-data', [PatientDataController::class, 'index']);
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/patient-data/{patient_id}', [PatientDataController::class, 'index']);
+        });
     });
 
     Route::get("/send-sms", [AtSMSController::class, "send"]);
