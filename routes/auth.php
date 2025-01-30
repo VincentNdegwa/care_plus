@@ -129,6 +129,7 @@ Route::prefix("/v1")->group(function () {
             Route::post('/set-caregiver', [SetCareGiversController::class, 'setCareGiver'])->name('set-caregiver');
             Route::post('/remove-doctor', [SetCareGiversController::class, 'removeDoctor']);
             Route::post('/remove-caregiver', [SetCareGiversController::class, 'removeCareGiver']);
+            Route::get("/fetch-all", [FetchCareProvidersController::class, "fetchAll"]);
         });
 
         Route::prefix('medication-schedules')->group(function () {
