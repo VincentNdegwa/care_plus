@@ -38,6 +38,7 @@ class FetchMedicationController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'doctor_id' => 'nullable|exists:doctors,id',
             'caregiver_id' => 'nullable|exists:caregivers,id',
+            'diagnosis_id' => 'nullable|exists:diagnoses,id'
         ];
 
         try {
@@ -82,6 +83,9 @@ class FetchMedicationController extends Controller
             if ($request->filled('caregiver_id')) {
                 $query->where('caregiver_id', $validatedData['caregiver_id']);
             }
+            if ($request->filled('diagnosis_id')) {
+                $query->where('diagnosis_id', $validatedData['diagnosis_id']);
+            }
 
             $medications = $query->paginate(
                 $validatedData['per_page'] ?? 10,
@@ -98,17 +102,7 @@ class FetchMedicationController extends Controller
                     'total_pages' => $medications->lastPage(),
                     'total_items' => $medications->total(),
                     'per_page' => $medications->perPage(),
-                ],
-                'filters' => [
-                    'search' => $request->query('search'),
-                    'form_id' => $request->query('form_id'),
-                    'route_id' => $request->query('route_id'),
-                    'active' => $request->query('active'),
-                    'start_date' => $request->query('start_date'),
-                    'end_date' => $request->query('end_date'),
-                    'doctor_id' => $request->query('doctor_id'),
-                    'caregiver_id' => $request->query('caregiver_id'),
-                ],
+                ]
             ]);
         } catch (ValidationException $e) {
             return response()->json([
