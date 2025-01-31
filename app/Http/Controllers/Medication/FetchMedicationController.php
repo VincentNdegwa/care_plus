@@ -30,22 +30,98 @@ class FetchMedicationController extends Controller
             'patient_id' => 'required|exists:patients,id',
             'per_page' => 'nullable|integer|min:1',
             'page_number' => 'nullable|integer|min:1',
+            'search' => 'nullable|string',
+            'form_id' => 'nullable|exists:medication_forms,id',
+            'route_id' => 'nullable|exists:medication_routes,id',
+            'active' => 'nullable|boolean',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'doctor_id' => 'nullable|exists:doctors,id',
+            'caregiver_id' => 'nullable|exists:caregivers,id',
         ];
 
         try {
             $validatedData = $request->validate($rules);
-            return $this->fetchMedications(
-                'patient_id',
-                $validatedData['patient_id'],
+
+            $query = Medication::where('patient_id', $validatedData['patient_id'])
+                ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route']);
+
+            if ($request->filled('search')) {
+                $search = $validatedData['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('medication_name', 'like', "%{$search}%")
+                        ->orWhere('dosage_strength', 'like', "%{$search}%")
+                        ->orWhere('frequency', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('form_id')) {
+                $query->where('form_id', $validatedData['form_id']);
+            }
+
+            if ($request->filled('route_id')) {
+                $query->where('route_id', $validatedData['route_id']);
+            }
+
+            if ($request->has('active')) {
+                $query->where('active', $validatedData['active']);
+            }
+
+            if ($request->filled('start_date')) {
+                $query->whereDate('prescribed_date', '>=', $validatedData['start_date']);
+            }
+
+            if ($request->filled('end_date')) {
+                $query->whereDate('prescribed_date', '<=', $validatedData['end_date']);
+            }
+
+            if ($request->filled('doctor_id')) {
+                $query->where('doctor_id', $validatedData['doctor_id']);
+            }
+
+            if ($request->filled('caregiver_id')) {
+                $query->where('caregiver_id', $validatedData['caregiver_id']);
+            }
+
+            $medications = $query->paginate(
                 $validatedData['per_page'] ?? 10,
+                ['*'],
+                'page',
                 $validatedData['page_number'] ?? 1
             );
+
+            return response()->json([
+                'error' => false,
+                'data' => $this->formatData($medications->items()),
+                'pagination' => [
+                    'current_page' => $medications->currentPage(),
+                    'total_pages' => $medications->lastPage(),
+                    'total_items' => $medications->total(),
+                    'per_page' => $medications->perPage(),
+                ],
+                'filters' => [
+                    'search' => $request->query('search'),
+                    'form_id' => $request->query('form_id'),
+                    'route_id' => $request->query('route_id'),
+                    'active' => $request->query('active'),
+                    'start_date' => $request->query('start_date'),
+                    'end_date' => $request->query('end_date'),
+                    'doctor_id' => $request->query('doctor_id'),
+                    'caregiver_id' => $request->query('caregiver_id'),
+                ],
+            ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'error' => true,
                 'message' => 'Validation failed.',
                 'details' => $e->errors(),
             ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => 'An error occurred while fetching medications.',
+                'details' => $e->getMessage(),
+            ], 500);
         }
     }
 

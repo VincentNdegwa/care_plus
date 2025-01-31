@@ -86,8 +86,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function professionalProfile()
     {
-        return $this->role === "Doctor"
-            ? $this->doctor()
-            : ($this->role === "Caregiver" ? $this->caregiver() : null);
+        if ($this->role === "Doctor") {
+            return $this->doctor();
+        } elseif ($this->role === "Caregiver") {
+            return $this->caregiver();
+        }
+        return null;
     }
 }

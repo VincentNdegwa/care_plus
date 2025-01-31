@@ -3,68 +3,110 @@
 namespace App\Http\Controllers\CareProvider;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\CareProviderValidation;
 use App\Models\CaregiverRelation;
 use App\Models\DoctorRelation;
 use App\Models\User;
+use App\Services\CareProviderQueryService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FetchCareProvidersController extends Controller
 {
-    public function fetchPatientDoctors(Request $request, $patient_id)
+    use CareProviderValidation;
+
+    protected CareProviderQueryService $queryService;
+
+    public function __construct(CareProviderQueryService $queryService)
     {
-        $page = $request->input('page', 1);
-        $per_page = $request->input('per_page', 10);
-        return $this->fetchData(DoctorRelation::class, 'doctor', $patient_id, $page, $per_page);
+        $this->queryService = $queryService;
     }
 
-    public function fetchPatientCareGivers(Request $request, $patient_id)
+    public function fetchAll(Request $request): JsonResponse
     {
-        $page = $request->input('page', 1);
-        $per_page = $request->input('per_page', 10);
-
-        return $this->fetchData(CaregiverRelation::class, 'caregiver', $patient_id, $page, $per_page);
+        $request->validate($this->getValidationRules());
+        return $this->fetchCareProviders($this->getRequestParams($request));
     }
 
-    private function fetchData($model, $relation, $patient_id, $page, $per_page)
+    public function fetchPatientDoctors(Request $request, $patientId): JsonResponse
     {
-        $user_ids = $model::where("patient_id", $patient_id)->with($relation)->get()->pluck($relation . '.user_id');
-        return $this->fetch($user_ids, $page, $per_page);
+        $request->validate($this->getValidationRules());
+        $params = $this->getRequestParams($request);
+        $params['user_ids'] = $this->getUserIds(DoctorRelation::class, 'doctor', $patientId);
+        return $this->fetchCareProviders($params);
     }
 
-    public function fetchAll(Request $request)
+    public function fetchPatientCareGivers(Request $request, $patientId): JsonResponse
     {
-        $page = $request->input('page', 1);
-        $per_page = $request->input('per_page', 10);
-
-        return $this->fetch(null, $page, $per_page);
+        $request->validate($this->getValidationRules());
+        $params = $this->getRequestParams($request);
+        $params['user_ids'] = $this->getUserIds(CaregiverRelation::class, 'caregiver', $patientId);
+        return $this->fetchCareProviders($params);
     }
 
-    public function fetch($user_ids = null, $page, $per_page)
+    protected function getRequestParams(Request $request): array
     {
-        $userQuery = User::query();
-        if (isset($user_ids) && $user_ids != null) {
-            $userQuery->whereIn('id', $user_ids);
-        }
+        return [
+            'page' => $request->input('page', 1),
+            'per_page' => $request->input('per_page', 10),
+            'search' => $request->query('search'),
+            'role' => $request->query('role'),
+            'agency_name' => $request->query('agency_name'),
+            'gender' => $request->query('gender'),
+            'specialization' => $request->query('specialization'),
+        ];
+    }
 
-        $users = $userQuery->where('role', '!=', 'patient')->paginate($per_page, ['*'], 'page', $page);
+    protected function getUserIds(string $model, string $relation, $patientId): array
+    {
+        return $model::where('patient_id', $patientId)
+            ->with($relation)
+            ->get()
+            ->pluck($relation . '.user_id')
+            ->toArray();
+    }
 
-        $users->getCollection()->transform(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'user_role' => $user->userRole(),
-                'profile' => $user->profile,
-            ];
+    protected function fetchCareProviders(array $params): JsonResponse
+    {
+        $query = User::query();
+        $this->queryService->buildQuery($query, $params);
+
+        $users = $query->paginate($params['per_page'], ['*'], 'page', $params['page']);
+
+        return response()->json($this->transformPaginatedData($users));
+    }
+
+    protected function transformPaginatedData($paginatedData): array
+    {
+        $transformedData = $paginatedData->through(function ($user) {
+            return $this->transformUserData($user);
         });
 
-        return response()->json([
-            'data' => $users->items(),
-            'current_page' => $users->currentPage(),
-            'last_page' => $users->lastPage(),
-            'per_page' => $users->perPage(),
-            'total' => $users->total(),
-        ]);
+        return [
+            'data' => $transformedData->items(),
+            'current_page' => $transformedData->currentPage(),
+            'last_page' => $transformedData->lastPage(),
+            'per_page' => $transformedData->perPage(),
+            'total' => $transformedData->total(),
+        ];
+    }
+
+    protected function transformUserData($user): array
+    {
+        $professionalData = null;
+        if ($user->role === 'Doctor') {
+            $professionalData = $user->doctor;
+        } elseif ($user->role === 'Caregiver') {
+            $professionalData = $user->caregiver;
+        }
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'profile' => $user->profile,
+            'user_role' => $professionalData,
+        ];
     }
 }
