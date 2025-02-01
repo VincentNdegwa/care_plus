@@ -28,4 +28,15 @@ jobs:
           docker compose down
           docker compose up -d --build
           docker image prune -f
+
+          # Clear Laravel cache
+          # docker compose exec php-fpm php artisan config:cache
+          # docker compose exec php-fpm php artisan route:cache
+          # docker compose exec php-fpm php artisan view:cache
+
+          # Restart queue workers
+          docker compose restart queue-worker
+
+          # Restart scheduler
+          docker compose restart scheduler
           EOF

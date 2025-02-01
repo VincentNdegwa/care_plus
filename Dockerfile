@@ -1,4 +1,3 @@
-
 FROM php:8.2-fpm-alpine3.18
 
 RUN apk add --no-cache \
@@ -21,6 +20,7 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     make \
+    supervisor \
     && docker-php-ext-configure zip \
     && docker-php-ext-configure intl \
     && docker-php-ext-install zip pdo pdo_mysql intl bcmath \
@@ -34,10 +34,15 @@ WORKDIR /var/www/html
 
 COPY . .
 
+# Create supervisor config directory
+RUN mkdir -p /etc/supervisor.d/
+
+# Copy supervisor configuration
+COPY docker/supervisor/supervisord.conf /etc/supervisord.conf
+COPY docker/supervisor/conf.d/ /etc/supervisor.d/
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
 
 COPY composer.json composer.lock /var/www/html/
 
