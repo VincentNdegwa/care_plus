@@ -8,6 +8,12 @@ class CareProviderQueryService
 {
     public function buildQuery(Builder $query, array $filters): Builder
     {
+        // If we have user_ids filter and it's empty, force no results
+        if (isset($filters['user_ids']) && empty($filters['user_ids'])) {
+            $query->whereRaw('1 = 0'); // This ensures no results are returned
+            return $query;
+        }
+
         $this->applyUserIdsFilter($query, $filters['user_ids'] ?? null);
         $this->applyRoleFilter($query, $filters['role'] ?? null);
         $this->applySearchFilter($query, $filters['search'] ?? null);
@@ -15,7 +21,7 @@ class CareProviderQueryService
         $this->applyGenderFilter($query, $filters['gender'] ?? null);
         $this->applySpecializationFilter($query, $filters['specialization'] ?? null, $filters['role'] ?? null);
         $this->loadRelationships($query, $filters['role'] ?? null);
-        
+
         return $query->where('role', '!=', 'patient');
     }
 
@@ -75,10 +81,10 @@ class CareProviderQueryService
     private function loadRelationships(Builder $query, ?string $role): void
     {
         $query->with(['profile']);
-        
+
         if ($role) {
             $relation = strtolower($role);
             $query->with($relation);
         }
     }
-} 
+}

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\CareProviderQueryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FetchCareProvidersController extends Controller
 {
@@ -33,6 +34,7 @@ class FetchCareProvidersController extends Controller
         $request->validate($this->getValidationRules());
         $params = $this->getRequestParams($request);
         $params['user_ids'] = $this->getUserIds(DoctorRelation::class, 'doctor', $patientId);
+        $params['role'] = 'Doctor';
         return $this->fetchCareProviders($params);
     }
 
@@ -41,6 +43,7 @@ class FetchCareProvidersController extends Controller
         $request->validate($this->getValidationRules());
         $params = $this->getRequestParams($request);
         $params['user_ids'] = $this->getUserIds(CaregiverRelation::class, 'caregiver', $patientId);
+        $params['role'] = 'Caregiver';
         return $this->fetchCareProviders($params);
     }
 
@@ -59,11 +62,14 @@ class FetchCareProvidersController extends Controller
 
     protected function getUserIds(string $model, string $relation, $patientId): array
     {
-        return $model::where('patient_id', $patientId)
+        $id_array = $model::where('patient_id', $patientId)
             ->with($relation)
             ->get()
             ->pluck($relation . '.user_id')
             ->toArray();
+        Log::info('Found user IDs: ' . json_encode($id_array));
+
+        return array_filter($id_array);
     }
 
     protected function fetchCareProviders(array $params): JsonResponse
