@@ -36,7 +36,7 @@ jobs:
           docker image prune -f
 
           # Run migrations
-          docker compose exec php-fpm php artisan migrate --force
+          docker compose exec care_plus-php-fpm-1 php artisan migrate --force
 
           # Clear cache
           # docker compose exec php-fpm php artisan optimize:clear
