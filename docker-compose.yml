@@ -9,39 +9,43 @@ services:
     volumes:
       - .:/var/www/html
     command: >
-      sh -c " chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && php-fpm "
+      sh -c "chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && php-fpm"
     networks:
       - app-network
 
-  # Add queue worker service
   queue-worker:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env.production
-    command: php artisan queue:work --tries=3 --timeout=90
-    depends_on:
-      - php-fpm
+    environment:
+      - QUEUE_WORKER=true
     volumes:
       - .:/var/www/html
+    depends_on:
+      - php-fpm
+      - database
     networks:
       - app-network
+    restart: unless-stopped
 
-  # Add scheduler service
   scheduler:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env.production
-    command: php artisan schedule:work
-    depends_on:
-      - php-fpm
+    environment:
+      - SCHEDULER=true
     volumes:
       - .:/var/www/html
+    depends_on:
+      - php-fpm
+      - database
     networks:
       - app-network
+    restart: unless-stopped
 
   nginx:
     image: nginx:alpine

@@ -25,18 +25,25 @@ jobs:
           ssh -t -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
           cd /var/www/html/care_plus || git clone https://github.com/VincentNdegwa/care_plus.git /var/www/html/care_plus && cd /var/www/html/care_plus
           git pull origin main
+
+          # Stop and remove existing containers
           docker compose down
+
+          # Build and start containers
           docker compose up -d --build
+
+          # Clean up old images
           docker image prune -f
 
-          # Clear Laravel cache
-          # docker compose exec php-fpm php artisan config:cache
-          # docker compose exec php-fpm php artisan route:cache
-          # docker compose exec php-fpm php artisan view:cache
+          # Run migrations
+          docker compose exec php-fpm php artisan migrate --force
 
-          # Restart queue workers
-          docker compose restart queue-worker
+          # Clear cache
+          docker compose exec php-fpm php artisan optimize:clear
+          docker compose exec php-fpm php artisan config:cache
+          docker compose exec php-fpm php artisan route:cache
+          docker compose exec php-fpm php artisan view:cache
 
-          # Restart scheduler
-          docker compose restart scheduler
+          # Restart queue and scheduler
+          docker compose restart queue-worker scheduler
           EOF
