@@ -56,7 +56,6 @@ RUN php artisan migrate --force \
 
 EXPOSE 9000
 
-# Create a startup script
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
