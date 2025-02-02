@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\MedicationConvert;
 use App\Models\Medication;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class CreateMedicationController extends Controller
 {
+    use MedicationConvert;
 
     public function create(Request $request)
     {
@@ -45,12 +47,16 @@ class CreateMedicationController extends Controller
             }
 
 
-            $medication = Medication::create($validatedData);
+            $newMedication = Medication::create($validatedData);
+            $medication = Medication::where("id", $newMedication->id)
+                ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route'])
+                ->first();
+            $converted = $this::convert($medication);
 
             return response()->json([
                 "error" => false,
                 "message" => "Medication record created successfully.",
-                "data" => $medication
+                "data" => $converted
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
