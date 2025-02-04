@@ -32,6 +32,11 @@ class MedicationTake implements ShouldBroadcast
         ];
     }
 
+    public function broadcastAs(): string
+    {
+        return 'medication.take';
+    }
+
     public function broadcastWith(): array
     {
         return $this->schedule->toArray();
