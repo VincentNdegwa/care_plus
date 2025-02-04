@@ -22,7 +22,6 @@ services:
     volumes:
       - .:/var/www/html
     depends_on:
-      - php-fpm
       - database
     networks:
       - app-network
@@ -37,7 +36,6 @@ services:
     volumes:
       - .:/var/www/html
     depends_on:
-      - php-fpm
       - database
     networks:
       - app-network
