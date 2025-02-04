@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\MedicationCheckJob;
+use App\Jobs\TestJobNotification;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -11,3 +12,4 @@ Artisan::command('inspire', function () {
 
 Schedule::job(new MedicationCheckJob)->everyMinute();
 Schedule::command('telescope:prune --hours=48')->daily();
+Schedule::job(new TestJobNotification)->everyMinute(); 
