@@ -16,48 +16,18 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     {
         // Telescope::night();
 
-        // $this->hideSensitiveRequestDetails();
-
-        // $isLocal = $this->app->environment('local');
-
-        // Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
-        //     return $isLocal ||
-        //         $entry->isReportableException() ||
-        //         $entry->isFailedRequest() ||
-        //         $entry->isFailedJob() ||
-        //         $entry->isScheduledTask() ||
-        //         $entry->hasMonitoredTag();
-        // });
-
-        // $this->app->register(TelescopeServiceProvider::class);
-
-        // Prevent Telescope from running the UI in production
-        if ($this->app->environment('production')) {
-            config(['telescope.enabled' => false]);
-        }
-
         $this->hideSensitiveRequestDetails();
 
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
-            return $isLocal || app()->environment('production')
-            ? in_array($entry->type, [
-                'exception',
-                'failed-job',
-                'query',  // Log database queries
-                'request', // Log failed requests
-                'schedule', // Log scheduled tasks
-            ])
-                : true;
+            return $isLocal ||
+                   $entry->isReportableException() ||
+                   $entry->isFailedRequest() ||
+                   $entry->isFailedJob() ||
+                   $entry->isScheduledTask() ||
+                   $entry->hasMonitoredTag();
         });
-
-        // Ensure Telescope logs data in production but only runs UI locally
-        if (!$this->app->environment('production')) {
-            $this->app->register(TelescopeServiceProvider::class);
-        }
-
- 
     }
 
     /**
