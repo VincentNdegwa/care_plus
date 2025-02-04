@@ -25,15 +25,15 @@ class MedicationTake implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        $channel = 'medication.take.' . $this->schedule->id;
+        $channel = 'medication.take.' . $this->schedule->patient_id;
         Log::info("Broadcasting on channel", ['channel' => $channel]);
         return [
             new PrivateChannel($channel),
         ];
     }
 
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
-        return $this->schedule;
+        return $this->schedule->toArray();
     }
 }

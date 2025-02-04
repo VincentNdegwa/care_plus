@@ -26,18 +26,20 @@ class SendMedicationDefaultNotification implements ShouldQueue
      */
     public function handle(): void
     {
-
-
-        MedicationScheduleNotification::create([
-            'medication_schedule_id' => $this->schedule->id,
-            'message' => "
+        MedicationScheduleNotification::updateOrCreate(
+            [
+                'medication_schedule_id' => $this->schedule->id,
+                'status' => 'Pending'
+            ],
+            [
+                'message' => "
                      
                      It's time to take your medication:      
                      Please take it as prescribed 
                      
                      Take care,  
                      ",
-            'status' => 'Pending',
-        ]);
+            ]
+        );
     }
 }
