@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CareProvider\FetchCareProvidersController;
+use Illuminate\Support\Facades\Broadcast;
 
 Route::prefix('v1')->group(function () {
     Route::get('care-providers', [FetchCareProvidersController::class, 'fetchAll']);
@@ -10,4 +11,4 @@ Route::prefix('v1')->group(function () {
 });
 
 
-
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
