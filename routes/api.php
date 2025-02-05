@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CareProvider\FetchCareProvidersController;
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::routes();
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
 Route::prefix('v1')->group(function () {
     Route::get('care-providers', [FetchCareProvidersController::class, 'fetchAll']);
     Route::get('patients/{patient_id}/doctors', [FetchCareProvidersController::class, 'fetchPatientDoctors']);
