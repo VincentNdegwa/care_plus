@@ -25,7 +25,7 @@ class EventTest implements ShouldBroadcast
     {
         $schedule = MedicationSchedule::create([
             'medication_id' => 5,
-            'patient_id' => 3,
+            'patient_id' => 2,
             // 'medication_id'=> 1,
             // 'patient_id'=> 1,
             'dose_time' => '2025-02-13 05:24:00',
