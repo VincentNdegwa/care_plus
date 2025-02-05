@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\EventTest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +24,6 @@ class TestJobNotification implements ShouldQueue
      */
     public function handle(): void
     {
-       Log::info("Running test job");
+        EventTest::dispatch();
     }
 }

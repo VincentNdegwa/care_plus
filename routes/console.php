@@ -12,4 +12,4 @@ Artisan::command('inspire', function () {
 
 Schedule::job(new MedicationCheckJob)->everyMinute();
 Schedule::command('telescope:prune --hours=48')->daily();
-Schedule::job(new TestJobNotification)->everyMinute(); 
+// Schedule::job(new TestJobNotification)->everyMinute(); 
