@@ -97,8 +97,7 @@ Route::prefix("/v1")->group(function () {
             Route::post("/create", [CreateMedicationController::class, 'create']);
             Route::patch("/update/{medication_id}", [UpdateMedicationController::class, 'update']);
             Route::delete("/delete/{medication_id}", [DeleteMedicationController::class, 'delete']);
-
-
+            Route::post("/schedule/generate-time", [ScheduleMedicationController::class, 'generateScheduleTimes']);
             Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
             Route::post("/schedule/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
             Route::prefix('medication-resources')->group(function () {

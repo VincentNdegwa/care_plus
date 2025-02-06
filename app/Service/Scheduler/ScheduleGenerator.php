@@ -5,11 +5,14 @@ namespace App\Service\Scheduler;
 use App\Models\Medication;
 use App\Models\Schedules\MedicationTracker;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class ScheduleGenerator extends BaseScheduler
 {
     public static $scheduledHours = null;
+
+
 
     public static function generateSchedule($custom, $timezone)
     {
@@ -118,6 +121,8 @@ class ScheduleGenerator extends BaseScheduler
                 'medication_id' => parent::$medication_id,
                 'patient_id' => parent::$patient_id,
             ];
+            $scheduleDoseTime[]= $startDate->setTimezone(parent::$app_timezone)->format('H:i:s');
+
             $hourMinute = $startDate->copy()->setTimezone($timezone)->format('H:i');
             if (!in_array($hourMinute, $scheduleHours)) {
                 $scheduleHours[] = $hourMinute;
@@ -127,5 +132,41 @@ class ScheduleGenerator extends BaseScheduler
         }
 
         self::$scheduledHours = $scheduleHours;
+    }
+
+    public static function getDefaultDoseTimes($custom){
+
+        parent::$app_timezone = config('app.timezone') ?: 'UTC';
+
+        $medication_id = $custom['medication_id'];
+        $medication = parent::getMedication($medication_id);
+        $timezone = $custom['timezone'];
+
+        parent::$medication_id = $medication_id;
+        parent::$patient_id = $medication->patient_id;
+
+        // Parse the user's start_datetime with the provided timezone, then convert to the app timezone (UTC)
+        $startDate = Carbon::parse($custom['start_datetime'], $timezone)->setTimezone(parent::$app_timezone);
+        $frequency = $medication->frequency;
+        $duration = $medication->duration;
+
+        $endDate = parent::calculateEndDate($startDate->copy(), $duration, parent::$app_timezone);
+
+        $stopDay = $endDate;
+
+        $frequencyInterval = parent::getFrequencyInterval($frequency);
+        $scheduleHours = [];
+
+        while ($startDate->lte($stopDay)) {
+            $hourMinute = $startDate->copy()->setTimezone($timezone)->format('H:i');
+            if (!in_array($hourMinute, $scheduleHours)) {
+                $scheduleHours[] = $hourMinute;
+            }
+
+            parent::updateStartDate($startDate, $frequency, $frequencyInterval);
+        }
+
+        self::$scheduledHours = $scheduleHours;
+        return $scheduleHours;
     }
 }

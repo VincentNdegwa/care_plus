@@ -163,4 +163,19 @@ class ScheduleMedicationController extends Controller
             "schedules" => $schedules
         ]);
     }
+
+    public function generateScheduleTimes(Request $request)
+    {
+        $validatedData = $request->validate([
+            'medication_id' => 'required|exists:medications,id',
+            'start_datetime' => 'date_format:Y-m-d H:i:s',
+            'timezone' => 'nullable|string'
+        ]);
+
+        $validatedData['timezone'] = $request->input('timezone', 'Africa/Nairobi');
+
+
+        return ScheduleGenerator::getDefaultDoseTimes($validatedData);
+
+    }
 }
