@@ -39,7 +39,7 @@ return new class extends Migration
             $table->foreignId('doctor_id')->nullable()->constrained('doctors')->onDelete('set null');
             $table->foreignId('caregiver_id')->nullable()->constrained('caregivers')->onDelete('set null');
             $table->integer('stock')->nullable(); // Total stock
-            $table->boolean('active')->default(true);
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }

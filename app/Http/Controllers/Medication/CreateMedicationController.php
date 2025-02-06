@@ -45,6 +45,7 @@ class CreateMedicationController extends Controller
             if (!isset($validatedData['prescribed_date'])) {
                 $validatedData['prescribed_date'] = Carbon::now()->format('Y-m-d H:i:s');
             }
+            $validatedData['active'] = 0;
 
 
             $newMedication = Medication::create($validatedData);
