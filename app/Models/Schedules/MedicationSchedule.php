@@ -17,7 +17,8 @@ class MedicationSchedule extends Model
         'medication_id',
         'patient_id',
         'dose_time',
-        'status'
+        'status',
+        'taken_at',
     ];
 
     /**

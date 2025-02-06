@@ -17,6 +17,7 @@ return new class extends Migration
             $table->dateTime('dose_time');
             $table->dateTime('processed_at')->nullable();
             $table->enum('status', ['Taken', 'Missed', 'Pending'])->default('Pending');
+            $table->dateTime('taken_at')->nullable();
             $table->timestamps();
         });
 
