@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Models\Medication;
 use App\Models\Patient;
 use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationTracker;
@@ -41,10 +42,18 @@ class ScheduleMedicationController extends Controller
 
             DB::commit();
 
+            Medication::where('id', $request->input('medication_id'))->update([
+                'active' => 1
+            ]);
+
+            $medicationScheduleData = MedicationSchedule::where("medication_id", $request->input('medication_id'))
+                ->with("medication.tracker")
+                ->first();
+
             return response()->json([
                 'error' => false,
                 'message' => $successMessage,
-                'data' => $scheduleData,
+                'data' => $medicationScheduleData,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
