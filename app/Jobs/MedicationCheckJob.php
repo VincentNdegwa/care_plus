@@ -58,6 +58,7 @@ class MedicationCheckJob implements ShouldQueue
 
             // Send second notification for pending schedules
             foreach ($pendingSchedules as $schedule) {
+                MedicationTake::dispatch($schedule);
                 SendMedicationDefaultNotification::dispatch($schedule);
                 Log::info("Sent second notification for schedule ID: {$schedule->id} after 2 hours");
             }
