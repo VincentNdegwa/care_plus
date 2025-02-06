@@ -29,26 +29,44 @@ class MedicationCheckJob implements ShouldQueue
     {
         try {
             $nowTime = Carbon::now();
-            $ourLateTime = $nowTime->copy()->subHour();
+            $oneHourAgo = $nowTime->copy()->subHour();
+            $twoHoursAgo = $nowTime->copy()->subHours(2);
+            $threeHoursAgo = $nowTime->copy()->subHours(3);
 
-
-            $schedules = MedicationSchedule::where('dose_time', '>=', $ourLateTime)
+            // Check for new medications that need to be processed
+            $newSchedules = MedicationSchedule::where('dose_time', '>=', $oneHourAgo)
                 ->where('dose_time', '<=', $nowTime)
-                ->whereNull("processed_at")
+                ->whereNull('processed_at')
+                ->where('status', 'Pending')
                 ->get();
 
-
-            foreach ($schedules as $schedule) {
-
+            // Process new schedules
+            foreach ($newSchedules as $schedule) {
                 $schedule->processed_at = $nowTime;
                 $schedule->save();
 
                 MedicationTake::dispatch($schedule);
-
                 SendMedicationDefaultNotification::dispatch($schedule);
-
-                Log::info("Dispatched MedicationTake event for schedule ID: {$schedule->id}");
+                Log::info("Dispatched initial MedicationTake event for schedule ID: {$schedule->id}");
             }
+
+            // Check for medications processed exactly 2 hours ago that are still pending
+            $pendingSchedules = MedicationSchedule::where('processed_at', '<=', $twoHoursAgo)
+                ->where('processed_at', '>=', $threeHoursAgo->addMinutes(30))
+                ->where('status', 'Pending')
+                ->get();
+
+            // Send second notification for pending schedules
+            foreach ($pendingSchedules as $schedule) {
+                SendMedicationDefaultNotification::dispatch($schedule);
+                Log::info("Sent second notification for schedule ID: {$schedule->id} after 2 hours");
+            }
+
+            // Mark medications as missed if not taken after 3 hours
+            $missedMedications = MedicationSchedule::where('dose_time', '<=', $threeHoursAgo)
+                ->where('status', 'Pending')
+                ->update(['status' => 'Missed']);
+
         } catch (\Throwable $th) {
             Log::error("Error: " . $th->getMessage());
         }
