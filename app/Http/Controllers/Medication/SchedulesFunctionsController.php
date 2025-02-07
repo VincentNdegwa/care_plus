@@ -41,7 +41,6 @@ class SchedulesFunctionsController extends Controller
     {
         $request->validate([
             'medication_id' => 'required|exists:medications,id',
-            'stopped_when' => 'required|date'
         ]);
 
         try {
@@ -59,7 +58,7 @@ class SchedulesFunctionsController extends Controller
             }
 
             $tracker->status = 'stopped';
-            $tracker->stopped_when = $request->stopped_when;
+            $tracker->stopped_when = Carbon::now();
             $tracker->save();
 
             // Clear future schedules
@@ -143,6 +142,21 @@ class SchedulesFunctionsController extends Controller
                 ], 404);
             }
 
+            $now = Carbon::now();
+            $originalEndDate = Carbon::parse($tracker->end_date);
+            
+            if ($request->input('extend_days', false)) {
+                // Calculate minutes difference between stopped time and now
+                $stoppedWhen = Carbon::parse($tracker->stopped_when);
+                $minutesDifference = $stoppedWhen->diffInMinutes($now);
+                
+                // Add the difference to the end date
+                $newEndDate = $originalEndDate->copy()->addMinutes($minutesDifference);
+                
+                // Update tracker end date
+                $tracker->end_date = $newEndDate;
+            }
+
             // Update medication and tracker status
             $tracker->status = 'Running';
             $tracker->stopped_when = null;
@@ -151,44 +165,31 @@ class SchedulesFunctionsController extends Controller
             Medication::where('id', $request->medication_id)
                 ->update(['active' => 1]);
 
-            // Get the last processed schedule
-            $lastSchedule = MedicationSchedule::where('medication_id', $request->medication_id)
-                ->orderBy('processed_at', 'desc')
-                ->first();
+            // Generate schedules from now to end date
+            $scheduleData = ScheduleGenerator::generateSchedule([
+                'medication_id' => $request->medication_id,
+                'start_datetime' => $now->format('Y-m-d H:i:s'),
+                'end_datetime' => $request->input('extend_days', false) ? 
+                    $tracker->end_date : 
+                    $originalEndDate->format('Y-m-d H:i:s')
+            ], $tracker->timezone);
 
-            if ($lastSchedule) {
-                $startDateTime = $lastSchedule->processed_at ?? Carbon::now();
-                
-                // Generate new schedules from where we left off
-                $scheduleData = ScheduleGenerator::generateResumeSchedule(
-                    $request->medication_id,
-                    $startDateTime,
-                    $tracker->timezone
-                );
-
-                // Save new schedules
-                foreach ($scheduleData['medications_schedules'] as $schedule) {
-                    MedicationSchedule::create($schedule);
-                }
-
-                // If no remaining days and extend_days is true, generate new month
-                if ($scheduleData['remaining_days'] === 0 && $request->input('extend_days', false)) {
-                    $extendData = ScheduleGenerator::generateSchedule([
-                        'medication_id' => $request->medication_id,
-                        'start_datetime' => Carbon::now(),
-                    ], $tracker->timezone);
-
-                    foreach ($extendData['medications_schedules'] as $schedule) {
-                        MedicationSchedule::create($schedule);
-                    }
-                }
+            // Save new schedules
+            foreach ($scheduleData['medications_schedules'] as $schedule) {
+                MedicationSchedule::create($schedule);
             }
 
             DB::commit();
 
             return response()->json([
                 'error' => false,
-                'message' => 'Medication resumed successfully'
+                'message' => 'Medication resumed successfully',
+                'data' => [
+                    'original_end_date' => $originalEndDate,
+                    'new_end_date' => $request->input('extend_days', false) ? $tracker->end_date : $originalEndDate,
+                    'minutes_added' => $request->input('extend_days', false) ? 
+                        Carbon::parse($tracker->stopped_when)->diffInMinutes($now) : 0
+                ]
             ]);
 
         } catch (\Exception $e) {

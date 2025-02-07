@@ -173,12 +173,17 @@ class ScheduleGenerator extends BaseScheduler
     /**
      * Generate schedules from where they were left off
      */
-    public static function generateResumeSchedule($medication_id, $startDateTime, $timezone)
+    public static function generateResumeSchedule($custom, $timezone)
     {
+        $startDate = $custom['start_datetime'];
+        $endDate = $custom['end_datetime'];
+        $medication_id= $custom['medication_id'];
+
         parent::$app_timezone = config('app.timezone') ?: 'UTC';
         
         $medication = parent::getMedication($medication_id);
         $tracker = MedicationTracker::where('medication_id', $medication_id)->first();
+
         
         if (!$tracker) {
             throw new InvalidArgumentException('No tracker found for this medication');
@@ -187,18 +192,14 @@ class ScheduleGenerator extends BaseScheduler
         parent::$medication_id = $medication_id;
         parent::$patient_id = $medication->patient_id;
 
-        // Convert start time to app timezone
-        $startDate = Carbon::parse($startDateTime, $timezone)->setTimezone(parent::$app_timezone);
-        
-        // Get the original end date from tracker
-        $originalEndDate = Carbon::parse($tracker->end_date);
         
         // If we still have days left
-        if ($startDate->lt($originalEndDate)) {
-            $stopDay = $originalEndDate;
+        if ($startDate->lt($endDate)) {
+            $stopDay = $endDate;
             $medicationSchedule = [];
 
             // Check if it's custom or default schedule
+            
             if ($tracker->schedules) {
                 // Custom schedules
                 $schedules = json_decode($tracker->schedules, true);
@@ -222,7 +223,7 @@ class ScheduleGenerator extends BaseScheduler
 
             return [
                 'medications_schedules' => $medicationSchedule,
-                'remaining_days' => $startDate->diffInDays($originalEndDate)
+                'remaining_days' => $startDate->diffInDays($endDate)
             ];
         }
 

@@ -34,6 +34,7 @@ use App\Http\Controllers\Profile\UserProfileController;
 use App\Http\Controllers\SideEffect\AlterSideEffectController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
+use App\Http\Controllers\Medication\SchedulesFunctionsController;
 
 
 Route::prefix("/v1")->group(function () {
@@ -97,9 +98,26 @@ Route::prefix("/v1")->group(function () {
             Route::post("/create", [CreateMedicationController::class, 'create']);
             Route::patch("/update/{medication_id}", [UpdateMedicationController::class, 'update']);
             Route::delete("/delete/{medication_id}", [DeleteMedicationController::class, 'delete']);
-            Route::post("/schedule/generate-time", [ScheduleMedicationController::class, 'generateScheduleTimes']);
-            Route::post("/schedule/default", [ScheduleMedicationController::class, "scheduleDefault"]);
-            Route::post("/schedule/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
+            // Schedule routes group
+            Route::prefix('schedule')->group(function () {
+                Route::post("/generate-time", [ScheduleMedicationController::class, 'generateScheduleTimes']);
+                Route::post("/default", [ScheduleMedicationController::class, "scheduleDefault"]);
+                Route::post("/custom", [ScheduleMedicationController::class, "scheduleCustom"]);
+                
+                // Function routes
+                Route::post("/take", [SchedulesFunctionsController::class, "take"])
+                    ->name('medication.schedule.take');
+                    
+                Route::post("/stop", [SchedulesFunctionsController::class, "stop"])
+                    ->name('medication.schedule.stop');
+                    
+                Route::post("/snooze", [SchedulesFunctionsController::class, "snooze"])
+                    ->name('medication.schedule.snooze');
+                    
+                Route::post("/resume", [SchedulesFunctionsController::class, "resume"])
+                    ->name('medication.schedule.resume');
+            });
+
             Route::prefix('medication-resources')->group(function () {
                 Route::get('/forms', [MedicationResourcesController::class, 'getMedicationForms']);
                 Route::get('/routes', [MedicationResourcesController::class, 'getMedicationRoutes']);
