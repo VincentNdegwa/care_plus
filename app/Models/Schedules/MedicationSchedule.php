@@ -64,4 +64,9 @@ class MedicationSchedule extends Model
             ->where('status', '!=', 'Dismissed')
             ->exists();
     }
+
+    public function hasActiveMedication():bool
+    {
+        return $this->medication()->where('status', 1)->exists();
+    }
 }

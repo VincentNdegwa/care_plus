@@ -142,6 +142,13 @@ class SchedulesFunctionsController extends Controller
                 ], 404);
             }
 
+            if ($tracker->status !== 'Stopped') {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Medication is not stopped'
+                ], 400);
+            }
+
             $now = Carbon::now();
             $originalEndDate = Carbon::parse($tracker->end_date);
             
