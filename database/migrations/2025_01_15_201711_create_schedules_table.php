@@ -34,6 +34,9 @@ return new class extends Migration
             $table->string('frequency')->nullable();
             $table->string('schedules')->nullable();
             $table->string("timezone")->default('Africa/Nairobi');
+            $table->boolean('active')->default(true);
+            $table->enum('status', ['Stopped', 'Running'])->default('Running');
+            $table->dateTime('stopped_when')->nullable();
             $table->timestamps();
         });
 

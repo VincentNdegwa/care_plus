@@ -21,7 +21,9 @@ class MedicationTracker extends Model
         'duration',
         'frequency',
         'schedules',
-        'timezone'
+        'timezone',
+        'status',
+        'stopped_when'
     ];
 
     /**

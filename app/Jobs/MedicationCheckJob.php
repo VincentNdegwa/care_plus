@@ -60,14 +60,16 @@ class MedicationCheckJob implements ShouldQueue
 
             // Send second notification for pending schedules
             foreach ($pendingSchedules as $schedule) {
-                MedicationTake::dispatch($schedule);
-                SendMedicationDefaultNotification::dispatch($schedule);
-                
-                // Mark that second notification has been sent
-                $schedule->second_notification_sent = 1;
-                $schedule->save();
-                
-                Log::info("Sent second notification for schedule ID: {$schedule->id} after 2 hours");
+                // Check if the schedule is snoozed
+                if (!$schedule->hasActiveSnooze()) {
+                    MedicationTake::dispatch($schedule);
+                    SendMedicationDefaultNotification::dispatch($schedule);
+                    
+                    $schedule->second_notification_sent = 1;
+                    $schedule->save();
+                    
+                    Log::info("Sent second notification for schedule ID: {$schedule->id} after 2 hours");
+                }
             }
 
             // Mark medications as missed if not taken after 3 hours

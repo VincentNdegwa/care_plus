@@ -169,4 +169,66 @@ class ScheduleGenerator extends BaseScheduler
         self::$scheduledHours = $scheduleHours;
         return $scheduleHours;
     }
+
+    /**
+     * Generate schedules from where they were left off
+     */
+    public static function generateResumeSchedule($medication_id, $startDateTime, $timezone)
+    {
+        parent::$app_timezone = config('app.timezone') ?: 'UTC';
+        
+        $medication = parent::getMedication($medication_id);
+        $tracker = MedicationTracker::where('medication_id', $medication_id)->first();
+        
+        if (!$tracker) {
+            throw new InvalidArgumentException('No tracker found for this medication');
+        }
+
+        parent::$medication_id = $medication_id;
+        parent::$patient_id = $medication->patient_id;
+
+        // Convert start time to app timezone
+        $startDate = Carbon::parse($startDateTime, $timezone)->setTimezone(parent::$app_timezone);
+        
+        // Get the original end date from tracker
+        $originalEndDate = Carbon::parse($tracker->end_date);
+        
+        // If we still have days left
+        if ($startDate->lt($originalEndDate)) {
+            $stopDay = $originalEndDate;
+            $medicationSchedule = [];
+
+            // Check if it's custom or default schedule
+            if ($tracker->schedules) {
+                // Custom schedules
+                $schedules = json_decode($tracker->schedules, true);
+                self::generateCustomSchedule(
+                    $startDate,
+                    $stopDay,
+                    $schedules,
+                    $medicationSchedule,
+                    $timezone
+                );
+            } else {
+                // Default schedule based on frequency
+                self::generateDefaultSchedule(
+                    $startDate,
+                    $stopDay,
+                    $tracker->frequency,
+                    $medicationSchedule,
+                    $timezone
+                );
+            }
+
+            return [
+                'medications_schedules' => $medicationSchedule,
+                'remaining_days' => $startDate->diffInDays($originalEndDate)
+            ];
+        }
+
+        return [
+            'medications_schedules' => [],
+            'remaining_days' => 0
+        ];
+    }
 }

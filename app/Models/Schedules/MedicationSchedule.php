@@ -19,6 +19,7 @@ class MedicationSchedule extends Model
         'dose_time',
         'status',
         'taken_at',
+        'second_notification_sent'
     ];
 
     /**
@@ -44,5 +45,23 @@ class MedicationSchedule extends Model
     public function notifications()
     {
         return $this->hasMany(MedicationScheduleNotification::class, 'medication_schedule_id');
+    }
+
+    /**
+     * Get the snoozes for the medication schedule.
+     */
+    public function snoozes()
+    {
+        return $this->hasMany(MedicationSnooze::class);
+    }
+
+    /**
+     * Check if the medication schedule has an active snooze.
+     */
+    public function hasActiveSnooze(): bool
+    {
+        return $this->snoozes()
+            ->where('status', '!=', 'Dismissed')
+            ->exists();
     }
 }
