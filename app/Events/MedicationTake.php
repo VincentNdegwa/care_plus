@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Schedules\MedicationSchedule;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -16,11 +17,13 @@ class MedicationTake implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $schedule;
+    public $medicationSchedule;
 
     public function __construct($schedule)
     {
         Log::info("MedicationTake event constructed", ['schedule_id' => $schedule->id]);
         $this->schedule = $schedule;
+        $this->medicationSchedule = MedicationSchedule::with('medication')->find($schedule->id);
     }
 
     public function broadcastOn(): array
@@ -39,6 +42,6 @@ class MedicationTake implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        return $this->schedule->toArray();
+        return $this->medicationSchedule->toArray();
     }
 }
