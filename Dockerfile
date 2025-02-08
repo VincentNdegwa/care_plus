@@ -48,10 +48,10 @@ COPY composer.json composer.lock /var/www/html/
 
 RUN composer install --optimize-autoloader
 
-RUN php artisan optimize:clear \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
+# RUN php artisan optimize:clear \
+#     && php artisan config:cache \
+#     && php artisan route:cache \
+#     && php artisan view:cache \
 
 EXPOSE 9000
 
