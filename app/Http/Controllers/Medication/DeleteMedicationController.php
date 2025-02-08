@@ -20,12 +20,9 @@ class DeleteMedicationController extends Controller
             }
 
             if ($medication->hasRunningSchedule()) {
-                return response()->json([
-                    'error' => true,
-                    'message' => "Medication has running schedules, stop the schedules first"
-                ], 400);
+              throw new \Exception("Medication has running schedules, stop them first");
             }
-            
+
             $medication->delete();
 
             return response()->json([
