@@ -11,30 +11,24 @@ class DeleteMedicationController extends Controller
     public function delete($medication_id)
     {
         try {
-            $medication = Medication::where('id', $medication_id)->first();
+            $medication = Medication::find($medication_id);
             if (!$medication) {
-                return response()->json([
-                    'error' => true,
-                    'message' => "Medication not found"
-                ], 404);
+                return response("Medication not found", 404);
             }
-
+    
             if ($medication->hasRunningSchedule()) {
-              throw new \Exception("Medication has running schedules, stop them first");
+                return response("Medication has running schedules, stop them first", 400);
             }
-
+    
             $medication->delete();
-
             return response()->json([
                 "error" => false,
                 "message" => "Medication Deleted Successfully"
             ], 200);
+            
         } catch (\Throwable $th) {
-            return response()->json([
-                "error" => false,
-                "message" => $th->getMessage(),
-                "errors" => $th,
-            ], 500);
+            return response($th->getMessage(), 500);
         }
     }
+    
 }
