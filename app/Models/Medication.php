@@ -75,4 +75,9 @@ class Medication extends Model
     {
         return $this->hasOne(MedicationTracker::class);
     }
+
+
+    public function hasRunningSchedule(){
+        return $this->tracker()->where('status', '!=', 'Stopped')->exists();
+    }
 }

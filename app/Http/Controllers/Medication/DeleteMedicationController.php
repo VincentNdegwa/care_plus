@@ -18,6 +18,14 @@ class DeleteMedicationController extends Controller
                     'message' => "Medication not found"
                 ], 404);
             }
+
+            if ($medication->hasRunningSchedule()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => "Medication has running schedules, stop the schedules first"
+                ], 400);
+            }
+            
             $medication->delete();
 
             return response()->json([
