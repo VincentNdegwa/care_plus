@@ -69,4 +69,9 @@ class MedicationSchedule extends Model
     {
         return $this->medication()->where('status', 1)->exists();
     }
+
+    public function scheduleIsRunning() : bool {
+
+        return $this->medication()->trackers()->where('status', '!=', 'Stopped')->exists();
+    }
 }

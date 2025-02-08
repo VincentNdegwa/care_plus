@@ -63,7 +63,7 @@ class SchedulesFunctionsController extends Controller
 
             // Clear future schedules
             MedicationSchedule::where('medication_id', $request->medication_id)
-                ->whereNotNull('processed_at')
+                ->where('processed_at', null)
                 ->delete();
 
             // Update medication status
