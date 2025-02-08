@@ -21,6 +21,7 @@ class EventTest implements ShouldBroadcast
      * Create a new event instance.
      */
     public $schedule;
+    public $medicationSchedule;
     public function __construct()
     {
         $schedule = MedicationSchedule::create([
@@ -33,6 +34,8 @@ class EventTest implements ShouldBroadcast
         ]);
 
         $this->schedule = $schedule;
+        $this->medicationSchedule = MedicationSchedule::with('medication')->find($schedule->id);
+
     }
 
     public function broadcastOn(): array
@@ -52,6 +55,6 @@ class EventTest implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        return $this->schedule->toArray();
+        return $this->medicationSchedule->toArray();
     }
 }
