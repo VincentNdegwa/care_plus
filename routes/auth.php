@@ -163,6 +163,11 @@ Route::prefix("/v1")->group(function () {
         Route::prefix('dashboard')->group(function () {
             Route::get('/patient-data/{patient_id}', [PatientDataController::class, 'index']);
         });
+
+        Route::prefix('notification')->group(function () {
+            Route::post('register-token', [DeviceTokenController::class, 'register']);
+            Route::post('deactivate-token', [DeviceTokenController::class, 'deactivate']);
+        });
     });
 
     Route::get("/send-sms", [AtSMSController::class, "send"]);
@@ -173,8 +178,4 @@ Route::prefix("/v1")->group(function () {
         EventTest::dispatch();
     });
 
-    Route::prefix('notification')->group(function () {
-        Route::post('register-token', [DeviceTokenController::class, 'register']);
-        Route::post('deactivate-token', [DeviceTokenController::class, 'deactivate']);
-    });
 });
