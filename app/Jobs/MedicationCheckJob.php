@@ -45,7 +45,7 @@ class MedicationCheckJob implements ShouldQueue
                 $schedule->processed_at = $nowTime;
                 $schedule->save();
 
-                MedicationTake::dispatch($schedule);
+                // MedicationTake::dispatch($schedule);
                 SendMedicationDefaultNotification::dispatch($schedule);
                 Log::info("Dispatched initial MedicationTake event for schedule ID: {$schedule->id}");
             }
@@ -62,7 +62,7 @@ class MedicationCheckJob implements ShouldQueue
             foreach ($pendingSchedules as $schedule) {
                 // Check if the schedule is snoozed
                 if (!$schedule->hasActiveSnooze()) {
-                    MedicationTake::dispatch($schedule);
+                    // MedicationTake::dispatch($schedule);
                     SendMedicationDefaultNotification::dispatch($schedule);
                     
                     $schedule->second_notification_sent = 1;
