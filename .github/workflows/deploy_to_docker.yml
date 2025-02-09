@@ -46,4 +46,7 @@ jobs:
           
           # Restart queue and scheduler
           docker compose restart queue-worker scheduler
+
+          # Clear docker cache
+          docker builder prune -a --force
           EOF
