@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FCM;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DeviceTokenController extends Controller
 {
@@ -15,10 +16,12 @@ class DeviceTokenController extends Controller
             'device_type' => 'required|in:android,ios,web'
         ]);
 
+        
+
         $token = DeviceToken::updateOrCreate(
             [
                 'token' => $request->token,
-                'user_id' => auth()->id()
+                'user_id' => Auth::user()->id
             ],
             [
                 'device_type' => $request->device_type,
@@ -40,7 +43,7 @@ class DeviceTokenController extends Controller
         ]);
 
         DeviceToken::where('token', $request->token)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::user()->id)
             ->update(['is_active' => false]);
 
         return response()->json([
