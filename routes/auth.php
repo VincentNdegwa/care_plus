@@ -173,7 +173,7 @@ Route::prefix("/v1")->group(function () {
         EventTest::dispatch();
     });
 
-    Route::prefix('fcm')->group(function () {
+    Route::prefix('notification')->group(function () {
         Route::post('register-token', [DeviceTokenController::class, 'register']);
         Route::post('deactivate-token', [DeviceTokenController::class, 'deactivate']);
     });
