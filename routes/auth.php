@@ -35,6 +35,7 @@ use App\Http\Controllers\SideEffect\AlterSideEffectController;
 use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
+use App\Http\Controllers\FCM\DeviceTokenController;
 
 
 Route::prefix("/v1")->group(function () {
@@ -170,5 +171,10 @@ Route::prefix("/v1")->group(function () {
 
     Route::get("/send-notification", function(){
         EventTest::dispatch();
+    });
+
+    Route::prefix('fcm')->group(function () {
+        Route::post('register-token', [DeviceTokenController::class, 'register']);
+        Route::post('deactivate-token', [DeviceTokenController::class, 'deactivate']);
     });
 });

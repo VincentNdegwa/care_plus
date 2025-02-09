@@ -21,3 +21,6 @@ yarn-error.log
 /.vscode
 /.zed
 .vercel
+google-services.json
+service-account.json
+cacert.pem

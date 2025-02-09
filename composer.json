@@ -10,6 +10,9 @@
     "require": {
         "php": "^8.2",
         "africastalking/africastalking": "^3.0",
+        "google/apiclient": "^2.18",
+        "google/auth": "^1.45",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel/breeze": "^2.2",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
