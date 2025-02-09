@@ -34,7 +34,7 @@ class TestJobNotification implements ShouldQueue
             "updated_at" => "2025-02-08T17:12:06.000000Z",
             "medication" => [
                 "id" => 1,
-                "patient_id" => 1,
+                "patient_id" => 2,
                 "diagnosis_id" => null,
                 "medication_name" => "Panadols",
                 "dosage_quantity" => "2",
