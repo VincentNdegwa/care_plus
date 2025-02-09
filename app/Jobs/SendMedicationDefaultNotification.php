@@ -22,7 +22,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
     public function __construct($schedule)
     {
         $this->schedule = $schedule;
-        $this->userId = Patient::find($schedule->patient_id)->user_id; ;
+        $this->userId = Patient::find($schedule->patient_id)->user_id; 
     }
 
     /**

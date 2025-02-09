@@ -36,7 +36,8 @@ use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
 use App\Http\Controllers\FCM\DeviceTokenController;
-
+use App\Jobs\TestJobNotification;
+use PHPUnit\Event\Code\Test;
 
 Route::prefix("/v1")->group(function () {
 
@@ -175,7 +176,7 @@ Route::prefix("/v1")->group(function () {
     // update side effects create route, diagnosis update route in the postman collection
 
     Route::get("/send-notification", function(){
-        EventTest::dispatch();
+        TestJobNotification::dispatch();
     });
 
 });
