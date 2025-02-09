@@ -177,13 +177,14 @@ class FCMService
         
         Log::info('Starting FCM test send');
         
+        // All data values must be strings
         $result = $this->sendToToken(
             $token,
             "Test Notification",
             "This is a test notification from Care Plus",
             [
                 "type" => "test",
-                "timestamp" => now()->toISOString()
+                "timestamp" => (string) now()->timestamp // Convert to string
             ]
         );
         

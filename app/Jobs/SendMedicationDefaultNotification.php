@@ -49,7 +49,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
             "It's time to take your medication",
             [
                 'type' => 'medication_reminder',
-                'payload'=> $this->schedule->toArray(),
+                'payload' => json_encode($this->schedule->toArray()),
             ]
         );
     }
