@@ -36,7 +36,7 @@ class MedicationCheckJob implements ShouldQueue
             // Check for new medications that need to be processed
             $newSchedules = MedicationSchedule::where('dose_time', '>=', $oneHourAgo)
                 ->where('dose_time', '<=', $nowTime)
-                ->whereNull('processed_at')
+                ->where('processed_at',null)
                 ->where('status', 'Pending')
                 ->get();
 

@@ -8,6 +8,7 @@ use App\Models\Schedules\MedicationScheduleNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Services\FCM\FCMService;
+use Illuminate\Support\Facades\Log;
 
 class SendMedicationDefaultNotification implements ShouldQueue
 {
@@ -41,6 +42,11 @@ class SendMedicationDefaultNotification implements ShouldQueue
             ]
         );
 
+        // Get the data in array form first
+        $scheduleArray = $this->schedule->load('medication')->toArray();
+        
+        Log::info("Schedule data:", ['data' => $scheduleArray]);
+        
         // Send FCM notification
         $fcm = new FCMService();
         $fcm->sendToUser(
@@ -49,7 +55,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
             "It's time to take your medication",
             [
                 'type' => 'medication_reminder',
-                'payload' => json_encode($this->schedule->toArray()),
+                'payload' => json_encode($scheduleArray), 
             ]
         );
     }
