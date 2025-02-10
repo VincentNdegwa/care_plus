@@ -16,6 +16,7 @@ services:
     environment:
       CACHE_DRIVER: sqlite
       CACHE_DATABASE: /var/www/html/database/database.sqlite
+      DB_SQLITE_DATABASE: /var/www/html/database/database.sqlite
 
   queue-worker:
     build:
@@ -27,6 +28,7 @@ services:
       QUEUE_WORKER: "true"
       CACHE_DRIVER: sqlite
       CACHE_DATABASE: /var/www/html/database/database.sqlite
+      DB_SQLITE_DATABASE: /var/www/html/database/database.sqlite
     volumes:
       - .:/var/www/html
       - sqlite_data:/var/www/html/database:rw
