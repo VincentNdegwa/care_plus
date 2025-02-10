@@ -8,6 +8,7 @@ services:
     image: care_plus:latest
     volumes:
       - .:/var/www/html
+      - sqlite_data:/var/www/html/database
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && php-fpm"
     networks:
@@ -26,6 +27,7 @@ services:
       DB_CONNECTION: "mysql"
     volumes:
       - .:/var/www/html
+      - sqlite_data:/var/www/html/database
     depends_on:
       - database
     networks:
@@ -42,6 +44,7 @@ services:
       SCHEDULER: "true"
     volumes:
       - .:/var/www/html
+      - sqlite_data:/var/www/html/database
     depends_on:
       - database
     networks:
@@ -78,3 +81,5 @@ networks:
 
 volumes:
   db_data: {}
+  sqlite_data:
+    driver: local
