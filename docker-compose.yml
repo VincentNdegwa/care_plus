@@ -21,6 +21,9 @@ services:
       - .env.production
     environment:
       QUEUE_WORKER: "true"
+      CACHE_DRIVER: "database"
+      CACHE_CONNECTION: "mysql"
+      DB_CONNECTION: "mysql"
     volumes:
       - .:/var/www/html
     depends_on:
