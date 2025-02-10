@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Create SQLite database if it doesn't exist
+touch /var/www/html/database/database.sqlite
+chmod 666 /var/www/html/database/database.sqlite
+
+# Run migrations for cache if needed
+php artisan migrate --database=sqlite
+
 if [ "${QUEUE_WORKER}" = "true" ]; then
     echo "Starting Queue Worker..."
     exec php /var/www/html/artisan queue:work --tries=3 --timeout=90

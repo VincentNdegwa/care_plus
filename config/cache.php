@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'file'),
+    'default' => env('CACHE_DRIVER', 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -87,6 +87,13 @@ return [
 
         'octane' => [
             'driver' => 'octane',
+        ],
+
+        'sqlite' => [
+            'driver' => 'database',
+            'table' => 'cache',
+            'database' => env('CACHE_DATABASE', '/var/www/html/database/database.sqlite'),
+            'connection' => 'sqlite',
         ],
 
     ],
