@@ -65,13 +65,10 @@ class FCMService
 
     public function sendToToken($token, $title, $body, $data = [])
     {
+        // Convert all data values to strings and encode the entire payload as a single string
         $formattedData = [];
         foreach ($data as $key => $value) {
-            if (is_string($value) && $this->isJson($value)) {
-                $formattedData[$key] = $value;
-            } else {
-                $formattedData[$key] = is_array($value) ? json_encode($value) : (string) $value;
-            }
+            $formattedData[$key] = is_string($value) ? $value : json_encode($value);
         }
 
         $message = [
@@ -81,7 +78,9 @@ class FCMService
                     'title' => $title,
                     'body' => $body,
                 ],
-                'data' => $formattedData, 
+                'data' => [
+                    'data' => json_encode($formattedData)
+                ],
                 'android' => [
                     'priority' => 'high',
                     'notification' => [
@@ -101,7 +100,7 @@ class FCMService
         ];
 
         try {
-            Log::info('FCM Request Payload:', ['payload' => $message]);  // Log the full payload
+            Log::info('FCM Request Payload:', ['payload' => $message]);
 
             $response = $this->guzzle->post(
                 $this->baseUrl . $this->projectId . '/messages:send',
@@ -144,7 +143,7 @@ class FCMService
             Log::error('FCM Send Error', [
                 'message' => $e->getMessage(),
                 'token' => $token,
-                'data' => $formattedData,  // Log the formatted data
+                'data' => $formattedData,
                 'trace' => $e->getTraceAsString()
             ]);
             return false;
