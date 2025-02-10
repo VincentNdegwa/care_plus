@@ -196,7 +196,7 @@ class FCMService
             "This is a test notification from Care Plus",
             [
                 "type" => "test",
-                "timestamp" => (string) now()->timestamp // Convert to string
+                "timestamp" => (string) now()->timestamp 
             ]
         );
         

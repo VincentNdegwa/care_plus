@@ -53,6 +53,8 @@ RUN composer install --optimize-autoloader
 #     && php artisan route:cache \
 #     && php artisan view:cache \
 
+RUN php artisan cache:clear && php artisan config:clear
+
 EXPOSE 9000
 
 COPY docker/start.sh /usr/local/bin/start.sh
