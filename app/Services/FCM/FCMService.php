@@ -65,6 +65,15 @@ class FCMService
 
     public function sendToToken($token, $title, $body, $data = [])
     {
+        $formattedData = [];
+        foreach ($data as $key => $value) {
+            if (is_string($value) && $this->isJson($value)) {
+                $formattedData[$key] = $value;
+            } else {
+                $formattedData[$key] = is_array($value) ? json_encode($value) : (string) $value;
+            }
+        }
+
         $message = [
             'message' => [
                 'token' => $token,
@@ -72,7 +81,7 @@ class FCMService
                     'title' => $title,
                     'body' => $body,
                 ],
-                'data' => $data,
+                'data' => $formattedData, 
                 'android' => [
                     'priority' => 'high',
                     'notification' => [
@@ -92,12 +101,7 @@ class FCMService
         ];
 
         try {
-            Log::info('Attempting to send FCM message', [
-                'token' => $token,
-                'title' => $title,
-                'project_id' => $this->projectId,
-                'url' => $this->baseUrl . $this->projectId . '/messages:send'
-            ]);
+            Log::info('FCM Request Payload:', ['payload' => $message]);  // Log the full payload
 
             $response = $this->guzzle->post(
                 $this->baseUrl . $this->projectId . '/messages:send',
@@ -140,10 +144,19 @@ class FCMService
             Log::error('FCM Send Error', [
                 'message' => $e->getMessage(),
                 'token' => $token,
+                'data' => $formattedData,  // Log the formatted data
                 'trace' => $e->getTraceAsString()
             ]);
             return false;
         }
+    }
+
+    private function isJson($string) {
+        if (!is_string($string)) {
+            return false;
+        }
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     public function sendToUser($userId, $title, $body, $data = [])
