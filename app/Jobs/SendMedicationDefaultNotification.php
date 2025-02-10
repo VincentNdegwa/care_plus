@@ -42,12 +42,12 @@ class SendMedicationDefaultNotification implements ShouldQueue
             ]
         );
 
-        // Get the data in array form first
         $scheduleArray = $this->schedule->load('medication')->toArray();
+        
+        $scheduleArray = $this->convertToString($scheduleArray);
         
         Log::info("Schedule data:", ['data' => $scheduleArray]);
         
-        // Send FCM notification
         $fcm = new FCMService();
         $fcm->sendToUser(
             $this->userId,
@@ -55,8 +55,23 @@ class SendMedicationDefaultNotification implements ShouldQueue
             "It's time to take your medication",
             [
                 'type' => 'medication_reminder',
-                'payload' => json_encode($scheduleArray), 
+                'payload' => json_encode($scheduleArray)
             ]
         );
+    }
+
+    /**
+     * Convert all values in an array to strings
+     */
+    private function convertToString($array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->convertToString($value);
+            } else {
+                $array[$key] = $value === null ? '' : (string) $value;
+            }
+        }
+        return $array;
     }
 }
