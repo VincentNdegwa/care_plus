@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\EventTest;
 use App\Models\Patient;
 use App\Services\FCM\FCMService;
 use Illuminate\Contracts\Queue\ShouldQueue;

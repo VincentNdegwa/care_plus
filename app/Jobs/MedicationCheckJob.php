@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\MedicationTake;
 use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationScheduleNotification;
 use Carbon\Carbon;
@@ -45,9 +44,8 @@ class MedicationCheckJob implements ShouldQueue
                 $schedule->processed_at = $nowTime;
                 $schedule->save();
 
-                // MedicationTake::dispatch($schedule);
                 SendMedicationDefaultNotification::dispatch($schedule);
-                Log::info("Dispatched initial MedicationTake event for schedule ID: {$schedule->id}");
+                Log::info("Dispatched initial Schedule Notification event for schedule ID: {$schedule->id}");
             }
 
             // Check for medications processed exactly 2 hours ago that are still pending
@@ -62,7 +60,6 @@ class MedicationCheckJob implements ShouldQueue
             foreach ($pendingSchedules as $schedule) {
                 // Check if the schedule is snoozed
                 if (!$schedule->hasActiveSnooze()) {
-                    // MedicationTake::dispatch($schedule);
                     SendMedicationDefaultNotification::dispatch($schedule);
                     
                     $schedule->second_notification_sent = 1;

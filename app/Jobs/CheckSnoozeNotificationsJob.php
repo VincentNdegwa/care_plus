@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\MedicationTake;
 use App\Models\Schedules\MedicationSnooze;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -35,7 +34,6 @@ class CheckSnoozeNotificationsJob implements ShouldQueue
                 }
 
                 // Send notifications
-                MedicationTake::dispatch($snooze->medicationSchedule);
                 SendMedicationDefaultNotification::dispatch($snooze->medicationSchedule);
                 
                 // Mark as dismissed since we've sent the notification
