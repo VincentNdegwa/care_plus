@@ -69,7 +69,7 @@ class TestJobNotification implements ShouldQueue
            "It's time to take your medication",
            [
                'type' => 'medication_reminder',
-               'payload'=> json_encode($this->schedule),
+               'payload'=> $this->schedule,
            ]
        );
     }
