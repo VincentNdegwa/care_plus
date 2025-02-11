@@ -81,21 +81,21 @@ class FCMService
                 'data' => [
                     'data' => json_encode($data)
                 ],
-                'android' => [
-                    'priority' => 'high',
-                    'notification' => [
-                        'channel_id' => 'medication_notifications',
-                        'notification_priority' => 'PRIORITY_HIGH'
-                    ]
-                ],
-                'apns' => [
-                    'payload' => [
-                        'aps' => [
-                            'sound' => 'default',
-                            'badge' => 1
-                        ]
-                    ]
-                ]
+                // 'android' => [
+                //     'priority' => 'high',
+                //     'notification' => [
+                //         'channel_id' => 'medication_notifications',
+                //         'notification_priority' => 'PRIORITY_HIGH'
+                //     ]
+                // ],
+                // 'apns' => [
+                //     'payload' => [
+                //         'aps' => [
+                //             'sound' => 'default',
+                //             'badge' => 1
+                //         ]
+                //     ]
+                // ]
             ]
         ];
 
