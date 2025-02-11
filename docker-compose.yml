@@ -8,15 +8,10 @@ services:
     image: care_plus:latest
     volumes:
       - .:/var/www/html
-      - sqlite_data:/var/www/html/database:rw
     command: >
       sh -c "chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && php-fpm"
     networks:
       - app-network
-    environment:
-      CACHE_DRIVER: sqlite
-      CACHE_DATABASE: /var/www/html/database/database.sqlite
-      DB_SQLITE_DATABASE: /var/www/html/database/database.sqlite
 
   queue-worker:
     build:
@@ -26,12 +21,8 @@ services:
       - .env.production
     environment:
       QUEUE_WORKER: "true"
-      CACHE_DRIVER: sqlite
-      CACHE_DATABASE: /var/www/html/database/database.sqlite
-      DB_SQLITE_DATABASE: /var/www/html/database/database.sqlite
     volumes:
       - .:/var/www/html
-      - sqlite_data:/var/www/html/database:rw
     depends_on:
       - database
     networks:
@@ -46,11 +37,8 @@ services:
       - .env.production
     environment:
       SCHEDULER: "true"
-      CACHE_DRIVER: sqlite
-      CACHE_DATABASE: /var/www/html/database/database.sqlite
     volumes:
       - .:/var/www/html
-      - sqlite_data:/var/www/html/database:rw
     depends_on:
       - database
     networks:
@@ -87,5 +75,3 @@ networks:
 
 volumes:
   db_data: {}
-  sqlite_data:
-    driver: local

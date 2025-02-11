@@ -1,15 +1,5 @@
 #!/bin/sh
 
-# Create SQLite database if it doesn't exist
-mkdir -p /var/www/html/database
-touch /var/www/html/database/database.sqlite
-chmod 666 /var/www/html/database/database.sqlite
-
-# Clear config cache
-php artisan config:clear
-
-# Run migrations for cache if needed
-php artisan migrate --database=sqlite --force
 
 if [ "${QUEUE_WORKER}" = "true" ]; then
     echo "Starting Queue Worker..."
