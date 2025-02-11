@@ -74,6 +74,7 @@ class FCMService
         $message = [
             'message' => [
                 'token' => $token,
+                "priority"=> "high",
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
@@ -84,7 +85,7 @@ class FCMService
                 'android' => [
                     'priority' => 'high',
                     'notification' => [
-                        'channel_id' => 'default',
+                        'channel_id' => 'medication_notifications',
                         'notification_priority' => 'PRIORITY_HIGH'
                     ]
                 ],
