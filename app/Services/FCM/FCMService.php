@@ -74,10 +74,10 @@ class FCMService
         $message = [
             'message' => [
                 'token' => $token,
-                'notification' => [
-                    'title' => $title,
-                    'body' => $body,
-                ],
+                // 'notification' => [
+                //     'title' => $title,
+                //     'body' => $body,
+                // ],
                 'data' => [
                     'data' => json_encode($data)
                 ],
