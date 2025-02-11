@@ -44,7 +44,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
 
         $scheduleArray = $this->schedule->load('medication')->toArray();
         
-        $scheduleArray = $this->convertToString($scheduleArray);
+        // $scheduleArray = $this->convertToString($scheduleArray);
         
         Log::info("Schedule data:", ['data' => $scheduleArray]);
         
@@ -55,7 +55,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
             "It's time to take your medication",
             [
                 'type' => 'medication_reminder',
-                'payload' => json_encode($scheduleArray)
+                'payload' => $scheduleArray
             ]
         );
     }
