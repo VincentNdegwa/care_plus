@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Clear cache and config before starting the workers
+php /var/www/html/artisan config:clear
+php /var/www/html/artisan cache:clear
+php /var/www/html/artisan config:cache
+php /var/www/html/artisan route:clear
+php /var/www/html/artisan view:clear
 
 if [ "${QUEUE_WORKER}" = "true" ]; then
     echo "Starting Queue Worker..."
