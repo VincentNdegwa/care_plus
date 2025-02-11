@@ -66,10 +66,10 @@ class FCMService
     public function sendToToken($token, $title, $body, $data = [])
     {
         // Convert all data values to strings and encode the entire payload as a single string
-        $formattedData = [];
-        foreach ($data as $key => $value) {
-            $formattedData[$key] = is_string($value) ? $value : json_encode($value);
-        }
+        // $formattedData = [];
+        // foreach ($data as $key => $value) {
+        //     $formattedData[$key] = is_string($value) ? $value : json_encode($value);
+        // }
 
         $message = [
             'message' => [
@@ -79,7 +79,7 @@ class FCMService
                     'body' => $body,
                 ],
                 'data' => [
-                    'data' => json_encode($formattedData)
+                    'data' => json_encode($data)
                 ],
                 'android' => [
                     'priority' => 'high',
@@ -143,7 +143,7 @@ class FCMService
             Log::error('FCM Send Error', [
                 'message' => $e->getMessage(),
                 'token' => $token,
-                'data' => $formattedData,
+                'data' => $data,
                 'trace' => $e->getTraceAsString()
             ]);
             return false;
