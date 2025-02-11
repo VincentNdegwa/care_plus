@@ -74,7 +74,6 @@ class FCMService
         $message = [
             'message' => [
                 'token' => $token,
-                "priority"=> "high",
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
