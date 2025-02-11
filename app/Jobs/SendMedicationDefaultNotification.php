@@ -61,7 +61,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
     }
 
     /**
-     * Convert all values in an array to strings
+     * Convert all values in an array to strings //maybe usefull
      */
     private function convertToString($array)
     {
