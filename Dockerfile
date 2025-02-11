@@ -21,10 +21,9 @@ RUN apk add --no-cache \
     g++ \
     make \
     supervisor \
-    sqlite \
     && docker-php-ext-configure zip \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install zip pdo pdo_mysql pdo_sqlite intl bcmath \
+    && docker-php-ext-install zip pdo pdo_mysql intl bcmath \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd
