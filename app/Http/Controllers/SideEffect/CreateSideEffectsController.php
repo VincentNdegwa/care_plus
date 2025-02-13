@@ -30,7 +30,7 @@ class CreateSideEffectsController extends Controller
             }
 
             $validatedData['patient_id'] = $medication->patient_id;
-            
+
             $side_effect = SideEffect::create($validatedData);
             return response()->json([
                 'error' => false,
@@ -42,12 +42,12 @@ class CreateSideEffectsController extends Controller
                 'error' => true,
                 "message" => $th->getMessage(),
                 'errors' => $th->errors()
-            ]);
+            ],422);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,
                 'message' => $e->getMessage()
-            ]);
+            ],500);
         }
     }
 }
