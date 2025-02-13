@@ -21,7 +21,16 @@ class CreateSideEffectsController extends Controller
                 'duration' => 'nullable|integer',
                 'notes' => 'nullable|string',
             ]);
-            $validatedData['patient_id'] = Medication::find($validatedData['medication_id'])->value('patient_id');
+            $medication = Medication::find($validatedData['medication_id']);
+            if (!$medication) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Medication not found'
+                ], 404);
+            }
+
+            $validatedData['patient_id'] = $medication->patient_id;
+            
             $side_effect = SideEffect::create($validatedData);
             return response()->json([
                 'error' => false,
