@@ -17,7 +17,7 @@ class CreateSideEffectsController extends Controller
                 'medication_id' => 'required|exists:medications,id',
                 'datetime' => 'required|date',
                 'side_effect' => 'required|string',
-                'severity' => 'required|in:mild,moderate,severe',
+                'severity' => 'required|in:Mild,Moderate,Severe',
                 'duration' => 'nullable|integer',
                 'notes' => 'nullable|string',
             ]);
