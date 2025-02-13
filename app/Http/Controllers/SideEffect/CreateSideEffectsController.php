@@ -41,7 +41,6 @@ class CreateSideEffectsController extends Controller
             return response()->json([
                 'error' => true,
                 "message" => $th->getMessage(),
-                'errors' => $th->errors()
             ],422);
         } catch (Exception $e) {
             return response()->json([
