@@ -15,7 +15,7 @@ class AlterSideEffectController extends Controller
             $validatedData = $request->validate([
                 'datetime' => 'required|date',
                 'side_effect' => 'required|string',
-                'severity' => 'required|in:mild,moderate,severe',
+                'severity' => 'required|in:Mild,Moderate,Severe',
                 'duration' => 'nullable|integer',
                 'notes' => 'nullable|string',
             ]);
@@ -38,7 +38,6 @@ class AlterSideEffectController extends Controller
             return response()->json([
                 'error' => true,
                 "message" => $th->getMessage(),
-                'errors' => $th->errors()
             ], 422);
         } catch (Exception $e) {
             return response()->json([
