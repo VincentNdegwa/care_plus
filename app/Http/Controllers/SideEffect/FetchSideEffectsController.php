@@ -25,6 +25,7 @@ class FetchSideEffectsController extends Controller
                 'to_datetime' => 'nullable|date|after_or_equal:from_datetime',
                 'per_page' => 'nullable|integer|min:1|max:100',
                 'page_number' => 'nullable|integer|min:1',
+                'search'=>'nullable|string'
             ]);
 
             $validated['per_page'] = $validated['per_page'] ?? 20;
@@ -48,6 +49,13 @@ class FetchSideEffectsController extends Controller
 
             if (!empty($validated['to_datetime'])) {
                 $query->where('datetime', '<=', $validated['to_datetime']);
+            }
+            if (!empty($validated['search'])) {
+                $query->where(function($query) use ($validated){
+                    $query->where('side_effect','like','%'.$validated['search'].'%')
+                    ->orWhere('severity','like','%'.$validated['search'].'%')
+                    ->orWhere('notes','like','%'.$validated['search'].'%');
+                });
             }
 
             $sideEffects = $query->paginate(
