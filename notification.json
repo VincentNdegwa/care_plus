@@ -1,0 +1,125 @@
+[
+    {
+      "receiver": "patient",
+      "event": "medication_reminder",
+      "title": "Time to Take Your Medication",
+      "description": "It's time to take your prescribed medication: [Medication Name]. Please take it as directed."
+    },
+    {
+      "receiver": "patient",
+      "event": "missed_medication_alert",
+      "title": "Missed Medication Dose",
+      "description": "You missed your scheduled dose of [Medication Name]. Please take it as soon as possible or consult your doctor."
+    },
+    {
+      "receiver": "patient",
+      "event": "new_prescription_added",
+      "title": "New Prescription Added",
+      "description": "Your doctor has prescribed a new medication: [Medication Name]. Check your medication schedule for details."
+    },
+    {
+      "receiver": "patient",
+      "event": "medication_adjustment",
+      "title": "Medication Dosage Updated",
+      "description": "Your doctor has adjusted the dosage for [Medication Name]. Please review your updated prescription."
+    },
+    {
+      "receiver": "patient",
+      "event": "caregiver_medication_reminder",
+      "title": "Your Caregiver Has Reminded You to Take Medication",
+      "description": "Your caregiver [Caregiver Name] has reminded you to take [Medication Name] at the scheduled time."
+    },
+    {
+      "receiver": "doctor",
+      "event": "patient_missed_medication",
+      "title": "Patient Missed a Medication Dose",
+      "description": "Patient [Patient Name] has missed their scheduled dose of [Medication Name]. Please review their adherence report."
+    },
+    {
+      "receiver": "doctor",
+      "event": "patient_took_medication",
+      "title": "Patient Took Their Medication",
+      "description": "Patient [Patient Name] has successfully taken their medication: [Medication Name]."
+    },
+    {
+      "receiver": "doctor",
+      "event": "new_diagnosis_recorded",
+      "title": "New Diagnosis Recorded",
+      "description": "You have successfully recorded a new diagnosis for [Patient Name]: [Diagnosis Details]."
+    },
+    {
+      "receiver": "doctor",
+      "event": "prescription_updated",
+      "title": "Prescription Updated",
+      "description": "The prescription for [Patient Name] has been updated. Review and ensure adherence."
+    },
+    {
+      "receiver": "doctor",
+      "event": "caregiver_medication_report",
+      "title": "Caregiver Reported Medication Status",
+      "description": "The caregiver for [Patient Name] has updated their medication status: [Status Details]."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "patient_medication_time",
+      "title": "Reminder: Ensure [Patient Name] Takes Their Medication",
+      "description": "It's time for [Patient Name] to take their medication: [Medication Name]. Please ensure they take it."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "patient_missed_medication",
+      "title": "Patient Missed Medication Dose",
+      "description": "Patient [Patient Name] has missed their medication: [Medication Name]. Consider reminding them or contacting their doctor."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "new_medication_for_patient",
+      "title": "New Medication Assigned to [Patient Name]",
+      "description": "Doctor [Doctor Name] has prescribed a new medication for [Patient Name]: [Medication Name]. Please ensure adherence."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "diagnosis_updated",
+      "title": "Patient Diagnosis Updated",
+      "description": "Doctor [Doctor Name] has updated the diagnosis for [Patient Name]: [Diagnosis Details]."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "medication_status_report",
+      "title": "Medication Status Update for [Patient Name]",
+      "description": "You have successfully submitted a medication status update for [Patient Name]. Doctor will review it shortly."
+    },
+    {
+      "receiver": "room",
+      "room_name": "[Room_Name]",
+      "event": "room_medication_reminder",
+      "title": "Medication Time for Patients in [Room Name]",
+      "description": "Reminder: Patients in [Room Name] need to take their scheduled medications now."
+    },
+    {
+      "receiver": "room",
+      "room_name": "[Room_Name]",
+      "event": "medication_missed_alert",
+      "title": "Missed Medication Alert for Patients in [Room Name]",
+      "description": "One or more patients in [Room Name] missed their medication. Please check their records and assist."
+    },
+    {
+      "receiver": "patient",
+      "event": "appointment_reminder",
+      "title": "Upcoming Doctor Appointment",
+      "description": "Reminder: You have an appointment with [Doctor Name] on [Date & Time]. Please be on time."
+    },
+    {
+      "receiver": "doctor",
+      "event": "appointment_scheduled",
+      "title": "New Appointment Scheduled",
+      "description": "A new appointment has been scheduled with [Patient Name] on [Date & Time]."
+    },
+    {
+      "receiver": "caregiver",
+      "event": "emergency_alert",
+      "title": "Emergency Alert for [Patient Name]",
+      "description": "Urgent: [Patient Name] has triggered an emergency alert. Please check immediately."
+    }
+  ]
+  
