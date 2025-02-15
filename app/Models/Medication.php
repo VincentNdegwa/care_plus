@@ -80,8 +80,8 @@ class Medication extends Model
     {
         return $this->tracker()->where('status', '!=', 'Stopped')->exists();
     }
-    public function isActive(): bool
+    public function isActive(): int
     {
-        return $this->hasRunningSchedule() && $this->active;
+        return (int) ($this->hasRunningSchedule() && $this->active);
     }
 }
