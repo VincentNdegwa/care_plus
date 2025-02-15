@@ -15,21 +15,28 @@ class FileUploadController extends Controller
             'folder' => 'required|string'
         ]);
 
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $folder = $request->folder;
-
-        $filePath = $file->storeAs($folder, $fileName, 'public');
-
-        return response()->json([
-            "error" => false,
-            "data"=>[
-                'file_path' => Storage::url($filePath),
-                "url"=> env('APP_URL')."/".Storage::url($filePath),
-                "file_name"=>$fileName,
-                "folder"=>$folder
-            ]
-        ]);
+        try {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $folder = $request->folder;
+    
+            $filePath = $file->storeAs($folder, $fileName, 'public');
+    
+            return response()->json([
+                "error" => false,
+                "data"=>[
+                    'file_path' => Storage::url($filePath),
+                    "url"=> env('APP_URL')."/".Storage::url($filePath),
+                    "file_name"=>$fileName,
+                    "folder"=>$folder
+                ]
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "error" => true,
+                "message" => $th->getMessage()
+            ],500);
+        }
     }
 
     public function delete(Request $request)
@@ -50,7 +57,7 @@ class FileUploadController extends Controller
             return response()->json([
                 "error" => true,
                 "message" => "File not found"
-            ]);
+            ],404);
         }
     }
 }
