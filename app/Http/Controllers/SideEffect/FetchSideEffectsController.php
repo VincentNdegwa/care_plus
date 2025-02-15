@@ -20,7 +20,7 @@ class FetchSideEffectsController extends Controller
             $validated = $request->validate([
                 'patient_id' => 'required|integer|exists:patients,id',
                 'medication_id' => 'nullable|integer|exists:medications,id',
-                'severity' => 'nullable|in:mild,moderate,severe',
+                'severity' => 'nullable|in:Mild,Moderate,Severe',
                 'from_datetime' => 'nullable|date|before_or_equal:to_datetime',
                 'to_datetime' => 'nullable|date|after_or_equal:from_datetime',
                 'per_page' => 'nullable|integer|min:1|max:100',
