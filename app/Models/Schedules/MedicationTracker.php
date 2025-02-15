@@ -33,4 +33,7 @@ class MedicationTracker extends Model
     {
         return $this->belongsTo(Medication::class, 'medication_id');
     }
+    public function getMedication(){
+        return Medication::find($this->medication_id);
+    }
 }
