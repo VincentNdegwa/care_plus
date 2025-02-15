@@ -214,7 +214,7 @@ class FetchMedicationController extends Controller
                 "avatar" => $medication->caregiver->user->profile->avatar,
             ] : null,
             'stock' => $medication->stock,
-            'active' => $medication->active,
+            'active' => $medication->isActive(),
             'diagnosis' => $medication->diagnosis,
         ];
     }

@@ -51,7 +51,7 @@ class MedicationCheckJob implements ShouldQueue
             // Check for medications processed exactly 2 hours ago that are still pending
             // and haven't received second notification
             $pendingSchedules = MedicationSchedule::where('processed_at', '<=', $twoHoursAgo)
-                ->where('processed_at', '>=', $threeHoursAgo->copy()->addMinutes(30))
+                ->where('processed_at', '>=', $threeHoursAgo->copy())
                 ->where('status', 'Pending')
                 ->where('second_notification_sent', 0)  // Only get schedules that haven't received second notification
                 ->get();
