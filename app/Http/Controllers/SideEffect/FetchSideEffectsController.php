@@ -21,9 +21,9 @@ class FetchSideEffectsController extends Controller
                 'patient_id' => 'required|integer|exists:patients,id',
                 'medication_id' => 'nullable|integer|exists:medications,id',
                 'severity' => 'nullable|in:Mild,Moderate,Severe',
-                'from_datetime' => 'nullable|date|before_or_equal:to_datetime',
-                'to_datetime' => 'nullable|date|after_or_equal:from_datetime',
-                'per_page' => 'nullable|integer|min:1|max:100',
+                'from_datetime' => 'nullable|date',
+                'to_datetime' => 'nullable|date',
+                'per_page' => 'nullable|integer|min:1',
                 'page_number' => 'nullable|integer|min:1',
                 'search'=>'nullable|string'
             ]);
