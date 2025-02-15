@@ -93,4 +93,9 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         return null;
     }
+    public function getAvatar()
+    {
+        $profile = $this->profile()->first();
+        return $profile ? $profile->avatar : null;
+    }
 }

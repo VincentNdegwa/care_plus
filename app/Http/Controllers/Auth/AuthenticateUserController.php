@@ -25,6 +25,8 @@ class AuthenticateUserController extends Controller
                 ]);
             }
             $token = $this->createToken($user);
+            
+            $user->avatar = $user->getAvatar();
             return response()->json([
                 "error" => false,
                 'message' => 'Login successful',
