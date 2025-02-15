@@ -39,7 +39,7 @@ class UpdateProfessionalProfileController extends Controller
                 return response()->json([
                     "error" => true,
                     "message" => $responseData['message'] ?? $responseData["errors"]
-                ]);
+                ],405);
             }
 
             return response()->json([
@@ -51,14 +51,12 @@ class UpdateProfessionalProfileController extends Controller
             return response()->json([
                 "error" => true,
                 "message" => $th->getMessage(),
-                'errors' => $th->errors()
-            ]);
+            ],422);
         } catch (\Exception $th) {
             return response()->json([
                 "error" => true,
-                "message" => "An error occurred while updating the profile",
-                'errors' => $th->getMessage()
-            ]);
+                "message" => "An error occurred while updating the profile ".$th->getMessage()
+            ],500);
         }
     }
 

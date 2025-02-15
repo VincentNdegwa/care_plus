@@ -42,14 +42,12 @@ class UserProfileController extends Controller
             return response()->json([
                 'error' => true,
                 'message' => 'Validation Error',
-                'errors' => $th->errors()
-            ]);
+            ],422);
         } catch (\Exception $th) {
             return response()->json([
                 'error' => true,
                 'message' => 'An error occurred while updating the profile',
-                'details' => $th->getMessage()
-            ]);
+            ],500);
         }
     }
 
