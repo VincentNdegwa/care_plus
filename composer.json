@@ -16,7 +16,6 @@
         "laravel/breeze": "^2.2",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
-        "laravel/telescope": "^5.4",
         "laravel/tinker": "^2.9",
         "pusher/pusher-php-server": "^7.2"
     },
