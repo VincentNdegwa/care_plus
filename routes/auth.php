@@ -35,6 +35,7 @@ use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
 use App\Http\Controllers\FCM\DeviceTokenController;
+use App\Http\Controllers\Uploads\FileUploadController;
 use App\Jobs\TestJobNotification;
 use PHPUnit\Event\Code\Test;
 
@@ -167,6 +168,11 @@ Route::prefix("/v1")->group(function () {
         Route::prefix('notification')->group(function () {
             Route::post('register-token', [DeviceTokenController::class, 'register']);
             Route::post('deactivate-token', [DeviceTokenController::class, 'deactivate']);
+        });
+
+        Route::prefix("upload")->group(function () {
+            Route::post("/file", [FileUploadController::class, "upload"]);
+            Route::delete("/file", [FileUploadController::class, "delete"]);
         });
     });
 
