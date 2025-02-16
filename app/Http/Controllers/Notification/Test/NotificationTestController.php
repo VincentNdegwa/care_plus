@@ -29,12 +29,11 @@ class NotificationTestController extends Controller
         $this->testData = json_decode(File::get($path), true);
     }
 
-    public function sendTest(Request $request)
+    public function testTokenNotification(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'event' => 'required|string',
-            'token' => 'required_without:room|string',
-            'room' => 'required_without:token|string'
+            'user_id' => 'required|exists:users,id'
         ]);
 
         if ($validator->fails()) {
@@ -56,12 +55,24 @@ class NotificationTestController extends Controller
 
         try {
             $testData = $this->testData[$event];
-            $result = $this->sendNotification($event, $request, $testData);
+            $recipients = [$request->input('user_id')];
+            $replacements = $this->getReplacements($event, $testData);
+
+            $result = $this->notificationService->send(
+                $event,
+                $recipients,
+                $replacements,
+                $testData
+            );
 
             return response()->json([
                 'success' => true,
-                'message' => 'Test notification sent successfully',
-                'data' => $result
+                'message' => 'Test token notification sent successfully',
+                'data' => [
+                    'event' => $event,
+                    'user_id' => $request->input('user_id'),
+                    'result' => $result
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -73,67 +84,116 @@ class NotificationTestController extends Controller
         }
     }
 
-    protected function sendNotification($event, Request $request, array $testData)
+    public function testRoomNotification(Request $request)
     {
-        $recipients = [];
-        $replacements = [];
-        
-        if ($testData['type'] === 'token' && $request->has('token')) {
-            $recipients = DeviceToken::where("token", $request->input('token'))->pluck('user_id')->toArray();
+        $validator = Validator::make($request->all(), [
+            'event' => 'required|string',
+            'room' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // Build replacements based on event type
+        $event = $request->input('event');
+        
+        if (!isset($this->testData[$event])) {
+            return response()->json([
+                'success' => false,
+                'message' => "No test data found for event: {$event}"
+            ], 404);
+        }
+
+        try {
+            $testData = $this->testData[$event];
+            $replacements = $this->getReplacements($event, $testData);
+
+            $result = $this->notificationService->send(
+                $event,
+                null,
+                $replacements,
+                $testData
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Test room notification sent successfully',
+                'data' => [
+                    'event' => $event,
+                    'room' => $request->input('room'),
+                    'result' => $result
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send test notification',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    protected function getReplacements($event, array $testData)
+    {
         switch ($event) {
             case 'medication_reminder':
-                $replacements = [
+                return [
                     'Medication Name' => $testData['payload']['medication']['medication_name'],
                     'Dosage Quantity' => $testData['payload']['medication']['dosage_quantity'],
                     'Dosage Strength' => $testData['payload']['medication']['dosage_strength'],
                 ];
-                break;
 
             case 'missed_medication_room':
-                $replacements = [
+                return [
                     'Patient_Id' => $testData['payload']['patient']['id'],
                     'Patient Name' => $testData['payload']['patient']['name'],
                     'Medication Name' => $testData['payload']['medication']['medication_name']
                 ];
-                break;
 
             case 'emergency_alert':
-                $replacements = [
+                return [
                     'Patient Name' => $testData['payload']['patient']['name'],
-                    'Alert Type' => ucfirst(str_replace('_', ' ', $testData['payload']['alert']['type'])),
-                    'Location' => $testData['payload']['location']['area']
+                    'Alert Type' => ucfirst(str_replace('_', ' ', $testData['payload']['alert_type'])),
+                    'Location' => $testData['payload']['location']
                 ];
-                break;
 
             case 'patient_vitals_room':
-                $replacements = [
-                    'Patient_Id' => $testData['payload']['patient']['id'],
+                return [
+                    'Patient_Id' => $testData['payload']['patient_id'],
                     'Patient Name' => $testData['payload']['patient']['name'],
-                    'Blood Pressure' => $testData['payload']['vitals']['blood_pressure'],
-                    'Heart Rate' => $testData['payload']['vitals']['heart_rate']
+                    'Blood Pressure' => $testData['payload']['blood_pressure'],
+                    'Heart Rate' => $testData['payload']['heart_rate']
                 ];
-                break;
 
             default:
                 throw new \RuntimeException("Unsupported event type: {$event}");
         }
-
-        return $this->notificationService->send(
-            $event,
-            $recipients,
-            $replacements,
-            $testData['data']
-        );
     }
 
     public function listEvents()
     {
-        return response()->json([
-            'success' => true,
-            'events' => array_keys($this->testData)
-        ]);
+
+        $templates = null;
+
+
+        if ($templates === null) {
+            $path = base_path('notification.json');
+            if (!File::exists($path)) {
+                throw new \RuntimeException('Notification templates file not found');
+            }
+            $templates = json_decode(File::get($path), true);
+
+            $template = collect($templates);
+
+            return response()->json([
+                'success' => true,
+                'data' => $template
+            ]);
+        }
     }
 }

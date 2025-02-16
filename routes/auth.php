@@ -35,6 +35,7 @@ use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
 use App\Http\Controllers\FCM\DeviceTokenController;
+use App\Http\Controllers\Notification\Test\NotificationTestController;
 use App\Http\Controllers\Uploads\FileUploadController;
 use App\Jobs\TestJobNotification;
 use PHPUnit\Event\Code\Test;
@@ -184,6 +185,11 @@ Route::prefix("/v1")->group(function () {
         TestJobNotification::dispatch();
     });
 
+    Route::prefix('notifications/test')->group(function () {
+        Route::post('token', [NotificationTestController::class, 'testTokenNotification']);
+        Route::post('room', [NotificationTestController::class, 'testRoomNotification']);
+        Route::get('events', [NotificationTestController::class, 'listEvents']);
+    });
 });
 
 Route::options('{any}', function () {

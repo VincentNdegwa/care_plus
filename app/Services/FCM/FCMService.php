@@ -121,7 +121,7 @@ class FCMService
             if (!isset($message['message']) || 
                 (!isset($message['message']['token']) && !isset($message['message']['topic']))) {
                 Log::error('FCM Invalid message structure', ['message' => $message]);
-                return false;
+                return 'Invalid message structure: '.json_encode($message);
             }
 
             $token = $message['message']['token'] ?? null;
@@ -168,7 +168,7 @@ class FCMService
                     DeviceToken::where('token', $recipientInfo['token'])->delete();
                 }
                 
-                return false;
+                return $body;
             }
 
             return true;
@@ -179,7 +179,12 @@ class FCMService
                 'trace' => $e->getTraceAsString(),
                 'projectId' => $this->projectId
             ], $recipientInfo));
-            return false;
+
+            return array_merge([
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'projectId' => $this->projectId
+            ], $recipientInfo);
         }
     }
 
@@ -204,7 +209,7 @@ class FCMService
 
         if (empty($tokens)) {
             Log::info("No active device tokens found for user: $userId");
-            return false;
+            return "No active device tokens found for user: $userId";
         }
 
         Log::info('Sending to user tokens:', [
@@ -230,7 +235,7 @@ class FCMService
     {
         if (!$token && !$room) {
             Log::error('FCM Error: Neither token nor room provided');
-            return false;
+            return "Neither token nor room provided";
         }
 
         $recipient = $token ? ['token' => $token] : ['topic' => $room];
