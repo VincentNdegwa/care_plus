@@ -2,8 +2,8 @@
     {
       "receiver": "patient",
       "event": "medication_reminder",
-      "title": "Time to Take Your Medication",
-      "description": "It's time to take your prescribed medication: [Medication Name]. Please take it as directed."
+      "title": "Time to Take you medication: [Medication Name]",
+      "description": "It's time to take [Dosage Quantity]-[Medication Name] - ([Dosage Strength])."
     },
     {
       "receiver": "patient",
@@ -92,16 +92,10 @@
     {
       "receiver": "room",
       "room_name": "[Room_Name]",
-      "event": "room_medication_reminder",
-      "title": "Medication Time for Patients in [Room Name]",
-      "description": "Reminder: Patients in [Room Name] need to take their scheduled medications now."
-    },
-    {
-      "receiver": "room",
-      "room_name": "[Room_Name]",
-      "event": "medication_missed_alert",
-      "title": "Missed Medication Alert for Patients in [Room Name]",
-      "description": "One or more patients in [Room Name] missed their medication. Please check their records and assist."
+      "event": "medication_reminder_room",
+      "room_pattern": "medication_reminder_[Patient_Id]",
+      "title": "Medication Time for Patients [Patient Name]",
+      "description": "Reminder: Patients [Patient Name] need to take their scheduled medications now."
     },
     {
       "receiver": "patient",
@@ -120,6 +114,20 @@
       "event": "emergency_alert",
       "title": "Emergency Alert for [Patient Name]",
       "description": "Urgent: [Patient Name] has triggered an emergency alert. Please check immediately."
+    },
+    {
+      "receiver": "room",
+      "event": "missed_medication_room",
+      "room_pattern": "missed_medication_[Patient_Id]",
+      "title": "Missed Medication Alert for Patient",
+      "description": "Patient [Patient Name] has missed their medication: [Medication Name]"
+    },
+    {
+      "receiver": "room",
+      "event": "patient_vitals_room",
+      "room_pattern": "patient_vitals_[Patient_Id]",
+      "title": "Patient Vitals Update",
+      "description": "New vitals recorded for patient [Patient Name]"
     }
   ]
   

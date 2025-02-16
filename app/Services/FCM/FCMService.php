@@ -25,7 +25,7 @@ class FCMService
         $this->accessToken = $this->getAccessToken();
     }
 
-    public function getAccessToken()
+    protected function getAccessToken()
     {
         $credentialsPath = config('services.fcm.credentials_path');
         
@@ -38,68 +38,99 @@ class FCMService
             throw new \RuntimeException('Firebase credentials file not found');
         }
 
-        $credentialsFile = json_decode(
-            file_get_contents($credentialsPath), 
-            true
-        );
-
+        $credentialsFile = json_decode(file_get_contents($credentialsPath), true);
         $credentials = new ServiceAccountCredentials(
             ['https://www.googleapis.com/auth/firebase.messaging'],
             $credentialsFile
         );
 
-        // Use Guzzle client directly
         $httpHandler = function ($request) {
-            $options = [
+            return $this->guzzle->send($request, [
                 'headers' => $request->getHeaders(),
                 'body' => $request->getBody(),
                 'verify' => false
-            ];
-            
-            return $this->guzzle->send($request, $options);
+            ]);
         };
 
         $token = $credentials->fetchAuthToken($httpHandler);
         return $token['access_token'];
     }
 
-    public function sendToToken($token, $title, $body, $data = [])
+    protected function buildDataMessage($recipient, $data)
     {
-        // Convert all data values to strings and encode the entire payload as a single string
-        // $formattedData = [];
-        // foreach ($data as $key => $value) {
-        //     $formattedData[$key] = is_string($value) ? $value : json_encode($value);
-        // }
-
         $message = [
             'message' => [
-                'token' => $token,
-                // 'notification' => [
-                //     'title' => $title,
-                //     'body' => $body,
-                // ],
                 'data' => [
                     'data' => json_encode($data)
                 ],
-                // 'android' => [
-                //     'priority' => 'high',
-                //     'notification' => [
-                //         'channel_id' => 'medication_notifications',
-                //         'notification_priority' => 'PRIORITY_HIGH'
-                //     ]
-                // ],
-                // 'apns' => [
-                //     'payload' => [
-                //         'aps' => [
-                //             'sound' => 'default',
-                //             'badge' => 1
-                //         ]
-                //     ]
-                // ]
             ]
         ];
 
+        if (isset($recipient['token'])) {
+            $token = trim($recipient['token']);
+            $message['message']['token'] = $token;
+        } elseif (isset($recipient['topic'])) {
+            $message['message']['topic'] = $recipient['topic'];
+        }
+
+        return $message;
+    }
+
+    protected function buildNotificationMessage($recipient, $event, $priority, $data)
+    {
+        $message = [
+            'message' => [
+                'notification' => [
+                    'title' => $event['title'] ?? 'Notification',
+                    'body' => $event['body'] ?? '',
+                ],
+                'data' => [
+                    'data' => json_encode($data)
+                ],
+                'android' => [
+                    'priority' => $priority,
+                    'notification' => [
+                        'channel_id' => 'medication_notifications',
+                        'notification_priority' => 'PRIORITY_HIGH'
+                    ]
+                ],
+                'apns' => [
+                    'payload' => [
+                        'aps' => [
+                            'sound' => 'default',
+                            'badge' => 1
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        if (isset($recipient['token'])) {
+            $message['message']['token'] = $recipient['token'];
+        } elseif (isset($recipient['topic'])) {
+            $message['message']['topic'] = $recipient['topic'];
+        }
+
+        return $message;
+    }
+
+    protected function sendMessage($message, $recipientInfo = [])
+    {
         try {
+            // Validate the message structure
+            if (!isset($message['message']) || 
+                (!isset($message['message']['token']) && !isset($message['message']['topic']))) {
+                Log::error('FCM Invalid message structure', ['message' => $message]);
+                return false;
+            }
+
+            $token = $message['message']['token'] ?? null;
+            if ($token) {
+                // Clean the token
+                $token = trim($token);
+                $message['message']['token'] = $token;
+            }
+
             Log::info('FCM Request Payload:', ['payload' => $message]);
 
             $response = $this->guzzle->post(
@@ -119,19 +150,22 @@ class FCMService
             
             Log::info('FCM Response', [
                 'status' => $statusCode,
-                'body' => $body
+                'body' => $body,
+                'token' => $token
             ]);
 
             if ($statusCode !== 200) {
-                Log::error('FCM Error', [
+                Log::error('FCM Error', array_merge([
                     'status' => $statusCode,
                     'body' => $body,
-                    'token' => $token
-                ]);
+                    'token' => $token,
+                    'projectId' => $this->projectId
+                ], $recipientInfo));
                 
-                if ($statusCode === 404 || 
-                    str_contains($body, 'registration-token-not-registered')) {
-                    DeviceToken::where('token', $token)->delete();
+                if (isset($recipientInfo['token']) && 
+                    ($statusCode === 404 || str_contains($body, 'registration-token-not-registered'))) {
+                    Log::info('Deleting invalid token', ['token' => $recipientInfo['token']]);
+                    DeviceToken::where('token', $recipientInfo['token'])->delete();
                 }
                 
                 return false;
@@ -140,22 +174,25 @@ class FCMService
             return true;
 
         } catch (\Exception $e) {
-            Log::error('FCM Send Error', [
+            Log::error('FCM Send Error', array_merge([
                 'message' => $e->getMessage(),
-                'token' => $token,
-                'data' => $data,
-                'trace' => $e->getTraceAsString()
-            ]);
+                'trace' => $e->getTraceAsString(),
+                'projectId' => $this->projectId
+            ], $recipientInfo));
             return false;
         }
     }
 
-    private function isJson($string) {
-        if (!is_string($string)) {
-            return false;
-        }
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
+    public function sendToToken($token, $title, $body, $data = [])
+    {
+        $message = $this->buildDataMessage(['token' => $token], $data);
+        return $this->sendMessage($message, ['token' => $token]);
+    }
+
+    public function sendToRoom($room, $title, $body, $data = [])
+    {
+        $message = $this->buildDataMessage(['topic' => $room], $data);
+        return $this->sendMessage($message, ['room' => $room]);
     }
 
     public function sendToUser($userId, $title, $body, $data = [])
@@ -170,14 +207,40 @@ class FCMService
             return false;
         }
 
+        Log::info('Sending to user tokens:', [
+            'userId' => $userId,
+            'tokens' => $tokens,
+            'data' => $data
+        ]);
+
         $successCount = 0;
         foreach ($tokens as $token) {
+            $token = trim($token);
+            if (empty($token)) continue;
+
             if ($this->sendToToken($token, $title, $body, $data)) {
                 $successCount++;
             }
         }
 
         return $successCount > 0;
+    }
+
+    public function sendNotification($token = null, $room = null, $event, $priority = 'high', $data = [])
+    {
+        if (!$token && !$room) {
+            Log::error('FCM Error: Neither token nor room provided');
+            return false;
+        }
+
+        $recipient = $token ? ['token' => $token] : ['topic' => $room];
+        $message = $this->buildNotificationMessage($recipient, $event, $priority, $data);
+        
+        return $this->sendMessage($message, [
+            'token' => $token,
+            'room' => $room,
+            'data' => $data
+        ]);
     }
 
     public function testSend()
@@ -214,7 +277,7 @@ class FCMService
             ];
         }
     }
-} 
+}
 
 
 
@@ -228,3 +291,31 @@ class FCMService
 //     "Test Message",
 //     ["key" => "value"]
 // );
+
+// $message = [
+//     'message' => [
+//         'token' => $token,
+//         'notification' => [
+//             'title' => $title,
+//             'body' => $body,
+//         ],
+//         'data' => [
+//             'data' => json_encode($data)
+//         ],
+//         'android' => [
+//             'priority' => 'high',
+//             'notification' => [
+//                 'channel_id' => 'medication_notifications',
+//                 'notification_priority' => 'PRIORITY_HIGH'
+//             ]
+//         ],
+//         'apns' => [
+//             'payload' => [
+//                 'aps' => [
+//                     'sound' => 'default',
+//                     'badge' => 1
+//                 ]
+//             ]
+//         ]
+//     ]
+// ];

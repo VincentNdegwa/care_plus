@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Medication;
 use App\Models\Schedules\MedicationTracker;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -25,7 +26,7 @@ class DeactivateMedication implements ShouldQueue
     public function handle(): void
     {
         $trakers = MedicationTracker::where(function($query){
-            $query->where('stop_date', '<', now())
+            $query->where('stop_date', '<', Carbon::now())
             ->orWhere('status', 'Stopped');
         })
         ->get();

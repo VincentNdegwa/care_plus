@@ -8,6 +8,7 @@ use App\Models\Schedules\MedicationScheduleNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Services\FCM\FCMService;
+use App\Services\Notifications\NotificationService;
 use Illuminate\Support\Facades\Log;
 
 class SendMedicationDefaultNotification implements ShouldQueue
@@ -31,8 +32,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        // Create notification record
-        $notification = MedicationScheduleNotification::updateOrCreate(
+        MedicationScheduleNotification::updateOrCreate(
             [
                 'medication_schedule_id' => $this->schedule->id,
                 'status' => 'Pending'
@@ -42,36 +42,23 @@ class SendMedicationDefaultNotification implements ShouldQueue
             ]
         );
 
-        $scheduleArray = $this->schedule->load('medication')->toArray();
+        $schedule = $this->schedule->load(['medication']);
+        $scheduleArray = $schedule->toArray();
         
-        // $scheduleArray = $this->convertToString($scheduleArray);
-        
-        Log::info("Schedule data:", ['data' => $scheduleArray]);
-        
-        $fcm = new FCMService();
-        $fcm->sendToUser(
-            $this->userId,
-            'Medication Reminder',
-            "It's time to take your medication",
+        $notification_service = new NotificationService();
+        $notification_service->send(
+            'medication_reminder',
+            [$this->userId],
             [
-                'type' => 'medication_reminder',
+                'Medication Name' => $scheduleArray['medication']['medication_name'] ?? '',
+                'Dosage Quantity' => $scheduleArray['medication']['dosage_quantity'] ?? '',
+                'Dosage Strength' => $scheduleArray['medication']['dosage_strength'] ?? ''
+            ],
+            [
+                'type' => 'medication_reminder', 
                 'payload' => $scheduleArray
             ]
         );
     }
 
-    /**
-     * Convert all values in an array to strings
-     */
-    private function convertToString($array)
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $array[$key] = $this->convertToString($value);
-            } else {
-                $array[$key] = $value === null ? '' : (string) $value;
-            }
-        }
-        return $array;
-    }
 }
