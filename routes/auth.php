@@ -185,3 +185,8 @@ Route::prefix("/v1")->group(function () {
     });
 
 });
+
+Route::options('{any}', function () {
+    return response()->json([], 204);
+})->where('any', '.*');
+
