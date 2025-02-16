@@ -1,0 +1,89 @@
+{
+    "medication_reminder": {
+        "type": "medication_reminder",
+        "payload": {
+            "id": 46,
+            "medication_id": 1,
+            "patient_id": 2,
+            "dose_time": "2025-02-16 15:50:25",
+            "processed_at": "2025-02-16 15:57:01",
+            "status": "Pending",
+            "taken_at": null,
+            "second_notification_sent": 1,
+            "created_at": "2025-02-15T22:59:27.000000Z",
+            "updated_at": "2025-02-16T17:57:05.000000Z",
+            "medication": {
+                "id": 1,
+                "patient_id": 2,
+                "diagnosis_id": null,
+                "medication_name": "Panadols",
+                "dosage_quantity": "2",
+                "dosage_strength": "500mg",
+                "form_id": 3,
+                "route_id": 2,
+                "frequency": "Three times a day",
+                "duration": "3 days",
+                "prescribed_date": "2025-02-07 17:33:25",
+                "doctor_id": null,
+                "caregiver_id": null,
+                "stock": 20,
+                "active": 1
+            }
+        }
+    },
+    "missed_medication_room": {
+        "type": "missed_medication_room",
+        "payload": {
+            "id": 46,
+            "medication_id": 1,
+            "patient_id": 1,
+            "dose_time": "2025-02-16 15:50:25",
+            "status": "Missed",
+            "patient": {
+                "id": 1,
+                "name": "John Doe"
+            },
+            "medication": {
+                "id": 1,
+                "medication_name": "Panadols",
+                "dosage_quantity": "2",
+                "dosage_strength": "500mg"
+            }
+        }
+    },
+    "emergency_alert": {
+        "type": "emergency_alert",
+        "payload": {
+            "id": 1,
+            "patient_id": 1,
+            "alert_type": "fall_detected",
+            "severity": "high",
+            "timestamp": "2025-02-16 14:30:00",
+            "location": "Bedroom",
+            "patient": {
+                "id": 1,
+                "name": "John Doe",
+                "room_number": "A-123"
+            },
+            "coordinates": {
+                "lat": 37.7749,
+                "lng": -122.4194
+            }
+        }
+    },
+    "patient_vitals_room": {
+        "type": "patient_vitals_room",
+        "payload": {
+            "id": 1,
+            "patient_id": 1,
+            "blood_pressure": "120/80",
+            "heart_rate": 75,
+            "temperature": 37.2,
+            "recorded_at": "2025-02-16 14:30:00",
+            "patient": {
+                "id": 1,
+                "name": "John Doe"
+            }
+        }
+    }
+}

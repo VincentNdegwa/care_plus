@@ -24,8 +24,8 @@ class TestJobNotification implements ShouldQueue
         $schedule = [
             "id" => 26,
             "medication_id" => 1,
-            "patient_id" => 1,
-            // "patient_id" => 2,
+            // "patient_id" => 1,
+            "patient_id" => 2,
             "dose_time" => "2025-02-08 15:11:21",
             "processed_at" => "2025-02-08 15:12:04",
             "status" => "Pending",
