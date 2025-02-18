@@ -36,6 +36,7 @@ use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
 use App\Http\Controllers\FCM\DeviceTokenController;
 use App\Http\Controllers\Notification\Test\NotificationTestController;
+use App\Http\Controllers\Patient\FetchPatientCareGiversController;
 use App\Http\Controllers\Uploads\FileUploadController;
 use App\Jobs\TestJobNotification;
 use PHPUnit\Event\Code\Test;
@@ -151,6 +152,9 @@ Route::prefix("/v1")->group(function () {
             Route::post('/remove-doctor', [SetCareGiversController::class, 'removeDoctor']);
             Route::post('/remove-caregiver', [SetCareGiversController::class, 'removeCareGiver']);
             Route::get("/fetch-all", [FetchCareProvidersController::class, "fetchAll"]);
+            Route::post("/fetch-doctor-patient", [FetchPatientCareGiversController::class, 'fetchForDoctor']);
+            Route::post("/fetch-caregiver-patient", [FetchPatientCareGiversController::class, 'fetchForCaregiver']);
+
         });
 
         Route::prefix('medication-schedules')->group(function () {
