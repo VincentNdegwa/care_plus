@@ -26,7 +26,7 @@ class FileUploadController extends Controller
                 "error" => false,
                 "data"=>[
                     'file_path' => Storage::url($filePath),
-                    "url"=> env('APP_URL')."/".Storage::url($filePath),
+                    "url"=> env('APP_URL').Storage::url($filePath),
                     "file_name"=>$fileName,
                     "folder"=>$folder
                 ]
