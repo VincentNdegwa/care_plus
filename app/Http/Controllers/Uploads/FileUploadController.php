@@ -17,14 +17,12 @@ class FileUploadController extends Controller
 
         try {
             $file = $request->file('file');
+            
+            $fileName = time() . '_' . $file->getClientOriginalName();
             $folder = $request->folder;
-            $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '_' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $extension;
 
             $filePath = $file->storeAs($folder, $fileName, 'public');
-    
-            $filePath = $file->storeAs($folder, $fileName, 'public');
-    
+        
             return response()->json([
                 "error" => false,
                 "data"=>[
