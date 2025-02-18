@@ -60,4 +60,6 @@ EXPOSE 9000
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
+RUN php artisan storage:link
+
 CMD ["/usr/local/bin/start.sh"]
