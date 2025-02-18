@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class UserProfileController extends Controller
 {
@@ -24,6 +25,9 @@ class UserProfileController extends Controller
             ]);
 
             $profile = UserProfile::firstOrNew(['user_id' => $user->id]);
+            if ($profile->avatar !== null && $request->avatar !== null && $profile->avatar !== $request->avatar) {
+                Storage::disk('public')->delete($profile->avatar);
+            }
             $profile->fill($request->only([
                 'gender',
                 'date_of_birth',
