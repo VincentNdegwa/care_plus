@@ -21,7 +21,9 @@ class ScheduleMedicationController extends Controller
     {
         try {
             $validatedData = $request->validate($rules);
-            $existTrack = MedicationTracker::where('medication_id', $request->input('medication_id'))->exists();
+            $existTrack = MedicationTracker::where('medication_id', $request->input('medication_id'))
+                ->where('status', '!=', 'Expired')
+                ->exists();
             if ($existTrack) {
                 return response()->json(
                     [
@@ -185,6 +187,5 @@ class ScheduleMedicationController extends Controller
 
 
         return ScheduleGenerator::getDefaultDoseTimes($validatedData);
-
     }
 }

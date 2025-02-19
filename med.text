@@ -1,0 +1,4 @@
+If medication is stopped ->schedules that are pending are deleted
+  The patient can opt to resume-> by extending days or just to the actual end_date
+  If the calclated end_date is past now -> throw an error
+  If the medication is expired, you can only resume by creating new schedule by providing the schedule

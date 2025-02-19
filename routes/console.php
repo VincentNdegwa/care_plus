@@ -9,5 +9,5 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::job(new MedicationCheckJob)->everyMinute();
 
 Schedule::job(new CheckSnoozeNotificationsJob)->everyMinute();
-Schedule::job(new DeactivateMedication)->daily();
+Schedule::job(new DeactivateMedication)->everyMinute();
 // Schedule::job(new TestJobNotification)->everyMinute(); 

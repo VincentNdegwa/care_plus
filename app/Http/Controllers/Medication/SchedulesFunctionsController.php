@@ -124,7 +124,7 @@ class SchedulesFunctionsController extends Controller
     {
         $request->validate([
             'medication_id' => 'required|exists:medications,id',
-            'extend_days' => 'boolean'
+            'extend_days' => 'boolean',
         ]);
 
         try {
@@ -157,6 +157,13 @@ class SchedulesFunctionsController extends Controller
 
                 // Add the difference to the end date
                 $newEndDate = $originalEndDate->copy()->addMinutes($minutesDifference);
+
+                if ($newEndDate->isPast()) {
+                    return response()->json([
+                        'error' => true,
+                        'message' => 'Cannot resume medication. End date is in the past. Create a new schedule instead.'
+                    ], 400);
+                }
 
                 // Update tracker end date
                 $tracker->end_date = $newEndDate;

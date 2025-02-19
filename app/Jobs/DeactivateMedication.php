@@ -29,8 +29,7 @@ class DeactivateMedication implements ShouldQueue
         $stopingMedication->each(function($tracker){
             $medication = $tracker->getMedication();
             $medication->active = false;
-            $tracker->stopped_when = Carbon::now();
-            $tracker->status = 'Stopped';
+            $tracker->status = 'Expired';
             
             $tracker->save();
             $medication->save();
