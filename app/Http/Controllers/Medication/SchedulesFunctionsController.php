@@ -193,7 +193,7 @@ class SchedulesFunctionsController extends Controller
             // Get the last dose time
             $lastDose = MedicationSchedule::where('medication_id', $request->medication_id)
                 ->where('status', 'Taken')
-                ->orderBy('scheduled_at', 'desc')
+                ->orderBy('dose_time', 'desc')
                 ->first();
 
             $now = Carbon::now();
