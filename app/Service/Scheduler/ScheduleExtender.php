@@ -60,6 +60,7 @@ class ScheduleExtender extends BaseScheduler
             'frequency' => $medicationTracker->frequency,
             'timezone' => $medicationTracker->timezone,
             'schedules' => $medicationTracker->schedules,
+            "status"=>'Running'
         ];
 
         return [

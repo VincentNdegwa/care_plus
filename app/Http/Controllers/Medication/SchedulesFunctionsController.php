@@ -120,6 +120,49 @@ class SchedulesFunctionsController extends Controller
         }
     }
 
+    private function getNextScheduleTime($lastDoseTime, $schedules, $timezone)
+    {
+        // Convert schedules from user timezone to UTC
+        $utcSchedules = collect(json_decode($schedules))->map(function ($time) use ($timezone) {
+            // Create a datetime with today's date and the schedule time in user's timezone
+            $scheduleDateTime = Carbon::now($timezone)
+                ->setTimeFromTimeString($time)
+                ->setTimezone('UTC');
+
+            return $scheduleDateTime->format('H:i');
+        })->sort();
+
+        // Convert last dose time to user's timezone for comparison
+        $lastDoseInUserTz = Carbon::parse($lastDoseTime);
+        $nowInUserTz = Carbon::now()->setTimezone($timezone);
+
+        // Find the next schedule time after the last dose
+        foreach ($utcSchedules as $schedule) {
+            list($hour, $minute) = explode(':', $schedule);
+
+            // Create schedule datetime in UTC
+            $scheduleDateTime = Carbon::now('UTC')
+                ->setTime($hour, $minute);
+
+            // If schedule is earlier than now, move to next day
+            if ($scheduleDateTime->isPast()) {
+                $scheduleDateTime->addDay();
+            }
+
+            // If this schedule is after the last dose time, use it
+            if ($scheduleDateTime->isAfter($lastDoseInUserTz)) {
+                return $scheduleDateTime;
+            }
+        }
+
+        // If no schedule found after last dose, use the first schedule of next day
+        $firstSchedule = $utcSchedules->first();
+        list($hour, $minute) = explode(':', $firstSchedule);
+        return Carbon::now('UTC')
+            ->addDay()
+            ->setTime($hour, $minute);
+    }
+
     public function resume(Request $request)
     {
         $request->validate([
@@ -147,15 +190,23 @@ class SchedulesFunctionsController extends Controller
                 ], 400);
             }
 
+            // Get the last dose time
+            $lastDose = MedicationSchedule::where('medication_id', $request->medication_id)
+                ->where('status', 'Taken')
+                ->orderBy('scheduled_at', 'desc')
+                ->first();
+
             $now = Carbon::now();
             $originalEndDate = Carbon::parse($tracker->end_date);
 
-            if ($request->input('extend_days', false)) {
-                // Calculate minutes difference between stopped time and now
-                $stoppedWhen = Carbon::parse($tracker->stopped_when);
-                $minutesDifference = $stoppedWhen->diffInMinutes($now);
+            // Determine restart time based on last dose and schedules
+            $restart_from = $lastDose
+                ? $this->getNextScheduleTime($lastDose->scheduled_at, $tracker->schedules, $tracker->timezone)
+                : $now;
 
-                // Add the difference to the end date
+            if ($request->input('extend_days', false)) {
+                $stoppedWhen = Carbon::parse($tracker->stopped_when);
+                $minutesDifference = $stoppedWhen->diffInMinutes($restart_from);
                 $newEndDate = $originalEndDate->copy()->addMinutes($minutesDifference);
 
                 if ($newEndDate->isPast()) {
@@ -165,25 +216,17 @@ class SchedulesFunctionsController extends Controller
                     ], 400);
                 }
 
-                // Update tracker end date
                 $tracker->end_date = $newEndDate;
             }
 
-
-
+            $restart_from = Carbon::parse($restart_from, "UTC")->setTimezone($tracker->timezone);
             Medication::where('id', $request->medication_id)
                 ->update(['active' => 1]);
 
-            $restart_from = $now->format('Y-m-d H:i:s');
-            if ($tracker->stopped_when != null) {
-                $restart_from = Carbon::parse($tracker->stopped_when)->format('Y-m-d H:i:s');
-            }
-            $restart_from = Carbon::parse($restart_from, config('app.timezone'))->setTimezone($tracker->timezone);
-
-            // Generate schedules from now to end date
+            // Generate schedules from restart time to end date
             $scheduleData = ScheduleGenerator::generateSchedule([
                 'medication_id' => $request->medication_id,
-                'start_datetime' => $restart_from,
+                'start_datetime' => $restart_from->format('Y-m-d H:i:s'),
                 'end_datetime' => $request->input('extend_days', false) ?
                     $tracker->end_date :
                     $originalEndDate->format('Y-m-d H:i:s'),
@@ -194,8 +237,6 @@ class SchedulesFunctionsController extends Controller
             foreach ($scheduleData['medications_schedules'] as $schedule) {
                 MedicationSchedule::create($schedule);
             }
-
-            // Update medication and tracker status
 
             $tracker->status = 'Running';
             $tracker->stopped_when = null;
@@ -209,8 +250,9 @@ class SchedulesFunctionsController extends Controller
                 'data' => [
                     'original_end_date' => $originalEndDate,
                     'new_end_date' => $request->input('extend_days', false) ? $tracker->end_date : $originalEndDate,
+                    'restart_from' => $restart_from,
                     'minutes_added' => $request->input('extend_days', false) ?
-                        Carbon::parse($tracker->stopped_when)->diffInMinutes($now) : 0
+                        Carbon::parse($tracker->stopped_when)->diffInMinutes($restart_from) : 0
                 ]
             ]);
         } catch (\Exception $e) {
@@ -240,7 +282,7 @@ class SchedulesFunctionsController extends Controller
 
         if (!$schedule) {
             return response()->json([
-                "error"=>true,
+                "error" => true,
                 'message' => 'No pending medication schedule found within 5 minutes of current time. Wait for Notification'
             ], 404);
         }

@@ -75,6 +75,7 @@ class ScheduleGenerator extends BaseScheduler
             'frequency' => $frequency,
             'timezone' => $timezone,
             'schedules' => self::$scheduledHours,
+            'status'=>'Running'
         ];
 
         return [
