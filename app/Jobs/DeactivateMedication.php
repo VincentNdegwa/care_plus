@@ -25,17 +25,15 @@ class DeactivateMedication implements ShouldQueue
      */
     public function handle(): void
     {
-        $trakers = MedicationTracker::where(function($query){
-            $query->where('stop_date', '<', Carbon::now())
-            ->orWhere('status', 'Stopped');
-        })
-        ->get();
-
-        foreach ($trakers as $tracker) {
+        $stopingMedication = MedicationTracker::where('stop_date', '<', Carbon::now())->get();
+        $stopingMedication->each(function($tracker){
             $medication = $tracker->getMedication();
             $medication->active = false;
+            $tracker->stopped_when = Carbon::now();
+            $tracker->status = 'Stopped';
+            
+            $tracker->save();
             $medication->save();
-        }
-
+        });
     }
 }
