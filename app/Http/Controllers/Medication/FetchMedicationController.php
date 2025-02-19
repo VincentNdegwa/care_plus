@@ -216,6 +216,7 @@ class FetchMedicationController extends Controller
             'stock' => $medication->stock,
             'active' => $medication->isActive(),
             'diagnosis' => $medication->diagnosis,
+            'status' => $medication->trackerStatus()
         ];
     }
 }
