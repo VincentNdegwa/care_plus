@@ -111,6 +111,8 @@ Route::prefix("/v1")->group(function () {
                 // Function routes
                 Route::post("/take", [SchedulesFunctionsController::class, "take"])
                     ->name('medication.schedule.take');
+                Route::post("/takeNow", [SchedulesFunctionsController::class, "takeNow"])
+                    ->name('medication.schedule.takeNow');
                     
                 Route::post("/stop", [SchedulesFunctionsController::class, "stop"])
                     ->name('medication.schedule.stop');

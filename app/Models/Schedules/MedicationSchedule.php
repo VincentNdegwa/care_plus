@@ -16,6 +16,7 @@ class MedicationSchedule extends Model
     protected $fillable = [
         'medication_id',
         'patient_id',
+        'processed_at',
         'dose_time',
         'status',
         'taken_at',

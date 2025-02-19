@@ -221,4 +221,39 @@ class SchedulesFunctionsController extends Controller
             ], 500);
         }
     }
+
+    public function takeNow(Request $request)
+    {
+        $request->validate([
+            "medication_id" => "required|exists:medications,id",
+        ]);
+
+        $now = Carbon::now();
+        $pastFiveMinutes = $now->copy()->subMinutes(5);
+        $futureFiveMinutes = $now->copy()->addMinutes(5);
+
+        $schedule = MedicationSchedule::where('medication_id', $request->medication_id)
+            ->whereBetween('dose_time', [$pastFiveMinutes, $futureFiveMinutes])
+            ->where('status', 'Pending')
+            ->orderBy('dose_time', 'asc')
+            ->first();
+
+        if (!$schedule) {
+            return response()->json([
+                "error"=>true,
+                'message' => 'No pending medication schedule found within 5 minutes of current time. Wait for Notification'
+            ], 404);
+        }
+
+        $schedule->status = 'Taken';
+        $schedule->processed_at = Carbon::now();
+        $schedule->taken_at = Carbon::now();
+        $schedule->save();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Medication taken successfully',
+            'data' => $schedule
+        ]);
+    }
 }
