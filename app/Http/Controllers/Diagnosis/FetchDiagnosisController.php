@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Diagnosis;
 
 use App\Http\Controllers\Controller;
 use App\Models\Diagnosis;
+use App\Models\CaregiverRelation;
 use Illuminate\Http\Request;
 
 class FetchDiagnosisController extends Controller
@@ -42,21 +43,45 @@ class FetchDiagnosisController extends Controller
     }
     public function searchDiagnoses(Request $request, $professionalId = null)
     {
-        $userId = $professionalId ?? $request->user()->id();
+        $userId = $professionalId ?? $request->user()->id;
+        $role = $request->user()->role;
         $search = $request->query('search');
         $this->default_per_page = $request->query('per_page', $this->default_per_page);
         $this->default_page_number = $request->query('page_number', $this->default_page_number);
 
-        $diagnoses = Diagnosis::with('patient.user', 'doctor.user')
-            ->where(function ($query) use ($userId) {
-                $query->where('patient_id', $userId)
-                    ->orWhere('doctor_id', $userId);
-            })
-            ->where(function ($query) use ($search) {
-                $query->where('diagnosis_name', 'LIKE', "%{$search}%")
-                    ->orWhere('symptoms', 'LIKE', "%{$search}%")
-                    ->orWhere('description', 'LIKE', "%{$search}%");
+        $diagnoses = Diagnosis::with('patient.user', 'doctor.user');
+        
+        switch ($role) {
+            case 'Doctor':
+                $diagnoses = $diagnoses->where('doctor_id', $userId);
+                break;
+            
+            case 'Patient':
+                $diagnoses = $diagnoses->where('patient_id', $userId);
+                break;
+            
+            case 'Caregiver':
+                $patientIds = CaregiverRelation::where('caregiver_id', $userId)
+                    ->pluck('patient_id');
+                $diagnoses = $diagnoses->whereIn('patient_id', $patientIds);
+                break;
+                
+            default:
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Invalid role'
+                ], 400);
+        }
+
+        if (!empty($search)) {
+            $diagnoses = $diagnoses->where(function ($query) use ($search) {
+                $query->where('diagnosis_name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('symptoms', 'LIKE', '%' . $search . '%')
+                      ->orWhere('description', 'LIKE', '%' . $search . '%');
             });
+        }
+
+        $diagnoses = $diagnoses->orderBy('created_at', 'desc');
 
         return $this->paginateQuery($diagnoses);
     }
