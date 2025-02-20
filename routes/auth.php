@@ -88,11 +88,11 @@ Route::prefix("/v1")->group(function () {
 
 
         Route::prefix("/diagnosis")->group(function () {
-            Route::get("/{diagnosis_id}", [FetchDiagnosisController::class, "find"]);
-            Route::get("/patient/{patient_id}", [FetchDiagnosisController::class, "fetchByPatient"]);
-            Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
             Route::get("/search", [FetchDiagnosisController::class, "searchDiagnoses"]);
             Route::post("/filter", [FetchDiagnosisController::class, "filterDiagnoses"]);
+            Route::get("/patient/{patient_id}", [FetchDiagnosisController::class, "fetchByPatient"]);
+            Route::get("/doctor/{doctor_id}", [FetchDiagnosisController::class, "fetchByDoctor"]);
+            Route::get("/{diagnosis_id}", [FetchDiagnosisController::class, "find"]);
             Route::patch("/update/{diagnosis_id}", [UpdateDiagnosisController::class, 'update']);
             Route::delete("/delete/{diagnosis_id}", [DeleteDiagnosisController::class, 'delete']);
         });

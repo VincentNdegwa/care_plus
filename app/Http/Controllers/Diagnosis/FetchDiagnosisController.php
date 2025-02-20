@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Diagnosis;
 
 use App\Http\Controllers\Controller;
+use App\Models\Caregiver;
 use App\Models\Diagnosis;
 use App\Models\CaregiverRelation;
+use App\Models\Doctor;
+use App\Models\Patient;
 use Illuminate\Http\Request;
 
 class FetchDiagnosisController extends Controller
@@ -49,28 +52,25 @@ class FetchDiagnosisController extends Controller
         $this->default_per_page = $request->query('per_page', $this->default_per_page);
         $this->default_page_number = $request->query('page_number', $this->default_page_number);
 
-        $diagnoses = Diagnosis::with('patient.user', 'doctor.user');
+        $diagnoses = Diagnosis::with(['patient.user', 'doctor.user']);
         
         switch ($role) {
             case 'Doctor':
-                $diagnoses = $diagnoses->where('doctor_id', $userId);
+                $doctorId = Doctor::where('user_id', $userId)->first()->id;
+                $diagnoses = $diagnoses->where('doctor_id', $doctorId);
                 break;
             
             case 'Patient':
-                $diagnoses = $diagnoses->where('patient_id', $userId);
+                $patientId = Patient::where('user_id', $userId)->first()->id;
+                $diagnoses = $diagnoses->where('patient_id', $patientId);
                 break;
             
             case 'Caregiver':
-                $patientIds = CaregiverRelation::where('caregiver_id', $userId)
+                $caregiverId = Caregiver::where('user_id', $userId)->first()->id;
+                $patientIds = CaregiverRelation::where('caregiver_id', $caregiverId)
                     ->pluck('patient_id');
                 $diagnoses = $diagnoses->whereIn('patient_id', $patientIds);
                 break;
-                
-            default:
-                return response()->json([
-                    'error' => true,
-                    'message' => 'Invalid role'
-                ], 400);
         }
 
         if (!empty($search)) {
