@@ -88,9 +88,9 @@ class FetchDiagnosisController extends Controller
 
             return $this->paginateQuery($diagnosesQuery);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['error' => true, 'message' => $e->getMessage(), "errors" => $e->errors()]);
+            return response()->json(['error' => true, 'message' => $e->getMessage()],422);
         } catch (\Exception $e) {
-            return response()->json(['error' => true, 'message' => $e->getMessage()]);
+            return response()->json(['error' => true, 'message' => $e->getMessage()],500);
         }
     }
 
@@ -125,7 +125,8 @@ class FetchDiagnosisController extends Controller
                 'id' => $diagnosis->doctor->id,
                 'name' => $diagnosis->doctor->user->name,
                 "email" => $diagnosis->doctor->user->email
-            ]
+            ],
+            "medication_counts"=> $diagnosis->medications->count(),
         ];
     }
 
