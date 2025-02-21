@@ -147,7 +147,7 @@ Route::prefix("/v1")->group(function () {
         });
 
         Route::prefix("/reports")->group(function () {
-            Route::prefix("/health-provider")->group(function(){
+            Route::prefix("/health-provider")->middleware(['ability:doctor,caregiver'])->group(function(){
                 Route::post("/adherence-per-patient", [ReportsController::class, "adherencePerPatient"]);
                 Route::post("/top-adhering-patients", [ReportsController::class, "topAdheringPatients"]);
                 Route::post("/bottom-adhering-patients", [ReportsController::class, "bottomAdheringPatients"]);
