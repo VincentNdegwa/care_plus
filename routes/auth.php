@@ -39,7 +39,7 @@ use App\Http\Controllers\Notification\Test\NotificationTestController;
 use App\Http\Controllers\Patient\FetchPatientCareGiversController;
 use App\Http\Controllers\Uploads\FileUploadController;
 use App\Jobs\TestJobNotification;
-use PHPUnit\Event\Code\Test;
+use App\Http\Controllers\Reports\ReportsController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -144,6 +144,20 @@ Route::prefix("/v1")->group(function () {
             Route::get("/{side_effect_id}", [FetchSideEffectsController::class, "getOne"]);
             Route::patch("/update/{side_effect_id}", [AlterSideEffectController::class, "update"]);
             Route::delete("/delete/{side_effect_id}", [AlterSideEffectController::class, "delete"]);
+        });
+
+        Route::prefix("/reports")->group(function () {
+            Route::prefix("/health-provider")->group(function(){
+                Route::post("/adherence-per-patient", [ReportsController::class, "adherencePerPatient"]);
+                Route::post("/top-adhering-patients", [ReportsController::class, "topAdheringPatients"]);
+                Route::post("/bottom-adhering-patients", [ReportsController::class, "bottomAdheringPatients"]);
+                Route::post("/fetch-side-effects", [ReportsController::class, "fetchSideEffects"]);
+            });
+            Route::post("/medication-vs-side-effect-counts", [ReportsController::class, "medicationVsSideEffectCounts"]);
+            Route::post("/top-side-effects", [ReportsController::class, "topSideEffects"]);
+            Route::post("/most-missed-medications", [ReportsController::class, "mostMissedMedications"]);
+            Route::post("/medical-adherence-report", [ReportsController::class, "medicalAdhearanceReport"]);
+            Route::post("/medication-adherence-by-medication", [ReportsController::class, "medicationAdherenceByMedication"]);
         });
 
         Route::prefix('care-providers')->group(function () {
