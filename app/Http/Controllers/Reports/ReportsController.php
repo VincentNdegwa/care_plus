@@ -365,7 +365,7 @@ class ReportsController extends Controller
 
             $medicationData[] = [
                 'medication_id' => $medicationId,
-                'medication_name' => $medication->name,
+                'medication_name' => $medication->medication_name,
                 'side_effect_count' => $sideEffectCount,
             ];
         }
