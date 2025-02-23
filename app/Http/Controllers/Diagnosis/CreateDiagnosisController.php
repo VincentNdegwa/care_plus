@@ -28,8 +28,9 @@ class CreateDiagnosisController extends Controller
             $diagnosisWithRelationship = Diagnosis::where("id", $diagnosis->id)
                 ->with('patient.user', 'doctor.user')
                 ->first();
+            $diagnosisWithRelationship->medication_counts = 0;
 
-            $diagnosisData = $diagnosisWithRelationship->toArray();
+            $diagnosisData = $this->formatData($diagnosisWithRelationship);
 
             SendNotification::dispatch(
                 [$diagnosisWithRelationship->patient->user->id], 
@@ -58,4 +59,24 @@ class CreateDiagnosisController extends Controller
         }
     }
 
+    public static function formatData($data)
+    {
+        return [
+            'id' => $data->id,
+            'diagnosis_name' => $data->diagnosis_name,
+            'description' => $data->description,
+            'date_diagnosed' => $data->date_diagnosed,
+            'patient' => [
+                'id' => $data->patient->user->id,
+                'name' => $data->patient->user->name,
+                'email' => $data->patient->user->email
+            ],
+            'doctor' => [
+                'id' => $data->doctor->user->id,
+                'name' => $data->doctor->user->name,
+                'email' => $data->doctor->user->email
+            ],
+            'medication_counts' => 0
+        ];
+    }
 }
