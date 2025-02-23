@@ -45,7 +45,7 @@ class NotificationTestController extends Controller
         }
 
         $event = $request->input('event');
-        
+
         if (!isset($this->testData[$event])) {
             return response()->json([
                 'success' => false,
@@ -74,7 +74,6 @@ class NotificationTestController extends Controller
                     'result' => $result
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -100,7 +99,7 @@ class NotificationTestController extends Controller
         }
 
         $event = $request->input('event');
-        
+
         if (!isset($this->testData[$event])) {
             return response()->json([
                 'success' => false,
@@ -128,7 +127,6 @@ class NotificationTestController extends Controller
                     'result' => $result
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -168,6 +166,11 @@ class NotificationTestController extends Controller
                     'Patient Name' => $testData['payload']['patient']['name'],
                     'Blood Pressure' => $testData['payload']['blood_pressure'],
                     'Heart Rate' => $testData['payload']['heart_rate']
+                ];
+            case 'new_diagnosis_notification':
+                return [
+                    'Doctor Name' => $testData['doctor']['user']['name'] ?? '',
+                    'Diagnosis Name' => $testData['diagnosis_name'] ?? '',
                 ];
 
             default:

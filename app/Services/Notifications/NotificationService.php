@@ -14,33 +14,38 @@ class NotificationService
         $this->fcm = new FCMService();
     }
 
-    public function send($event, $recipients, $replacements = [], $additionalData = [])
+    public function send($event, $userIds, $replacements = [], $additionalData = [])
     {
         try {
-            $notification = NotificationTemplate::get($event, $replacements);
+            Log::info('Sending notification:', [
+                'event' => $event,
+                'userIds' => $userIds,
+                'replacements' => $replacements
+            ]);
+            
+            $template = NotificationTemplate::get($event, $replacements);
             
             $data = array_merge([
                 'type' => $event,
-                'notification' => $notification
+                'notification' => $template
             ], $additionalData);
 
             Log::info('Sending notification', [
                 "data" => $data,
             ]);
 
-            if ($notification['receiver'] === 'room') {
-                return $this->sendToRoom($notification, $data);
+            if ($template['receiver'] === 'room') {
+                return $this->sendToRoom($template, $data);
             }
 
-            return $this->sendToRecipients($notification, $recipients, $data);
+            return $this->sendToRecipients($template, $userIds, $data);
 
         } catch (\Exception $e) {
-            Log::error('Failed to send notification', [
-                'event' => $event,
+            Log::error('Notification error:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return false;
+            throw $e;
         }
     }
 

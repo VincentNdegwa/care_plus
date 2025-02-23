@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Diagnosis;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\DiagnosisNotifications;
+use App\Jobs\SendNotification;
 use App\Models\Diagnosis;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CreateDiagnosisController extends Controller
 {
@@ -27,7 +28,15 @@ class CreateDiagnosisController extends Controller
             $diagnosisWithRelationship = Diagnosis::where("id", $diagnosis->id)
                 ->with('patient.user', 'doctor.user')
                 ->first();
-            DiagnosisNotifications::dispatch($diagnosisWithRelationship);
+
+            $diagnosisData = $diagnosisWithRelationship->toArray();
+
+            SendNotification::dispatch(
+                [$diagnosisWithRelationship->patient->user->id], 
+                $diagnosisData, 
+                'new_diagnosis_notification'
+            );
+           
             return response()->json([
                 "error" => false,
                 "message" => "Diagnosis created successfully",
@@ -40,6 +49,7 @@ class CreateDiagnosisController extends Controller
                 'errors' => $th->errors()
             ]);
         } catch (\Exception $e) {
+            Log::error($e);
             return response()->json([
                 "error" => true,
                 'message' => 'An error occurred while creating the diagnosis',
@@ -47,4 +57,5 @@ class CreateDiagnosisController extends Controller
             ], 500);
         }
     }
+
 }

@@ -3,6 +3,7 @@
 namespace App\Services\Notifications;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class NotificationTemplate
 {
@@ -23,12 +24,16 @@ class NotificationTemplate
     public static function get($event, $replacements = [])
     {
         $templates = self::load();
+        
+        Log::info('Loaded templates:', ['templates' => $templates]);
+        Log::info('Looking for event:', ['event' => $event]);
+        
         $template = collect($templates)->firstWhere('event', $event);
 
         if (!$template) {
             throw new \RuntimeException("Notification template not found for event: {$event}");
         }
-
+        
         $roomName = null;
         if ($template['receiver'] === 'room' && isset($template['room_pattern'])) {
             $roomName = self::replaceVariables($template['room_pattern'], $replacements);

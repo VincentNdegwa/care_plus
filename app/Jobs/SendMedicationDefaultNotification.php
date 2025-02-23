@@ -45,20 +45,7 @@ class SendMedicationDefaultNotification implements ShouldQueue
         $schedule = $this->schedule->load(['medication']);
         $scheduleArray = $schedule->toArray();
         
-        $notification_service = new NotificationService();
-        $notification_service->send(
-            'medication_reminder',
-            [$this->userId],
-            [
-                'Medication Name' => $scheduleArray['medication']['medication_name'] ?? '',
-                'Dosage Quantity' => $scheduleArray['medication']['dosage_quantity'] ?? '',
-                'Dosage Strength' => $scheduleArray['medication']['dosage_strength'] ?? ''
-            ],
-            [
-                'type' => 'medication_reminder', 
-                'payload' => $scheduleArray
-            ]
-        );
+        SendNotification::dispatch([$this->userId], $scheduleArray, 'medication_reminder');
     }
 
 }

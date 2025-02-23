@@ -33,4 +33,5 @@ class Diagnosis extends Model
     {
         return $this->hasMany(Medication::class, 'diagnosis_id');
     }
+
 }

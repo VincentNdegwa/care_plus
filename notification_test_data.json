@@ -89,40 +89,22 @@
     "new_diagnosis_notification": {
         "type": "new_diagnosis_notification",
         "payload": {
-            "id": 3,
-            "patient_id": 1,
             "diagnosis_name": "Malaria",
             "description": null,
             "symptoms": null,
             "date_diagnosed": "2024-11-21",
-            "doctor_id": 2,
-            "patient": {
-                "id": 1,
-                "user_id": 1,
-                "user": {
-                    "id": 1,
-                    "name": "Jacquelyn Ziemann",
-                    "email": "ndegwavincent7@gmail.com",
-                    "role": "Patient",
-                    "email_verified_at": null
-                }
-            },
             "doctor": {
-                "id": 2,
-                "user_id": 7,
-                "specialization": null,
-                "last_activity": null,
-                "license_number": null,
-                "license_issuing_body": null,
-                "clinic_name": null,
-                "clinic_address": null,
-                "active": "1",
                 "user": {
                     "id": 7,
                     "name": "Julia Roberts III",
-                    "email": "Kayla49@example.com",
-                    "role": "Doctor",
-                    "email_verified_at": null
+                    "email": "Kayla49@example.com"
+                }
+            },
+            "patient": {
+                "user": {
+                    "id": 1,
+                    "name": "Jacquelyn Ziemann",
+                    "email": "ndegwavincent7@gmail.com"
                 }
             }
         }

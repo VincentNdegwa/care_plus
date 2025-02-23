@@ -73,16 +73,18 @@ class TestJobNotification implements ShouldQueue
         //        ]
         //    );
 
-        $notification_service = new NotificationService();
-        $notification_service->send(
-            'medication_reminder',
-            [$this->userId],
-            [
-                'Medication Name' => $this->schedule['medication']['medication_name'] ?? '',
-                'Dosage Quantity' => $this->schedule['medication']['dosage_quantity'] ?? '',
-                'Dosage Strength' => $this->schedule['medication']['dosage_strength'] ?? ''
-            ],
-            ['type' => 'medication_reminder', 'payload' => $this->schedule]
-        );
+        // $notification_service = new NotificationService();
+        // $notification_service->send(
+        //     'medication_reminder',
+        //     [$this->userId],
+        //     [
+        //         'Medication Name' => $this->schedule['medication']['medication_name'] ?? '',
+        //         'Dosage Quantity' => $this->schedule['medication']['dosage_quantity'] ?? '',
+        //         'Dosage Strength' => $this->schedule['medication']['dosage_strength'] ?? ''
+        //     ],
+        //     ['type' => 'medication_reminder', 'payload' => $this->schedule]
+        // );
+
+        SendNotification::dispatch([$this->userId], $this->schedule, 'medication_reminder');
     }
 }
