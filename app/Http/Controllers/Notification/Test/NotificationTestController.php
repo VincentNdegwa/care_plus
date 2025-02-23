@@ -169,8 +169,8 @@ class NotificationTestController extends Controller
                 ];
             case 'new_diagnosis_notification':
                 return [
-                    'Doctor Name' => $testData['doctor']['user']['name'] ?? '',
-                    'Diagnosis Name' => $testData['diagnosis_name'] ?? '',
+                    'Doctor Name' => $testData['payload']['doctor']['user']['name'] ?? '',
+                    'Diagnosis Name' => $testData['payload']['diagnosis_name'] ?? '',
                 ];
 
             default:
