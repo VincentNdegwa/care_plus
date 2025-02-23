@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Diagnosis;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\DiagnosisNotifications;
 use App\Models\Diagnosis;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,7 @@ class CreateDiagnosisController extends Controller
             $diagnosisWithRelationship = Diagnosis::where("id", $diagnosis->id)
                 ->with('patient.user', 'doctor.user')
                 ->first();
+            DiagnosisNotifications::dispatch($diagnosisWithRelationship);
             return response()->json([
                 "error" => false,
                 "message" => "Diagnosis created successfully",

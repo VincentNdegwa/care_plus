@@ -128,6 +128,12 @@
       "room_pattern": "patient_vitals_[Patient_Id]",
       "title": "Patient Vitals Update",
       "description": "New vitals recorded for patient [Patient Name]"
+    },
+    {
+      "receiver": "patient",
+      "event": "new_diagnosis_notification",
+      "title": "New Diagnosis Added",
+      "description": "Dr. [Doctor Name] has diagnosed you with [Diagnosis Name]. Check your portal for more details."
     }
   ]
   
