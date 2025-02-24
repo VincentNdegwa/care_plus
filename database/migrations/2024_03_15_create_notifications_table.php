@@ -28,8 +28,8 @@ return new class extends Migration
             // Status and Tracking
             $table->boolean('is_read')->default(false);
             $table->timestamp('read_at')->nullable();
-            $table->enum('status', ['sent', 'delivered', 'failed'])->default('sent');
-            $table->enum('notification_type', ['fcm', 'in_app', 'email', 'sms'])->default('in_app');
+            $table->enum('status', ['Sent', 'Delivered', 'Failed'])->default('Sent');
+            $table->enum('notification_type', ['Medication', 'Health', 'System']);
             
             // Timestamps
             $table->timestamps();
