@@ -18,11 +18,11 @@ class NotificationService
     public function send($event, $userIds, $replacements = [], $additionalData = [],$notifiable=null)
     {
         try {
-            Log::info('Sending notification:', [
-                'event' => $event,
-                'userIds' => $userIds,
-                'replacements' => $replacements
-            ]);
+            // Log::info('Sending notification:', [
+            //     'event' => $event,
+            //     'userIds' => $userIds,
+            //     'replacements' => $replacements
+            // ]);
             
             $template = NotificationTemplate::get($event, $replacements);
             
@@ -31,10 +31,11 @@ class NotificationService
                 'notification' => $template
             ], $additionalData);
 
-            Log::info('Template', [
-                "template" => $template,
-                'notifiable'=>$notifiable
-            ]);
+            // Log::info('Template', [
+            //     "template" => $template,
+            //     'notifiable'=>$notifiable
+            // ]);
+
             if (isset($notifiable) && $notifiable != null) {
                 foreach($userIds as $userId){
                     Notification::create([
