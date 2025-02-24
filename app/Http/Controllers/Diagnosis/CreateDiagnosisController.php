@@ -35,7 +35,11 @@ class CreateDiagnosisController extends Controller
             SendNotification::dispatch(
                 [$diagnosisWithRelationship->patient->user->id], 
                 $diagnosisData, 
-                'new_diagnosis_notification'
+                'new_diagnosis_notification',
+                [
+                    'notifiable' => Diagnosis::class,
+                    'notifiable_id' => $diagnosis->id
+                ]
             );
            
             return response()->json([

@@ -2,6 +2,7 @@
 
 namespace App\Services\Notifications;
 
+use App\Models\Notification;
 use App\Services\FCM\FCMService;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +15,7 @@ class NotificationService
         $this->fcm = new FCMService();
     }
 
-    public function send($event, $userIds, $replacements = [], $additionalData = [])
+    public function send($event, $userIds, $replacements = [], $additionalData = [],$notifiable=null)
     {
         try {
             Log::info('Sending notification:', [
@@ -33,7 +34,20 @@ class NotificationService
             Log::info('Sending notification', [
                 "data" => $data,
             ]);
-
+            if (isset($notifiable) && $notifiable != null) {
+                Notification::create([
+                    'title' => $template['title'],
+                    'body' => $template['body'],
+                    'event_type' => $event,
+                    'receiver' => $template['receiver'],
+                    'room_name' => $template['room_name'] ?? null,
+                    'data' => $data,
+                    'notification_type' => $template['notification_type'],
+                    'notifiable'=>$notifiable['notifiable'],
+                    'notifiable_id'=>$notifiable['notifiable_id']
+                ]);
+            }
+    
             if ($template['receiver'] === 'room') {
                 return $this->sendToRoom($template, $data);
             }

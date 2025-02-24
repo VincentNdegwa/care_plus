@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Notification;
 use App\Models\Patient;
 use App\Models\Schedules\MedicationSchedule;
 use App\Models\Schedules\MedicationScheduleNotification;
@@ -32,20 +33,14 @@ class SendMedicationDefaultNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        MedicationScheduleNotification::updateOrCreate(
-            [
-                'medication_schedule_id' => $this->schedule->id,
-                'status' => 'Pending'
-            ],
-            [
-                'message' => "It's time to take your medication"
-            ]
-        );
 
         $schedule = $this->schedule->load(['medication']);
         $scheduleArray = $schedule->toArray();
         
-        SendNotification::dispatch([$this->userId], $scheduleArray, 'medication_reminder');
+        SendNotification::dispatch([$this->userId], $scheduleArray, 'medication_reminder',[
+            'notifiable'=>MedicationSchedule::class,
+            'notifiable_id'=>$schedule->id
+        ]);
     }
 
 }

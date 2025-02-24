@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('room_name')->nullable(); // For room-specific notifications
             
             // Related Data References
-            $table->morphs('notifiable'); // For polymorphic relations (diagnosis_id, medication_id, etc)
-            $table->json('data')->nullable(); // Additional data payload
+            $table->morphs('notifiable'); 
+            $table->json('data')->nullable();
             
             // Status and Tracking
             $table->boolean('is_read')->default(false);

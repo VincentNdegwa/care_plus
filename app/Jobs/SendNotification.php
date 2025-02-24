@@ -16,15 +16,17 @@ class SendNotification implements ShouldQueue
     public $userIds;
     public $arrayData;
     public $notificationType;
+    public $notifiable;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($userIds, $arrayData, $notificationType)
+    public function __construct($userIds, $arrayData, $notificationType, $notifiable)
     {
         $this->userIds = $userIds;
         $this->arrayData = $arrayData;
         $this->notificationType = $notificationType;
+        $this->notifiable = $notifiable;
     }
 
     /**
@@ -44,7 +46,8 @@ class SendNotification implements ShouldQueue
                     [
                         'type' => $this->notificationType,
                         'payload' => $this->arrayData
-                    ]
+                    ],
+                    $this->notifiable
                 );
                 break;
 
@@ -60,7 +63,8 @@ class SendNotification implements ShouldQueue
                     [
                         'type' => $this->notificationType,
                         'payload' => $this->arrayData
-                    ]
+                    ],
+                    $this->notifiable
                 );
                 break;
             
