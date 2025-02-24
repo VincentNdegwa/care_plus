@@ -35,6 +35,7 @@ use App\Http\Controllers\SideEffect\CreateSideEffectsController;
 use App\Http\Controllers\SideEffect\FetchSideEffectsController;
 use App\Http\Controllers\Medication\SchedulesFunctionsController;
 use App\Http\Controllers\FCM\DeviceTokenController;
+use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Notification\Test\NotificationTestController;
 use App\Http\Controllers\Patient\FetchPatientCareGiversController;
 use App\Http\Controllers\Uploads\FileUploadController;
@@ -199,16 +200,19 @@ Route::prefix("/v1")->group(function () {
 
     Route::get("/send-sms", [AtSMSController::class, "send"]);
     Route::get("/medication-extend/{medication_tracker_id}", [ScheduleMedicationController::class, 'extend']);
-    // update side effects create route, diagnosis update route in the postman collection
-
     Route::get("/send-notification", function(){
         TestJobNotification::dispatch();
     });
 
-    Route::prefix('notifications/test')->group(function () {
-        Route::post('token', [NotificationTestController::class, 'testTokenNotification']);
-        Route::post('room', [NotificationTestController::class, 'testRoomNotification']);
-        Route::get('events', [NotificationTestController::class, 'listEvents']);
+    Route::prefix('notifications')->group(function () {
+        Route::post('/', [NotificationController::class, 'index']);
+        Route::post('/mark-as-read', [NotificationController::class, 'markAsRead']);
+        Route::post('/delete', [NotificationController::class, 'destroy']);
+        Route::prefix('test')->group(function(){
+            Route::post('token', [NotificationTestController::class, 'testTokenNotification']);
+            Route::post('room', [NotificationTestController::class, 'testRoomNotification']);
+            Route::get('events', [NotificationTestController::class, 'listEvents']);
+        });
     });
 });
 
