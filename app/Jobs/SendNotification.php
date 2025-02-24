@@ -40,7 +40,7 @@ class SendNotification implements ShouldQueue
                     $this->notificationType,
                     $this->userIds,
                     [
-                        'Doctor Name' => $this->arrayData['doctor']['user']['name'] ?? '',
+                        'Doctor Name' => $this->arrayData['doctor']['name'] ?? '',
                         'Diagnosis Name' => $this->arrayData['diagnosis_name'] ?? '',
                     ],
                     [

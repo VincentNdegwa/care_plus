@@ -25,8 +25,6 @@ class NotificationTemplate
     {
         $templates = self::load();
         
-        Log::info('Loaded templates:', ['templates' => $templates]);
-        Log::info('Looking for event:', ['event' => $event]);
         
         $template = collect($templates)->firstWhere('event', $event);
 
@@ -44,7 +42,8 @@ class NotificationTemplate
             'body' => self::replaceVariables($template['description'], $replacements),
             'event' => $event,
             'receiver' => $template['receiver'],
-            'room_name' => $roomName
+            'room_name' => $roomName,
+            'notification_type' => $template['notification_type'] ?? 'System'
         ];
     }
 

@@ -31,21 +31,26 @@ class NotificationService
                 'notification' => $template
             ], $additionalData);
 
-            Log::info('Sending notification', [
-                "data" => $data,
+            Log::info('Template', [
+                "template" => $template,
+                'notifiable'=>$notifiable
             ]);
             if (isset($notifiable) && $notifiable != null) {
-                Notification::create([
-                    'title' => $template['title'],
-                    'body' => $template['body'],
-                    'event_type' => $event,
-                    'receiver' => $template['receiver'],
-                    'room_name' => $template['room_name'] ?? null,
-                    'data' => $data,
-                    'notification_type' => $template['notification_type'],
-                    'notifiable'=>$notifiable['notifiable'],
-                    'notifiable_id'=>$notifiable['notifiable_id']
-                ]);
+                foreach($userIds as $userId){
+                    Notification::create([
+                        'user_id' => $userId,
+                        'title' => $template['title'],
+                        'body' => $template['body'],
+                        'event_type' => $event,
+                        'receiver' => $template['receiver'],
+                        'room_name' => $template['room_name'] ?? null,
+                        'data' => $data,
+                        'notification_type' => $template['notification_type'],
+                        'notifiable_type'=>$notifiable['notifiable'],
+                        'notifiable_id'=>$notifiable['notifiable_id']
+                    ]);
+
+                }
             }
     
             if ($template['receiver'] === 'room') {
