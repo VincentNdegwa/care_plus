@@ -30,8 +30,7 @@ class SettingsController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
-                'message' => 'Failed to fetch settings',
-                'details' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -59,8 +58,7 @@ class SettingsController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => true,
-                    'message' => 'Invalid settings data',
-                    'details' => $validator->errors()
+                    'message' => $validator->getMessageBag()->first(),
                 ], 422);
             }
 
@@ -76,8 +74,7 @@ class SettingsController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => true,
-                'message' => 'Failed to update settings',
-                'details' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
