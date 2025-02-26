@@ -103,4 +103,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(UserSetting::class);
     }
+
+
+    public function sendSms($message){
+        $settings = $this->settings()->first();
+        if ($settings && $settings->settings["user_management"]["notification_preferences"]["sms"] == true) {
+            //dispatch a queue to send sms
+        }
+    }
+
+    public function sendEmail(){
+        $settings = $this->settings()->first();
+        if ($settings && $settings->settings["user_management"]["notification_preferences"]["email"] == true) {
+            //dispatch a queue to send email
+        }
+    }
 }
