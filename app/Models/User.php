@@ -98,4 +98,9 @@ class User extends Authenticatable implements MustVerifyEmail
         $profile = $this->profile()->first();
         return $profile ? $profile->avatar : null;
     }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
 }

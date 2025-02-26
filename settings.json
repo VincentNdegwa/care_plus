@@ -8,7 +8,7 @@
             "push_notifications": true
           },
           "language_preferences": "en",
-          "timezone_settings": "UTC"
+          "timezone": "UTC"
         },
         "emergency_alerts": {
           "emergency_contacts": [
