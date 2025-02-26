@@ -104,6 +104,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserSetting::class);
     }
 
+    public function getTimezone(){
+        return $this->settings()->first()->settings["user_management"]["timezone"] ?? "Africa/Nairobi";
+    }
 
     public function sendSms($message){
         $settings = $this->settings()->first();
