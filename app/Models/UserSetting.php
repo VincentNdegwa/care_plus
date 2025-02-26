@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class UserSetting extends Model
 {
@@ -15,7 +16,85 @@ class UserSetting extends Model
         'settings' => 'array'
     ];
 
-    // Relationship with User
+    private static $settingsTemplate = null;
+
+    public static function getSettingsTemplate()
+    {
+        if (self::$settingsTemplate === null) {
+            $path = base_path('settings.json');
+            if (!File::exists($path)) {
+                throw new \RuntimeException('Settings file not found');
+            }
+            self::$settingsTemplate = json_decode(File::get($path), true)['settings'];
+        }
+        return self::$settingsTemplate;
+    }
+
+    private function arrayMergeCustom($template, $userSettings)
+    {
+        $result = [];
+        $userRole = strtolower($this->user->role);
+        
+        if (isset($template['all_users'])) {
+            $result = $template['all_users'];
+        }
+
+        if (isset($template[$userRole])) {
+            foreach ($template[$userRole] as $key => $value) {
+                if (!isset($result[$key])) {
+                    $result[$key] = $value;
+                } else if (is_array($value) && is_array($result[$key])) {
+                    $result[$key] = array_merge($result[$key], $value);
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+        }
+
+        if (!empty($userSettings)) {
+            foreach ($result as $key => $defaultValue) {
+                if (isset($userSettings[$key])) {
+                    if (is_array($defaultValue) && is_array($userSettings[$key])) {
+                        $result[$key] = $this->mergeArraysRecursively($defaultValue, $userSettings[$key]);
+                    } else {
+                        $result[$key] = $userSettings[$key];
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function mergeArraysRecursively($template, $userArray)
+    {
+        $result = $template;
+
+        foreach ($template as $key => $value) {
+            if (isset($userArray[$key])) {
+                if (is_array($value) && is_array($userArray[$key])) {
+                    $result[$key] = $this->mergeArraysRecursively($value, $userArray[$key]);
+                } else {
+                    $result[$key] = $userArray[$key];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getMergedSettings()
+    {
+        $template = self::getSettingsTemplate();
+        return $this->arrayMergeCustom($template, $this->settings);
+    }
+
+    public function getAvailableSettings()
+    {
+        $template = self::getSettingsTemplate();
+        return $template;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -120,6 +199,13 @@ class UserSetting extends Model
         $settings = $this->settings;
         $settings['reporting_analytics']['receive_health_statement'] = $receive;
         $this->settings = $settings;
+        return $this->save();
+    }
+
+    public function updateSettings(array $newSettings)
+    {
+        $template = self::getSettingsTemplate();
+        $this->settings = $this->arrayMergeCustom($template, $newSettings);
         return $this->save();
     }
 } 

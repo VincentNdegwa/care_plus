@@ -1,4 +1,29 @@
-If medication is stopped ->schedules that are pending are deleted
-  The patient can opt to resume-> by extending days or just to the actual end_date
-  If the calclated end_date is past now -> throw an error
-  If the medication is expired, you can only resume by creating new schedule by providing the schedule
+        "patient": {
+            "reporting_analytics": {
+                "generate_reports": {
+                    "medication_adherence": true,
+                    "health_vitals": true,
+                    "diagnosis_history": true
+                },
+                "receive_health_statement": true
+            }
+        },
+        "doctor": {
+            "professional_settings": {
+                "availability_status": true,
+                "consultation_hours": [],
+                "notification_for_new_patients": true
+            },
+            "reporting_preferences": {
+                "patient_reports": true,
+                "medication_alerts": true,
+                "diagnostic_updates": true
+            }
+        },
+        "caregiver": {
+            "patient_monitoring": {
+                "medication_alerts": true,
+                "health_vital_alerts": true,
+                "emergency_notifications": true
+            }
+        }

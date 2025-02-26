@@ -1,38 +1,30 @@
 {
     "settings": {
-      "all_users": {
-        "user_management": {
-          "notification_preferences": {
-            "email": false,
-            "sms": false,
-            "push_notifications": true
-          },
-          "language_preferences": "en",
-          "timezone": "UTC"
-        },
-        "emergency_alerts": {
-          "emergency_contacts": [
-            {
-              "name": "",
-              "email": "",
-              "phone": "",
-              "address": ""
+        "all_users": {
+            "user_management": {
+                "notification_preferences": {
+                    "email": false,
+                    "sms": false,
+                    "push_notifications": true
+                },
+                "language_preferences": "en",
+                "timezone": "UTC"
+            },
+            "emergency_alerts": {
+                "emergency_contacts": [
+                    {
+                        "name": "",
+                        "email": "",
+                        "phone": "",
+                        "address": ""
+                    }
+                ],
+                "alert_preferences": {
+                    "sms": false,
+                    "email": false
+                }
             }
-          ],
-          "alert_preferences": {
-            "sms": false,
-            "email":false
-          }
-        },
-        "reporting_analytics": {
-          "generate_reports": {
-            "medication_adherence": true,
-            "health_vitals": true,
-            "diagnosis_history": true
-          },
-          "receive_health_statement": true
         }
-      }
     }
-  }
+}
   

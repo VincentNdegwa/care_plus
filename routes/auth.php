@@ -41,6 +41,7 @@ use App\Http\Controllers\Patient\FetchPatientCareGiversController;
 use App\Http\Controllers\Uploads\FileUploadController;
 use App\Jobs\TestJobNotification;
 use App\Http\Controllers\Reports\ReportsController;
+use App\Http\Controllers\Settings\SettingsController;
 
 Route::prefix("/v1")->group(function () {
 
@@ -195,6 +196,11 @@ Route::prefix("/v1")->group(function () {
         Route::prefix("upload")->group(function () {
             Route::post("/file", [FileUploadController::class, "upload"]);
             Route::delete("/file", [FileUploadController::class, "delete"]);
+        });
+
+        Route::prefix('settings')->group(function () {
+            Route::get('/', [SettingsController::class, 'index']);
+            Route::post('/', [SettingsController::class, 'update']);
         });
     });
 
