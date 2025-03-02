@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserSetting;
+use App\Models\TimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -87,7 +88,7 @@ class SettingsController extends Controller
                     ->orWhere("utc_offset", "like", "%".$request->query("search")."%");
             });
         }
-        return response()->json($timezone->get());
+        return response()->json($timezone->get()->select("name", "utc_offset"));
     }
 
 }
