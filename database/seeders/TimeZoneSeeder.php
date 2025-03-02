@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\TimeZone;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -416,5 +417,14 @@ class TimeZoneSeeder extends Seeder
             'Asia/Kamchatka' => '(GMT+12:00) Asia/Kamchatka (Petropavlovsk-Kamchatski Time)'
         ];
 
+    
+    foreach ($timezones as $key => $value) {
+        TimeZone::updateOrCreate(
+            ['name' => $key], 
+            ['utc_offset' => $value] 
+        );
+        
+    }
+    
     }
 }
