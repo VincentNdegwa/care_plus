@@ -220,6 +220,8 @@ Route::prefix("/v1")->group(function () {
             Route::get('events', [NotificationTestController::class, 'listEvents']);
         });
     });
+
+    Route::get("timezone",[SettingsController::class, "timezone"]);
 });
 
 Route::options('{any}', function () {

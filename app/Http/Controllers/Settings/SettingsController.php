@@ -79,4 +79,15 @@ class SettingsController extends Controller
         }
     }
 
+    public function timezone(Request $request){
+        $timezone = TimeZone::query();
+        if ($request->query("search")) {
+            $timezone->where(function ($query) use ($request) {
+                $query->where("name", "like", "%".$request->query("search")."%")
+                    ->orWhere("utc_offset", "like", "%".$request->query("search")."%");
+            });
+        }
+        return response()->json($timezone->get());
+    }
+
 }
