@@ -65,6 +65,7 @@ Route::prefix("/v1")->group(function () {
         Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
         Route::patch('/profile', [UserProfileController::class, 'update']);
         Route::get("/profile", [UserProfileController::class, "open"]);
+        Route::post("/change-password", [PasswordResetLinkController::class, "updatePassword"]);
     });
 
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class PasswordResetLinkController extends Controller
@@ -40,4 +42,38 @@ class PasswordResetLinkController extends Controller
             ]);
         }
     }
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required',
+                'new_password' => 'required|min:4|confirmed',
+            ]);
+        
+    
+            $user = Auth::user();
+    
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Current password is incorrect',
+                ], 400);
+            }
+    
+            $user->update(['password' => Hash::make($request->new_password)]);
+    
+            return response()->json([
+                'error' => false,
+                'message' => 'Password updated successfully',
+            ], 200);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+
 }

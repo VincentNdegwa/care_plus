@@ -44,10 +44,7 @@ class NewPasswordController extends Controller
                 return response()->json([
                     "error" => true,
                     "message" => __($status),
-                    "errors" => [
-                        "email" => __($status),
-                    ]
-                ]);
+                ],422);
             }
 
             return response()->json([
@@ -58,14 +55,12 @@ class NewPasswordController extends Controller
             return response()->json([
                 "error" => true,
                 "message" => $th->getMessage(),
-                'errors' => $th->errors()
-            ]);
+            ], 422);
         } catch (Exception $th) {
             return response()->json([
                 "error" => true,
                 "message" => $th->getMessage(),
-                'errors' => $th->getMessage()
-            ]);
+            ],500);
         }
     }
 }
