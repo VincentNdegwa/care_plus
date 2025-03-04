@@ -1,0 +1,122 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Referenced models from other schemas
+model User {
+  id              Int           @id @default(autoincrement())
+  name            String
+  email           String        @unique
+  role            String
+  doctor          Doctor?
+  patient         Patient?
+  caregiver       Caregiver?
+
+  @@map("users")
+}
+
+model Doctor {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @unique @map("user_id")
+  specialization     String?
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diagnoses          Diagnosis[]
+  doctorRelations    DoctorRelation[]
+
+  @@map("doctors")
+}
+
+model Patient {
+  id                Int       @id @default(autoincrement())
+  userId            Int       @unique @map("user_id")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diagnoses         Diagnosis[]
+  doctorRelations   DoctorRelation[]
+  caregiverRelations CaregiverRelation[]
+  healthVitals      HealthVital?
+
+  @@map("patients")
+}
+
+model Caregiver {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @unique @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relations     CaregiverRelation[]
+
+  @@map("caregivers")
+}
+
+model Medication {
+  id              Int       @id @default(autoincrement())
+  diagnosisId     Int?      @map("diagnosis_id")
+  diagnosis       Diagnosis? @relation(fields: [diagnosisId], references: [id])
+
+  @@map("medications")
+}
+
+// Health module models
+model Diagnosis {
+  id             Int      @id @default(autoincrement())
+  patientId      Int      @map("patient_id")
+  diagnosisName  String   @map("diagnosis_name")
+  description    String?
+  symptoms       String?
+  dateDiagnosed  DateTime @map("date_diagnosed")
+  doctorId       Int?     @map("doctor_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor         Doctor?  @relation(fields: [doctorId], references: [id])
+  medications    Medication[]
+
+  @@map("diagnoses")
+}
+
+model HealthVital {
+  id          Int      @id @default(autoincrement())
+  patientId   Int      @unique @map("patient_id")
+  vitalData   String   @map("vital_data")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("health_vitals")
+}
+
+model DoctorRelation {
+  id          Int      @id @default(autoincrement())
+  doctorId    Int      @map("doctor_id")
+  patientId   Int      @map("patient_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_relations")
+}
+
+model CaregiverRelation {
+  id           Int       @id @default(autoincrement())
+  caregiverId  Int       @map("caregiver_id")
+  patientId    Int       @map("patient_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  caregiver    Caregiver @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  patient      Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("caregiver_relations")
+}

@@ -1,0 +1,161 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Referenced models from other schemas
+model Patient {
+  id           Int          @id @default(autoincrement())
+  medications  Medication[]
+  userId       Int         @unique @map("user_id")
+
+  @@map("patients")
+}
+
+model Doctor {
+  id           Int          @id @default(autoincrement())
+  medications  Medication[]
+  userId       Int         @unique @map("user_id")
+
+  @@map("doctors")
+}
+
+model Caregiver {
+  id           Int          @id @default(autoincrement())
+  medications  Medication[]
+  userId       Int         @unique @map("user_id")
+
+  @@map("caregivers")
+}
+
+model Diagnosis {
+  id           Int          @id @default(autoincrement())
+  medications  Medication[]
+
+  @@map("diagnoses")
+}
+
+// Medication module models
+model Medication {
+  id              Int       @id @default(autoincrement())
+  patientId       Int       @map("patient_id")
+  diagnosisId     Int?      @map("diagnosis_id")
+  medicationName  String    @map("medication_name")
+  dosageQuantity  String    @map("dosage_quantity")
+  dosageStrength  String    @map("dosage_strength")
+  formId          Int?      @map("form_id")
+  unitId          Int?      @map("unit_id")
+  routeId         Int?      @map("route_id")
+  frequency       String
+  duration        String?
+  prescribedDate  DateTime  @map("prescribed_date")
+  doctorId        Int?      @map("doctor_id")
+  caregiverId     Int?      @map("caregiver_id")
+  stock           Int?
+  active          Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  diagnosis       Diagnosis? @relation(fields: [diagnosisId], references: [id])
+  doctor          Doctor?   @relation(fields: [doctorId], references: [id])
+  caregiver       Caregiver? @relation(fields: [caregiverId], references: [id])
+  form            MedicationForm?  @relation(fields: [formId], references: [id])
+  unit            MedicationUnit?  @relation(fields: [unitId], references: [id])
+  route           MedicationRoute? @relation(fields: [routeId], references: [id])
+  sideEffects     SideEffect[]
+  tracker         MedicationTracker?
+  schedules       MedicationSchedule[]
+
+  @@map("medications")
+}
+
+model MedicationForm {
+  id         Int          @id @default(autoincrement())
+  patientId  Int         @map("patient_id")
+  name       String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  medications Medication[]
+
+  @@map("medication_forms")
+}
+
+model MedicationUnit {
+  id         Int          @id @default(autoincrement())
+  patientId  Int         @map("patient_id")
+  name       String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  medications Medication[]
+
+  @@map("medication_units")
+}
+
+model MedicationRoute {
+  id         Int          @id @default(autoincrement())
+  patientId  Int         @map("patient_id")
+  name       String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  medications Medication[]
+
+  @@map("medication_routes")
+}
+
+model SideEffect {
+  id            Int         @id @default(autoincrement())
+  medicationId  Int         @map("medication_id")
+  description   String
+  severity      String
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  medication    Medication  @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("side_effects")
+}
+
+// Referenced from schedules module
+model MedicationSchedule {
+  id            Int         @id @default(autoincrement())
+  medicationId  Int         @map("medication_id")
+  medication    Medication  @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("medication_schedules")
+}
+
+model MedicationTracker {
+  id              Int       @id @default(autoincrement())
+  medicationId    Int       @unique @map("medication_id")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  nextStartMonth  DateTime? @map("next_start_month")
+  stopDate        DateTime? @map("stop_date")
+  duration        String?
+  frequency       String?
+  schedules       String?
+  timezone        String    @default("Africa/Nairobi")
+  active          Boolean   @default(true)
+  status          String    @default("Running")
+  stoppedWhen     DateTime? @map("stopped_when")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  medication      Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("medication_tracker")
+}

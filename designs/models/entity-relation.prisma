@@ -1,0 +1,277 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  name            String
+  email           String        @unique
+  password        String
+  role            String
+  emailVerifiedAt DateTime?     @map("email_verified_at")
+  rememberToken   String?       @map("remember_token")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  // Relations exactly as in User.php
+  profile         UserProfile?
+  patient         Patient?
+  doctor          Doctor?
+  caregiver       Caregiver?
+  settings        UserSetting?
+
+  @@map("users")
+}
+
+model UserProfile {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique @map("user_id")
+  gender       String?
+  dateOfBirth  DateTime? @map("date_of_birth")
+  address      String?
+  phoneNumber  String?   @map("phone_number")
+  avatar       String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in UserProfile.php
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Doctor {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @unique @map("user_id")
+  specialization     String?
+  lastActivity       DateTime? @map("last_activity")
+  active             Boolean   @default(true)
+  licenseNumber      String?   @unique @map("license_number")
+  licenseIssuingBody String?   @map("license_issuing_body")
+  clinicName         String?   @map("clinic_name")
+  clinicAddress      String?   @map("clinic_address")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in Doctor.php
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patients           Patient[] @relation("DoctorPatient")
+  diagnoses          Diagnosis[]
+  medications        Medication[]
+  doctorRelations    DoctorRelation[]
+
+  @@map("doctors")
+}
+
+model Patient {
+  id                Int       @id @default(autoincrement())
+  userId            Int       @unique @map("user_id")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in Patient.php
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctors           Doctor[]  @relation("DoctorPatient")
+  doctorRelations   DoctorRelation[]
+  caregiverRelations CaregiverRelation[]
+  diagnoses         Diagnosis[]
+  medications       Medication[]
+  healthVitals      HealthVital?
+
+  @@map("patients")
+}
+
+model Caregiver {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @unique @map("user_id")
+  certification String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medications   Medication[]
+  relations     CaregiverRelation[]
+
+  @@map("caregivers")
+}
+
+model Diagnosis {
+  id             Int      @id @default(autoincrement())
+  patientId      Int      @map("patient_id")
+  diagnosisName  String   @map("diagnosis_name")
+  description    String?
+  symptoms       String?
+  dateDiagnosed  DateTime @map("date_diagnosed")
+  doctorId       Int?     @map("doctor_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations exactly as in Diagnosis.php
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor         Doctor?  @relation(fields: [doctorId], references: [id])
+  medications    Medication[]
+
+  @@map("diagnoses")
+}
+
+model Medication {
+  id              Int       @id @default(autoincrement())
+  patientId       Int       @map("patient_id")
+  diagnosisId     Int?      @map("diagnosis_id")
+  medicationName  String    @map("medication_name")
+  dosageQuantity  String    @map("dosage_quantity")
+  dosageStrength  String    @map("dosage_strength")
+  formId          Int?      @map("form_id")
+  unitId          Int?      @map("unit_id")
+  routeId         Int?      @map("route_id")
+  frequency       String
+  duration        String?
+  prescribedDate  DateTime  @map("prescribed_date")
+  doctorId        Int?      @map("doctor_id")
+  caregiverId     Int?      @map("caregiver_id")
+  stock           Int?
+  active          Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in Medication.php
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  diagnosis       Diagnosis? @relation(fields: [diagnosisId], references: [id])
+  doctor          Doctor?   @relation(fields: [doctorId], references: [id])
+  caregiver       Caregiver? @relation(fields: [caregiverId], references: [id])
+  sideEffects     SideEffect[]
+  tracker         MedicationTracker?
+  schedules       MedicationSchedule[]
+
+  @@map("medications")
+}
+
+model MedicationSchedule {
+  id                    Int       @id @default(autoincrement())
+  medicationId          Int       @map("medication_id")
+  patientId             Int       @map("patient_id")
+  doseTime              DateTime  @map("dose_time")
+  processedAt          DateTime? @map("processed_at")
+  status               String    @default("Pending")
+  takenAt              DateTime? @map("taken_at")
+  secondNotificationSent Boolean  @default(false) @map("second_notification_sent")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  medication           Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  notifications        MedicationScheduleNotification[]
+
+  @@map("medication_schedules")
+}
+
+model MedicationTracker {
+  id              Int       @id @default(autoincrement())
+  medicationId    Int       @unique @map("medication_id")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  nextStartMonth  DateTime? @map("next_start_month")
+  stopDate        DateTime? @map("stop_date")
+  duration        String?
+  frequency       String?
+  schedules       String?
+  timezone        String    @default("Africa/Nairobi")
+  active          Boolean   @default(true)
+  status          String    @default("Running")
+  stoppedWhen     DateTime? @map("stopped_when")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in MedicationTracker.php
+  medication      Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("medication_tracker")
+}
+
+model HealthVital {
+  id          Int      @id @default(autoincrement())
+  patientId   Int      @unique @map("patient_id")
+  vitalData   String   @map("vital_data")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations exactly as in HealthVital.php
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("health_vitals")
+}
+
+model SideEffect {
+  id            Int         @id @default(autoincrement())
+  medicationId  Int         @map("medication_id")
+  description   String
+  severity      String
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  // Relations exactly as in SideEffect.php
+  medication    Medication  @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@map("side_effects")
+}
+
+model DoctorRelation {
+  id          Int      @id @default(autoincrement())
+  doctorId    Int      @map("doctor_id")
+  patientId   Int      @map("patient_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations exactly as in DoctorRelation.php
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("doctor_relations")
+}
+
+model CaregiverRelation {
+  id           Int       @id @default(autoincrement())
+  caregiverId  Int       @map("caregiver_id")
+  patientId    Int       @map("patient_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations exactly as in CaregiverRelation.php
+  caregiver    Caregiver @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  patient      Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@map("caregiver_relations")
+}
+
+model UserSetting {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations exactly as in UserSetting.php
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model MedicationScheduleNotification {
+  id                    Int               @id @default(autoincrement())
+  medicationScheduleId  Int               @map("medication_schedule_id")
+  message               String
+  status                String            @default("Pending")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  // Relations
+  schedule              MedicationSchedule @relation(fields: [medicationScheduleId], references: [id], onDelete: Cascade)
+
+  @@map("medication_schedules_notifications")
+}
