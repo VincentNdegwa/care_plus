@@ -113,11 +113,11 @@ class MoveSMSService
                     'response' => $response->json()
                 ]);
 
-                // return [
-                //     'error' => false,
-                //     'message' => 'Bulk SMS sent successfully',
-                //     'data' => $response->json()
-                // ];
+                return [
+                    'error' => false,
+                    'message' => 'Bulk SMS sent successfully',
+                    'data' => $response->json()
+                ];
             }
 
             Log::error('Failed to send bulk SMS', [
@@ -125,11 +125,11 @@ class MoveSMSService
                 'response' => $response->body()
             ]);
 
-            // return [
-            //     'error' => true,
-            //     'message' => 'Failed to send bulk SMS',
-            //     'details' => $response->body()
-            // ];
+            return [
+                'error' => true,
+                'message' => 'Failed to send bulk SMS',
+                'details' => $response->body()
+            ];
 
         } catch (\Exception $e) {
             Log::error('Bulk SMS sending error', [
@@ -137,11 +137,11 @@ class MoveSMSService
                 'error' => $e->getMessage()
             ]);
 
-            // return [
-            //     'error' => true,
-            //     'message' => 'Bulk SMS sending error',
-            //     'details' => $e->getMessage()
-            // ];
+            return [
+                'error' => true,
+                'message' => 'Bulk SMS sending error',
+                'details' => $e->getMessage()
+            ];
         }
     }
 

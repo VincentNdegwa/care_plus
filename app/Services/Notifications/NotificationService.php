@@ -3,27 +3,28 @@
 namespace App\Services\Notifications;
 
 use App\Models\Notification;
+use App\Models\User;
 use App\Services\FCM\FCMService;
+use App\Services\MoveSMS\MoveSMSService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificationMail;
 
 class NotificationService
 {
     protected $fcm;
+    protected $smsService;
 
-    public function __construct()
+    public function __construct(FCMService $fcm, MoveSMSService $smsService)
     {
-        $this->fcm = new FCMService();
+        $this->fcm = $fcm;
+        $this->smsService = $smsService;
     }
 
     public function send($event, $userIds, $replacements = [], $additionalData = [],$notifiable=null)
     {
         try {
-            // Log::info('Sending notification:', [
-            //     'event' => $event,
-            //     'userIds' => $userIds,
-            //     'replacements' => $replacements
-            // ]);
-            
+
             $template = NotificationTemplate::get($event, $replacements);
             
             $data = array_merge([
@@ -31,10 +32,6 @@ class NotificationService
                 'notification' => $template
             ], $additionalData);
 
-            // Log::info('Template', [
-            //     "template" => $template,
-            //     'notifiable'=>$notifiable
-            // ]);
 
             if (isset($notifiable) && $notifiable != null) {
                 foreach($userIds as $userId){
@@ -75,16 +72,67 @@ class NotificationService
             $recipients = [$recipients];
         }
 
+        $users = User::whereIn('id', $recipients)
+            ->with(['settings', 'profile'])
+            ->get();
+
+        $pushRecipients = [];
+        $smsRecipients = [];
+        $emailRecipients = [];
         $successCount = 0;
-        foreach ($recipients as $recipient) {
+
+        // Group users by their notification preferences
+        foreach ($users as $user) {
+            $notification_pref = $user->settings->settings['user_management']['notification_preferences'] ?? null;
+            
+            if ($notification_pref) {
+                if ($notification_pref['push_notifications'] ?? false) {
+                    $pushRecipients[] = $user->id;
+                }
+                if ($notification_pref['sms'] ?? false) {
+                    if ($user->profile && $user->profile->phone_number) {
+                        $smsRecipients[] = $user->profile->phone_number;
+                    }
+                }
+                if ($notification_pref['email'] ?? false) {
+                    if ($user->email) {
+                        $emailRecipients[] =  $user->email;
+                    }
+                }
+            }
+        }
+
+        if (!empty($pushRecipients)) {
             $success = match ($notification['receiver']) {
-                'patient' => $this->fcm->sendToUser($recipient, $notification['title'], $notification['body'], $data),
-                'doctor' => $this->fcm->sendToUser($recipient, $notification['title'], $notification['body'], $data),
-                'caregiver' => $this->fcm->sendToUser($recipient, $notification['title'], $notification['body'], $data),
+                'patient', 'doctor', 'caregiver' => $this->fcm->sendToUser($pushRecipients, $notification['title'], $notification['body'], $data),
                 default => false
             };
-
             if ($success) $successCount++;
+        }
+
+        if (!empty($smsRecipients)) {
+            try {
+                // $this->smsService->sendBulkSMS($smsRecipients, $notification['body']);
+                $successCount++;
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification SMS: ' . $e->getMessage());
+            }
+        }
+
+        if (!empty($emailRecipients)) {
+            try {
+                Log::info('Sending email notification to: ' . implode(', ', $emailRecipients));
+                Mail::to($emailRecipients)->send(
+                    new NotificationMail(
+                        $notification['title'],
+                        $notification['body'],
+                        $data
+                    )
+                );
+                $successCount++;
+            } catch (\Exception $e) {
+                Log::error('Failed to send notification email: ' . $e->getMessage());
+            }
         }
 
         return $successCount > 0;

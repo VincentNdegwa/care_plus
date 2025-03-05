@@ -212,12 +212,6 @@ class FCMService
             return "No active device tokens found for user: $userId";
         }
 
-        Log::info('Sending to user tokens:', [
-            'userId' => $userId,
-            'tokens' => $tokens,
-            'data' => $data
-        ]);
-
         $successCount = 0;
         foreach ($tokens as $token) {
             $token = trim($token);
