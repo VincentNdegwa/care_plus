@@ -8,6 +8,7 @@ use App\Models\Schedules\MedicationSchedule;
 use App\Models\CaregiverRelation;
 use App\Models\DoctorRelation;
 use App\Models\Patient;
+use App\Models\Schedules\MedicationTracker;
 use App\Models\SideEffect;
 use Illuminate\Http\Request;
 
@@ -432,5 +433,16 @@ class ReportsController extends Controller
             'data' => $responseData,
             'message' => 'Top side effects fetched successfully.'
         ]);
+    }
+
+    public function medicationProgress(Request $request){
+        $medication_id = $request->query("medication_id");
+        $tracker = MedicationTracker::where("medication_id", $medication_id)->first();
+
+        if ($tracker == null) {
+            return [];
+        }
+
+        
     }
 }
