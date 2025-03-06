@@ -161,6 +161,7 @@ Route::prefix("/v1")->group(function () {
             Route::post("/most-missed-medications", [ReportsController::class, "mostMissedMedications"]);
             Route::post("/medical-adherence-report", [ReportsController::class, "medicalAdhearanceReport"]);
             Route::post("/medication-adherence-by-medication", [ReportsController::class, "medicationAdherenceByMedication"]);
+            Route::get("/medication-progress", [ReportsController::class, "medicationProgress"]);
         });
 
         Route::prefix('care-providers')->group(function () {

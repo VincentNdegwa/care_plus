@@ -29,10 +29,10 @@ class CreateMedicationController extends Controller
             "medication_name" => 'required|string',
             'dosage_quantity' => 'required|string|max:255',
             'dosage_strength' => 'required|string|max:255',
+            'duration' => 'required|string|max:255', // Example: "7 days"
             'form_id' => 'nullable|exists:medication_forms,id',
             'route_id' => 'nullable|exists:medication_routes,id',
             'frequency' => 'required|string|max:255', // Example: "2 times per day"
-            'duration' => 'nullable|string|max:255', // Example: "7 days"
             'prescribed_date' => 'nullable|date',
             'stock' => 'nullable|integer|min:0',
         ];

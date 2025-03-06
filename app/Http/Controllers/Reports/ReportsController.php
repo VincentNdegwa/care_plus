@@ -137,7 +137,7 @@ class ReportsController extends Controller
             $missedCount = MedicationSchedule::where('patient_id', $request->patient_id)
                 ->where('medication_id', $medicationId)
                 ->whereBetween('dose_time', [$fromDate, $toDate])
-                ->where('status', 'Missed') 
+                ->where('status', 'Missed')
                 ->count();
 
             if ($missedCount > 0) {
@@ -193,7 +193,7 @@ class ReportsController extends Controller
 
             $patient = Patient::with('user')->find($patientId);
             $patientName = $patient ? $patient->user->name : null;
-            
+
             $adherenceData[] = [
                 'patient_id' => $patientId,
                 'patient_name' => $patientName,
@@ -435,14 +435,91 @@ class ReportsController extends Controller
         ]);
     }
 
-    public function medicationProgress(Request $request){
+    public function medicationProgress(Request $request)
+    {
         $medication_id = $request->query("medication_id");
         $tracker = MedicationTracker::where("medication_id", $medication_id)->first();
+        $taken = MedicationSchedule::where('medication_id', $medication_id)->where('status', 'Taken')->count();
 
         if ($tracker == null) {
-            return [];
+            return [
+                'progress' => 0,
+                'total_schedules' => 0,
+                'completed_schedules' => 0,
+                'taken_schedules' => $taken
+            ];
+        }
+        $schedules = json_decode($tracker->schedules, true);
+        if (empty($schedules)) {
+            return [
+                'progress' => 0,
+                'total_schedules' => 0,
+                'completed_schedules' => 0,
+                'taken_schedules' => $taken
+            ];
         }
 
-        
+        // Count daily doses based on schedule times
+        $doses_per_day = count($schedules);
+
+        // Sort schedule times to ensure proper ordering
+        sort($schedules);
+
+        $timezone = $tracker->timezone ?? config('app.timezone');
+        $now = now()->timezone($timezone);
+        $start_date = \Carbon\Carbon::parse($tracker->start_date)->timezone($timezone)->startOfDay();
+        $end_date = \Carbon\Carbon::parse($tracker->end_date)->timezone($timezone)->endOfDay();
+        // Calculate total expected doses
+        $total_expected_doses = $start_date->diffInDays($end_date) * $doses_per_day;
+
+        // Get completed schedules count
+        $completed_schedules = MedicationSchedule::where('medication_id', $medication_id)
+            ->where('processed_at', '!=', null)
+            ->count();
+
+        if ($tracker->status === 'Completed' || $now->greaterThan($end_date)) {
+            return [
+                'progress' => 100,
+                'total_schedules' => (int)$total_expected_doses,
+                'completed_schedules' => (int)$completed_schedules,
+                'taken_schedules' => $taken
+
+            ];
+        }
+        // Handle frequencies with no fixed schedule
+        if (in_array($tracker->frequency, ['On demand', 'As needed', 'Until finished', 'Until bottle is empty'])) {
+            $completed_schedules = MedicationSchedule::where('medication_id', $medication_id)
+                ->where('processed_at', '!=', null)
+                ->count();
+
+            return [
+                'progress' => 0,
+                'total_schedules' => (int)$total_expected_doses,
+                'completed_schedules' => (int)$completed_schedules,
+                'taken_schedules' => $taken
+            ];
+        }
+
+        // If start date is in future, return 0 progress
+        if ($now->lessThan($start_date)) {
+            return [
+                'progress' => 0,
+                'total_schedules' => (int)$total_expected_doses,
+                'completed_schedules' => (int)$completed_schedules,
+                'taken_schedules' => $taken
+            ];
+        }
+
+
+        // Calculate progress percentage
+        $progress = $total_expected_doses > 0 ? (int)round(($completed_schedules / $total_expected_doses) * 100) : 0;
+        $progress = min($progress, 100); // Cap at 100%
+
+        return [
+            'progress' => $progress,
+            'total_schedules' => (int)$total_expected_doses,
+            'completed_schedules' => (int)$completed_schedules,
+            'taken_schedules' => $taken
+        ];
     }
 }
