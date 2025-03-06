@@ -77,6 +77,7 @@ class MedicationFilterController extends Controller
             $pageNumber = $validatedData['page_number'] ?? 1;
             $medications = $query
                 ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route'])
+                ->withCount('sideEffects')
                 ->paginate($perPage, ['*'], 'page', $pageNumber);
 
             return response()->json([
