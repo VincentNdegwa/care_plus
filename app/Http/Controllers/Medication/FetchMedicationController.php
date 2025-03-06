@@ -45,7 +45,9 @@ class FetchMedicationController extends Controller
             $validatedData = $request->validate($rules);
 
             $query = Medication::where('patient_id', $validatedData['patient_id'])
-                ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route']);
+                ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route'])
+                ->withCount('sideEffects');
+                
 
             if ($request->filled('search')) {
                 $search = $validatedData['search'];
@@ -155,6 +157,7 @@ class FetchMedicationController extends Controller
         try {
             $medications = Medication::where($field, $value)
                 ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route'])
+                ->withCount('sideEffects')
                 ->paginate($perPage, ['*'], 'page', $pageNumber);
 
             return response()->json([
@@ -216,7 +219,8 @@ class FetchMedicationController extends Controller
             'stock' => $medication->stock,
             'active' => $medication->isActive(),
             'diagnosis' => $medication->diagnosis,
-            'status' => $medication->trackerStatus()
+            'status' => $medication->trackerStatus(),
+            'side_effects_count'=> $medication->side_effects_count ?? 0,
         ];
     }
 }
