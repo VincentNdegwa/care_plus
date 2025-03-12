@@ -472,7 +472,7 @@ class ReportsController extends Controller
 
         // Get completed schedules count
         $completed_schedules = MedicationSchedule::where('medication_id', $medication_id)
-            ->where('processed_at', '!=', null)
+            ->whereIn("status", ["Taken", "Missed"])
             ->count();
 
         if ($tracker->status === 'Completed' || $now->greaterThan($end_date)) {
@@ -486,9 +486,6 @@ class ReportsController extends Controller
         }
         // Handle frequencies with no fixed schedule
         if (in_array($tracker->frequency, ['On demand', 'As needed', 'Until finished', 'Until bottle is empty'])) {
-            $completed_schedules = MedicationSchedule::where('medication_id', $medication_id)
-                ->where('processed_at', '!=', null)
-                ->count();
 
             return [
                 'progress' => 0,
