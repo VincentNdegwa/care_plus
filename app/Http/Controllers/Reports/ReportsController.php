@@ -462,10 +462,8 @@ class ReportsController extends Controller
         // Count daily doses based on schedule times
         $doses_per_day = count($schedules);
 
-        // Sort schedule times to ensure proper ordering
-        sort($schedules);
 
-        $timezone = $tracker->timezone ?? config('app.timezone');
+        $timezone = config('app.timezone');
         $now = now()->timezone($timezone);
         $start_date = \Carbon\Carbon::parse($tracker->start_date)->timezone($timezone)->startOfDay();
         $end_date = \Carbon\Carbon::parse($tracker->end_date)->timezone($timezone)->endOfDay();
