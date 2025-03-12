@@ -465,8 +465,8 @@ class ReportsController extends Controller
 
         $timezone = config('app.timezone');
         $now = now()->timezone($timezone);
-        $start_date = \Carbon\Carbon::parse($tracker->start_date)->timezone($timezone)->startOfDay();
-        $end_date = \Carbon\Carbon::parse($tracker->end_date)->timezone($timezone)->endOfDay();
+        $start_date = \Carbon\Carbon::parse($tracker->start_date);
+        $end_date = \Carbon\Carbon::parse($tracker->end_date);
         // Calculate total expected doses
         $total_expected_doses = $start_date->diffInDays($end_date) * $doses_per_day;
 
