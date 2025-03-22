@@ -155,6 +155,7 @@ Route::prefix("/v1")->group(function () {
                 Route::post("/top-adhering-patients", [ReportsController::class, "topAdheringPatients"]);
                 Route::post("/bottom-adhering-patients", [ReportsController::class, "bottomAdheringPatients"]);
                 Route::post("/fetch-side-effects", [ReportsController::class, "fetchSideEffects"]);
+                Route::post("/patient-missed-medications", [ReportsController::class, "missedSchedulesForHealthProviders"]);
             });
             Route::post("/medication-vs-side-effect-counts", [ReportsController::class, "medicationVsSideEffectCounts"]);
             Route::post("/top-side-effects", [ReportsController::class, "topSideEffects"]);

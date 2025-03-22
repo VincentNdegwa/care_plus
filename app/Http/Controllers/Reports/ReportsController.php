@@ -11,6 +11,7 @@ use App\Models\Patient;
 use App\Models\Schedules\MedicationTracker;
 use App\Models\SideEffect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportsController extends Controller
 {
@@ -517,4 +518,31 @@ class ReportsController extends Controller
             'taken_schedules' => $taken
         ];
     }
+
+
+    public function missedSchedulesForHealthProviders(Request $request)
+    {
+        $user = Auth::user();
+        $role = $user->role;
+        $query = collect();
+
+        if ($role == "Doctor") {
+            $query = DoctorRelation::where("doctor_id", $user->doctor->id)->pluck("patient_id");
+        } elseif ($role == "Caregiver") {
+            $query = CaregiverRelation::where("caregiver_id", $user->caregiver->id)->pluck("patient_id");
+        }
+
+        $patients = Patient::whereIn("id", $query)->get();
+
+        $missedSchedules = $patients->map(function ($patient) {
+            return [
+                "patient_id" => $patient->id,
+                "patient_name" => $patient->user->name,
+                "counts" => $patient->missedSchedules(),
+            ];
+        });
+
+        return response()->json($missedSchedules->values());
+    }
 }
+

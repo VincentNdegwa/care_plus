@@ -65,4 +65,9 @@ class Patient extends Model
             'medications' => $medications,
         ];
     }
+
+    public function missedSchedules()
+    {
+        return $this->hasMany(MedicationSchedule::class, 'patient_id')->where('status', 'Missed')->count();
+    }
 }
