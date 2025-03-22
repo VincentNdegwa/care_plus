@@ -544,5 +544,66 @@ class ReportsController extends Controller
 
         return response()->json($missedSchedules->values());
     }
+
+
+    public function latestPatientSideEffects(Request $request)
+    {
+        $user = Auth::user();
+        $role = $user->role;
+        $query = collect();
+
+        if ($role == "Doctor") {
+            $query = DoctorRelation::where("doctor_id", $user->doctor->id)->pluck("patient_id");
+        } elseif ($role == "Caregiver") {
+            $query = CaregiverRelation::where("caregiver_id", $user->caregiver->id)->pluck("patient_id");
+        }
+
+        $validatedData = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'per_page' => 'nullable|integer|min:1',
+            'page' => 'nullable|integer|min:1'
+        ]);
+
+        $search = $validatedData['search'] ?? null;
+        $startDate = $validatedData['start_date'] ?? null;
+        $endDate = $validatedData['end_date'] ?? null;
+        $perPage = $validatedData['per_page'] ?? 10;
+        $page = $validatedData['page'] ?? 1;
+
+        $sideEffectsQuery = SideEffect::whereIn("patient_id", $query)
+            ->orderBy('created_at', 'DESC')
+            ->with(['patient.user', 'medication']);
+
+        if (!empty($search)) {
+            $sideEffectsQuery->whereHas('patient.user', function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%$search%");
+            })->orWhereHas('medication', function ($query) use ($search) {
+                $query->where('medication_name', 'LIKE', "%$search%");
+            });
+        }
+
+        if (!empty($startDate) && !empty($endDate)) {
+            $sideEffectsQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $sideEffects = $sideEffectsQuery->paginate($perPage, ['*'], 'page', $page);
+
+        $formatted = $this->formatPaginationData($sideEffects);
+
+        return response()->json($formatted);
+    }
+
+
+    public function formatPaginationData($data){
+        return [
+            'data' => $data->items(),
+            'current_page' => $data->currentPage(),
+            'last_page' => $data->lastPage(),
+            'per_page' => $data->perPage(),
+            'total' => $data->total(),
+        ];
+    }
 }
 

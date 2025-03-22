@@ -21,4 +21,8 @@ class SideEffect extends Model
     {
         return $this->belongsTo(Medication::class, 'medication_id');
     }
+
+    public function patient(){
+        return $this->belongsTo(Patient::class, 'patient_id');
+    }
 }
