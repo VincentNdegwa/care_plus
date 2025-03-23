@@ -23,11 +23,11 @@ class Patient extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function doctorRelations()
+    public function doctors()
     {
         return $this->hasMany(DoctorRelation::class, 'patient_id');
     }
-    public function caregiverRelations()
+    public function caregivers()
     {
         return $this->hasMany(CaregiverRelation::class, 'patient_id');
     }

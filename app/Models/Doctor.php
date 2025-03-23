@@ -33,10 +33,6 @@ class Doctor extends Model
     //     return $this->hasMany(Patient::class);
     // }
 
-    public function doctorRelations(){
-        return $this->hasMany(DoctorRelation::class);
-    }
-
     public function patients(){
         return $this->hasMany(DoctorRelation::class);
     }
