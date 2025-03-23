@@ -23,6 +23,8 @@ jobs:
       - name: Deploy Application
         run: |
           ssh -t -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+          set -e 
+          
           cd /var/www/html/care_plus || git clone https://github.com/VincentNdegwa/care_plus.git /var/www/html/care_plus && cd /var/www/html/care_plus
           git pull origin main
 
