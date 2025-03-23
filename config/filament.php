@@ -21,7 +21,11 @@ return [
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'auth' => [
-            \Filament\Http\Middleware\Authenticate::class,
+            'auth:web',
         ],
+    ],
+    'auth_session' => [
+        'enabled' => true,
+        'key' => 'filament_auth',
     ],
 ];

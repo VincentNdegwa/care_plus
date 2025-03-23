@@ -37,6 +37,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
+            // Check if the request is for Filament admin panel
+            if (str_starts_with($request->path(), 'admin')) {
+                return redirect()->route('filament.admin.auth.login');
+            }
+            
             return response()->json([
                 "error" => true,
                 'message' => 'Not authenticated, please login to proceed'
