@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\CaregiverResource\Pages;
+use App\Filament\Resources\CaregiverResource\RelationManagers;
+use App\Models\Caregiver;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,42 +13,26 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class CaregiverResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Caregiver::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?int $navigationSort = 1;
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
-
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('user_id')
                     ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('specialization')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->unique('users', 'email')
-                    ->email()
-                    ->required()
+                Forms\Components\DateTimePicker::make('last_activity'),
+                Forms\Components\TextInput::make('agency_name')
                     ->maxLength(255),
-                Forms\Components\Select::make('role')
-                ->options([
-                    'Patient' => 'Patient',
-                    'Doctor' => 'Doctor',
-                    "Caregiver"=>"Caregiver",
-                ])
-                    ->required(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
+                Forms\Components\TextInput::make('agency_contact')
                     ->maxLength(255),
             ]);
     }
@@ -57,14 +41,18 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('user_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('specialization')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('role'),
-                Tables\Columns\TextColumn::make('email_verified_at')
+                Tables\Columns\TextColumn::make('last_activity')
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('agency_name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('agency_contact')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -97,9 +85,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListCaregivers::route('/'),
+            'create' => Pages\CreateCaregiver::route('/create'),
+            'edit' => Pages\EditCaregiver::route('/{record}/edit'),
         ];
     }
 }
