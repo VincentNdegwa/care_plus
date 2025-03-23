@@ -25,9 +25,28 @@ class PatientResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
+                Forms\Components\TextInput::make('name')
+                    ->label('Full Name')
                     ->required()
-                    ->numeric(),
+                    ->live(),
+                Forms\Components\TextInput::make('email')
+                    ->label('Email Address')
+                    ->email()
+                    ->unique(
+                        table: 'users',
+                        column: 'email',
+                        ignorable: fn($record) => $record?->user
+                    )
+                    ->required()
+                    ->live(),
+                Forms\Components\TextInput::make('password')
+                    ->label('Password')
+                    ->password()
+                    ->required()
+                    ->visibleOn('create')
+                    ->live(),
+                Forms\Components\Hidden::make('user.role')
+                    ->default('Patient'),
             ]);
     }
 
@@ -35,9 +54,9 @@ class PatientResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

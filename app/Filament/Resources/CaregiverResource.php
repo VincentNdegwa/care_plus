@@ -24,16 +24,47 @@ class CaregiverResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('specialization')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('last_activity'),
-                Forms\Components\TextInput::make('agency_name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('agency_contact')
-                    ->maxLength(255),
+
+                Forms\Components\Section::make('User Details')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Full Name')
+                            ->required()
+                            ->live(),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email Address')
+                            ->email()
+                            ->unique(
+                                table: 'users',
+                                column: 'email',
+                                ignorable: fn($record) => $record?->user
+                            )
+                            ->required()
+                            ->live(),
+                        Forms\Components\TextInput::make('password')
+                            ->label('Password')
+                            ->password()
+                            ->required()
+                            ->visibleOn('create')
+                            ->live(),
+                        Forms\Components\Hidden::make('user.role')
+                            ->default('Caregiver'),
+                    ])
+                    ->columns(2),
+
+                Forms\Components\Section::make('Caregiver Details')
+                    ->schema([
+                        Forms\Components\Hidden::make('user_id')
+                            ->required(),
+                        Forms\Components\TextInput::make('specialization')
+                            ->maxLength(255),
+                        Forms\Components\DateTimePicker::make('last_activity'),
+                        Forms\Components\TextInput::make('agency_name')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('agency_contact')
+                            ->maxLength(255),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -41,9 +72,9 @@ class CaregiverResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('specialization')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_activity')
