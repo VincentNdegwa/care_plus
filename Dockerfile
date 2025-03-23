@@ -44,11 +44,11 @@ COPY composer.json composer.lock /var/www/html/
 RUN composer install --optimize-autoloader
 
 # Optimize and cache for production
-RUN php artisan optimize:clear \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
-    && php artisan filament:assets
+# RUN php artisan optimize:clear \
+#     && php artisan config:cache \
+#     && php artisan route:cache \
+#     && php artisan view:cache \
+#     && php artisan filament:assets
 
 # Set proper permissions for public directory
 RUN chown -R www-data:www-data /var/www/html/public \
