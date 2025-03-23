@@ -1,22 +1,17 @@
 FROM php:8.4-fpm
 
-RUN apt add --no-cache \
-    libzip \
+RUN apt update && apt install -y \
     libzip-dev \
-    freetype \
-    jpeg \
-    libpng \
-    freetype-dev \
-    jpeg-dev \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype-dev \
     nodejs \
     npm \
-    icu-libs \
-    icu-dev \
-    zlib-dev \
-    bzip2-dev \
-    xz-dev \
-    pkgconf \
+    libicu-dev \
+    zlib1g-dev \
+    bzip2 \
+    xz-utils \
+    pkg-config \
     gcc \
     g++ \
     make \
@@ -24,7 +19,7 @@ RUN apt add --no-cache \
     && docker-php-ext-configure zip \
     && docker-php-ext-configure intl \
     && docker-php-ext-install zip pdo pdo_mysql intl bcmath \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd
 
