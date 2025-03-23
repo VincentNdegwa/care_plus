@@ -14,6 +14,8 @@ class CreateCaregiver extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        // dd($data);
+        
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -25,6 +27,7 @@ class CreateCaregiver extends CreateRecord
 
         unset($data['name']);
         unset($data['email']);
+        unset($data['password']);
         unset($data['user']);
 
         return $data;
