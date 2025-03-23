@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'domain' => env('FILAMENT_DOMAIN', 'care.tech360.systems'),
+    'domain' => env('FILAMENT_DOMAIN', null),
     'path' => env('FILAMENT_PATH', 'admin'),
     'home_url' => env('FILAMENT_HOME_URL', '/admin'),
     'auth' => [
@@ -21,11 +21,11 @@ return [
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'auth' => [
-            'auth:web',
+            \Filament\Http\Middleware\Authenticate::class,
         ],
     ],
-    'auth_session' => [
-        'enabled' => true,
-        'key' => 'filament_auth',
+    'assets' => [
+        'is_secure' => true,
+        'middleware' => ['web'],
     ],
 ];
