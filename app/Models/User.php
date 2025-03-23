@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Panel;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -49,6 +51,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 
     public function profile()
@@ -104,18 +110,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserSetting::class);
     }
 
-    public function getTimezone(){
+    public function getTimezone()
+    {
         return $this->settings()->first()->settings["user_management"]["timezone"] ?? "Africa/Nairobi";
     }
 
-    public function sendSms($message){
+    public function sendSms($message)
+    {
         $settings = $this->settings()->first();
         if ($settings && $settings->settings["user_management"]["notification_preferences"]["sms"] == true) {
             //dispatch a queue to send sms
         }
     }
 
-    public function sendEmail(){
+    public function sendEmail()
+    {
         $settings = $this->settings()->first();
         if ($settings && $settings->settings["user_management"]["notification_preferences"]["email"] == true) {
             //dispatch a queue to send email
