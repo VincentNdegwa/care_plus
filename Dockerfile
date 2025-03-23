@@ -1,6 +1,6 @@
 FROM php:8.4-fpm
 
-RUN apk add --no-cache \
+RUN apt add --no-cache \
     libzip \
     libzip-dev \
     freetype \
