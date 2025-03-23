@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CaregiverResource\Pages;
+use App\Filament\Resources\CaregiverResource\RelationManagers\PatientsRelationManager;
 use App\Models\Caregiver;
 use App\Models\User;
 use Filament\Forms;
@@ -103,5 +104,12 @@ class CaregiverResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            PatientsRelationManager::class
+        ];
     }
 }
