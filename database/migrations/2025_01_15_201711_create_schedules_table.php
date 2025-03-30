@@ -35,7 +35,8 @@ return new class extends Migration
             $table->string('schedules')->nullable();
             $table->string("timezone")->default('Africa/Nairobi');
             $table->boolean('active')->default(true);
-            $table->enum('status', ['Stopped', 'Running','Expired'])->default('Running');
+            $table->enum('status', ['Stopped', 'Running','Expired', 'Not Started'])->default('Running');
+
             $table->dateTime('stopped_when')->nullable();
             $table->timestamps();
         });

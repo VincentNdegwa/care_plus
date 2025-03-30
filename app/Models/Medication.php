@@ -85,6 +85,6 @@ class Medication extends Model
         return (int) ($this->hasRunningSchedule() && $this->active);
     }
     public function trackerStatus(){
-        return $this->tracker->status ?? "Expired";
+        return $this->tracker->status ?? "Not Started";
     }
 }
