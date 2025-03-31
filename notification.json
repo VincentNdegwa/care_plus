@@ -17,14 +17,14 @@
       "receiver": "patient",
       "event": "new_prescription_added",
       "title": "New Prescription Added",
-      "description": "Your doctor has prescribed a new medication: [Medication Name]. Check your medication schedule for details.",
+      "description": "Your Health Provider has prescribed a new medication: [Medication Name]. Check your medication schedule for details.",
       "notification_type": "Medication"
     },
     {
       "receiver": "patient",
       "event": "medication_adjustment",
       "title": "Medication Dosage Updated",
-      "description": "Your doctor has adjusted the dosage for [Medication Name]. Please review your updated prescription.",
+      "description": "Your Health Provider has adjusted the dosage for [Medication Name]. Please review your updated prescription.",
       "notification_type": "Medication"
     },
     {

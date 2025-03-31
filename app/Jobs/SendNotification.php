@@ -67,7 +67,19 @@ class SendNotification implements ShouldQueue
                     $this->notifiable
                 );
                 break;
-            
+            case 'new_prescription_added':
+                $notificationService->send(
+                    $this->notificationType,
+                    $this->userIds,
+                    [
+                        'Medication Name' => $this->arrayData['medication_name'] ?? '',
+                    ],
+                    [
+                        'type' => $this->notificationType,
+                        'payload' => $this->arrayData
+                    ],
+                    $this->notifiable
+                );
             default:
                 break;
         }

@@ -84,17 +84,16 @@ class NotificationService
         // Group users by their notification preferences
         foreach ($users as $user) {
             $notification_pref = $user->settings->settings['user_management']['notification_preferences'] ?? null;
-            
             if ($notification_pref) {
-                if ($notification_pref['push_notifications'] ?? false) {
+                if ($notification_pref['push_notifications']==true ?? false) {
                     $pushRecipients[] = $user->id;
                 }
-                if ($notification_pref['sms'] ?? false) {
+                if ($notification_pref['sms']==true ?? false) {
                     if ($user->profile && $user->profile->phone_number) {
                         $smsRecipients[] = $user->profile->phone_number;
                     }
                 }
-                if ($notification_pref['email'] ?? false) {
+                if ($notification_pref['email']==true ?? false) {
                     if ($user->email) {
                         $emailRecipients[] =  $user->email;
                     }

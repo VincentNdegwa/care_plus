@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Medication;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendNotification;
 use App\MedicationConvert;
 use App\Models\Medication;
 use Carbon\Carbon;
@@ -53,6 +54,16 @@ class CreateMedicationController extends Controller
                 ->with(['patient.user.profile', 'doctor.user.profile', 'caregiver.user.profile', 'diagnosis', 'form', 'unit', 'route'])
                 ->first();
             $converted = $this::convert($medication);
+
+            SendNotification::dispatch(
+                [$request->patient_id],
+                $validatedData,
+                "new_prescription_added",
+                [
+                    'notifiable' => Medication::class,
+                    'notifiable_id' => $medication->id
+                ]
+            );
 
             return response()->json([
                 "error" => false,
