@@ -20,11 +20,11 @@ class DeviceTokenController extends Controller
 
         $token = DeviceToken::updateOrCreate(
             [
-                'token' => $request->token,
-                'user_id' => Auth::user()->id
+                'user_id' => Auth::user()->id,
+                'device_type' => $request->device_type,
             ],
             [
-                'device_type' => $request->device_type,
+                'token' => $request->token,
                 'is_active' => true
             ]
         );
