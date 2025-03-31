@@ -111,7 +111,7 @@ class NotificationService
 
         if (!empty($smsRecipients)) {
             try {
-                // $this->smsService->sendBulkSMS($smsRecipients, $notification['body']);
+                $this->smsService->sendBulkSMS($smsRecipients, $notification['body']);
                 $successCount++;
             } catch (\Exception $e) {
                 Log::error('Failed to send notification SMS: ' . $e->getMessage());
