@@ -89,19 +89,25 @@ class ScheduleGenerator extends BaseScheduler
     {
         $doseTime = $startDate->copy()->setTimezone($timezone);
         $stopDay = $stopDay->copy()->setTimezone($timezone);
+        $nowUserTime = Carbon::now()->setTimezone($timezone);
 
         while ($doseTime->lte($stopDay)) {
             foreach ($schedule as $time) {
                 [$hour, $minute] = explode(':', $time);
 
-                $appDoseTime = $doseTime->copy()->setTime($hour, $minute)
-                    ->setTimezone(parent::$app_timezone);
+                $userDoseTime = $doseTime->copy()->setTime($hour, $minute);
 
-                $medicationSchedule[] = [
-                    'dose_time' => $appDoseTime->format('Y-m-d H:i:s'),
-                    'medication_id' => parent::$medication_id,
-                    'patient_id' => parent::$patient_id,
-                ];
+                //if the dosetime is not less than the current time
+                if($userDoseTime->gte($nowUserTime)){
+                    $appDoseTime = $userDoseTime->copy()
+                        ->setTimezone(parent::$app_timezone);
+    
+                    $medicationSchedule[] = [
+                        'dose_time' => $appDoseTime->format('Y-m-d H:i:s'),
+                        'medication_id' => parent::$medication_id,
+                        'patient_id' => parent::$patient_id,
+                    ];
+                }
             }
 
             $doseTime->addDay();
