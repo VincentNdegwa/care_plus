@@ -138,7 +138,7 @@ class ScheduleMedicationController extends Controller
 
             foreach ($data as $schedule) {
                 $snooze = $schedule->snoozes()
-                    ->where('status', '!=', 'Pending')
+                    ->where('status', '=', 'Pending')
                     ->first();
 
                 if(isset($snooze)) {
