@@ -36,7 +36,7 @@ class MoveSMSService
         try {
             $phoneNumber = $this->formatPhoneNumber($phoneNumber);
 
-            $response = Http::get($this->baseUrl, [
+            $response = Http::timeout(300)->get($this->baseUrl, [
                 'username' => $this->username,
                 'api_key' => $this->apiKey,
                 'sender' => $this->senderId,
@@ -97,7 +97,7 @@ class MoveSMSService
             // Format phone numbers
             $phoneNumbers = array_map([$this, 'formatPhoneNumber'], $phoneNumbers);
             
-            $response = Http::get($this->baseUrl, [
+            $response = Http::timeout(300)->get($this->baseUrl, [
                 'username' => $this->username,
                 'api_key' => $this->apiKey,
                 'sender' => $this->senderId,
