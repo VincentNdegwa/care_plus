@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\FCM\FCMService;
 use App\Services\MoveSMS\MoveSMSService;
+use App\Jobs\SendSMSJob;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificationMail;
@@ -111,7 +112,7 @@ class NotificationService
 
         if (!empty($smsRecipients)) {
             try {
-                $this->smsService->sendBulkSMS($smsRecipients, $notification['body']);
+                SendSMSJob::dispatch($smsRecipients, $notification['body'], true);
                 $successCount++;
             } catch (\Exception $e) {
                 Log::error('Failed to send notification SMS: ' . $e->getMessage());
