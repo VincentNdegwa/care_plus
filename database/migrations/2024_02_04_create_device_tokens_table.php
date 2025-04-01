@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('token');
-            $table->enum('device_type', ['android', 'ios', 'web'])->default('android');
+            $table->string('device_type')->default('android');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

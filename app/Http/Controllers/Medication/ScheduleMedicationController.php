@@ -131,8 +131,22 @@ class ScheduleMedicationController extends Controller
 
             $data = $query->where('dose_time', '>=', $request->input('start_date'))
                 ->where('dose_time', '<=', $request->input('end_date'))
-                ->with("medication")
+                ->with([
+                    "medication", 
+                ])
                 ->get();
+
+            foreach ($data as $schedule) {
+                $snooze = $schedule->snoozes()
+                    ->where('status', '!=', 'Pending')
+                    ->first();
+
+                if(isset($snooze)) {
+                    $schedule->dose_time = $snooze->snooze_time;
+                }
+
+                unset($schedule->snoozes);
+            }
             $count = $data->count();
 
             return response()->json([
