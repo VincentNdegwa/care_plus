@@ -208,8 +208,8 @@ class FCMService
             ->toArray();
 
         if (empty($tokens)) {
-            Log::info("No active device tokens found for user: $userId");
-            return "No active device tokens found for user: $userId";
+            Log::info("No active device tokens found for user ID: $userId");
+            return false;
         }
 
         $successCount = 0;
