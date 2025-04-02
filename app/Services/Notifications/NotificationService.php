@@ -104,7 +104,9 @@ class NotificationService
 
         if (!empty($pushRecipients)) {
             $success = match ($notification['receiver']) {
-                'patient', 'doctor', 'caregiver' => $this->fcm->sendToUser($pushRecipients, $notification['title'], $notification['body'], $data),
+                'patient', 'doctor', 'caregiver' => collect($pushRecipients)->map(function($userId) use ($notification, $data) {
+                    return $this->fcm->sendToUser($userId, $notification['title'], $notification['body'], $data);
+                })->contains(true),
                 default => false
             };
             if ($success) $successCount++;
