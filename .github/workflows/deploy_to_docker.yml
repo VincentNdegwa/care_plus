@@ -35,7 +35,7 @@ jobs:
           docker compose up -d --build
 
           # Clean up old images
-          #docker image prune -f
+          docker image prune -f
 
           # Run migrations
           # docker compose exec care_plus-php-fpm-1 php artisan migrate --force
